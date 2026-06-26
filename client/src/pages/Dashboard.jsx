@@ -465,7 +465,7 @@ export default function Dashboard() {
 
   // Calcula o filtro CQL que deve ser repassado ao WMS (Manchas no Mapa)
   // Utiliza a mesma regra do WFS para garantir sincronia com os pinos
-  const wmsCqlFilter = React.useMemo(() => {
+  const wmsCqlFilter = useMemo(() => {
     let s, e;
     if (timezone === 'UTC') {
       s = `${date}T00:00:00Z`;
