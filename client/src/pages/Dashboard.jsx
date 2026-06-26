@@ -23,6 +23,12 @@ L.Icon.Default.mergeOptions({
   shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
 });
 
+// Coordenadas extremas de Goiás (Sudoeste, Nordeste) para enquadramento perfeito
+const GOIAS_BOUNDS = [
+  [-19.4990, -53.2500],
+  [-12.3950, -45.9060]
+];
+
 // Ícone SVG Customizado para permitir cor e tamanho dinâmicos
 const createPinIcon = (isSelected, isUC) => {
   let color = '#3b82f6'; // blue-500 padrão
@@ -64,12 +70,12 @@ function MapController({ selectedEvent, sortedEvents, goiasCenter, showUCs, setS
         map.flyTo([ev.lat, ev.lng], 10, { animate: true, duration: 1.2 });
       }
     } else {
-      map.flyTo(goiasCenter, 6, { animate: true, duration: 1.2 });
+      map.flyToBounds(GOIAS_BOUNDS, { duration: 1.2 });
     }
-  }, [selectedEvent, map, sortedEvents, goiasCenter]);
+  }, [selectedEvent, map, sortedEvents]);
 
   const handleReset = () => {
-    map.flyTo(goiasCenter, 6, { animate: true });
+    map.flyToBounds(GOIAS_BOUNDS, { duration: 1.5, padding: [10, 10] });
   };
 
   return (
@@ -406,8 +412,8 @@ export default function Dashboard() {
           </CardHeader>
           <CardContent className="p-0 flex-1 relative">
             <MapContainer 
-              center={[-15.8270, -49.8362]} 
-              zoom={6} 
+              bounds={GOIAS_BOUNDS}
+              boundsOptions={{ padding: [10, 10] }}
               scrollWheelZoom={true}
               className="w-full h-full z-0"
             >
