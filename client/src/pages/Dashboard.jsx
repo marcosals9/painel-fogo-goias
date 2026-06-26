@@ -505,6 +505,8 @@ export default function Dashboard() {
             <MapContainer 
               bounds={GOIAS_BOUNDS}
               boundsOptions={{ padding: [10, 10] }}
+              zoomSnap={0.1}
+              zoomDelta={0.5}
               scrollWheelZoom={true}
               className="w-full h-full z-0"
             >
