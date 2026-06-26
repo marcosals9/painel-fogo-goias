@@ -463,23 +463,6 @@ export default function Dashboard() {
     XLSX.writeFile(wb, `focos_calor_goias_${date}.xlsx`);
   };
 
-  // Calcula o filtro CQL que deve ser repassado ao WMS (Manchas no Mapa)
-  // Utiliza a mesma regra do WFS para garantir sincronia com os pinos
-  const wmsCqlFilter = useMemo(() => {
-    let s, e;
-    if (timezone === 'UTC') {
-      s = `${date}T00:00:00Z`;
-      e = `${date}T23:59:59Z`;
-    } else {
-      s = `${date}T03:00:00Z`;
-      const d = new Date(date);
-      d.setUTCDate(d.getUTCDate() + 1);
-      const nextDateStr = d.toISOString().split('T')[0];
-      e = `${nextDateStr}T02:59:59Z`;
-    }
-    return `BBOX(geom,-53.25,-19.49,-45.90,-12.39) AND dt_maxima >= '${s}' AND dt_minima <= '${e}'`;
-  }, [date, timezone]);
-
   return (
     <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
@@ -623,16 +606,6 @@ export default function Dashboard() {
                   }}
                 />
               )}
-              
-              {/* Manchas de Calor (Frente de Detecção - WMS) */}
-              <WMSTileLayer
-                url="https://panorama.sipam.gov.br/geoserver/painel_do_fogo/wms"
-                layers="painel_do_fogo:mv_frente_deteccao"
-                format="image/png"
-                transparent={true}
-                opacity={0.8}
-                zIndex={5} // Fica atrás dos pinos, mas acima da base
-              />
 
               {sortedEvents.map(event => (
                 <Marker 
