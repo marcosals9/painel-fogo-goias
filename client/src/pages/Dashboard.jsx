@@ -23,13 +23,13 @@ L.Icon.Default.mergeOptions({
   shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
 });
 
-// Ícone SVG Customizado (Pino Clássico)
+// Ícone SVG Customizado para permitir cor e tamanho dinâmicos
 const createPinIcon = (isSelected, isUC) => {
-  let color = '#f59e0b'; // amber-500 padrão para demais focos
-  if (isUC) color = '#ea580c'; // orange-600 tradicional para Unidades de Conservação
-  if (isSelected) color = '#dc2626'; // red-600 quando selecionado (destaque)
+  let color = '#3b82f6'; // blue-500 padrão
+  if (isUC) color = '#f59e0b'; // amber-500 para Unidades de Conservação (mesma cor da tabela)
+  if (isSelected) color = '#ef4444'; // red-500 quando selecionado (destaque máximo)
   
-  const scale = isSelected ? 1.0 : 0.75; // Pino selecionado fica em tamanho original (100%)
+  const scale = 0.75; // Reduz o tamanho do pino para 75% do original
   const width = 25 * scale;
   const height = 41 * scale;
   
@@ -39,7 +39,7 @@ const createPinIcon = (isSelected, isUC) => {
 
   return L.divIcon({
     html: svg,
-    className: `bg-transparent border-0 transition-transform duration-300 ${isSelected ? 'z-50' : ''}`, 
+    className: 'bg-transparent border-0', // Remove fundo branco padrão do divIcon
     iconSize: [width, height],
     iconAnchor: [width / 2, height],
     popupAnchor: [0, -(height - 5)]
@@ -478,7 +478,7 @@ export default function Dashboard() {
                       <p><span className="font-semibold">Detecções:</span> {event.qtd_deteccoes}</p>
                       <p><span className="font-semibold">Duração:</span> {event.duracao_h ? `${event.duracao_h} h` : 'N/A'}</p>
                       {event.ucText && event.ucText !== 'N/A' && (
-                         <p className="pt-1 mt-1 border-t border-muted/30 text-orange-600"><span className="font-bold">UC:</span> {event.ucText}</p>
+                         <p className="pt-1 mt-1 border-t border-muted/30 text-amber-600"><span className="font-bold">UC:</span> {event.ucText}</p>
                       )}
                     </div>
                   </Popup>
@@ -557,7 +557,7 @@ export default function Dashboard() {
                       <TableCell className="text-xs text-orange-600 font-bold">{event.qtd_deteccoes || 0}</TableCell>
                       <TableCell className="text-xs">{event.duracao_h ? `${event.duracao_h} h` : 'N/A'}</TableCell>
                       <TableCell className="font-medium text-[10px] leading-tight py-2" title={event.ucText !== 'N/A' ? event.ucText : ''}>
-                        {event.ucText !== 'N/A' ? <span className="text-orange-600 capitalize">{event.ucText.toLowerCase()}</span> : 'Não'}
+                        {event.ucText !== 'N/A' ? <span className="text-amber-600 capitalize">{event.ucText.toLowerCase()}</span> : 'Não'}
                       </TableCell>
                     </TableRow>
                   )) : (
