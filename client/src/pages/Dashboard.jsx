@@ -95,7 +95,13 @@ function MapController({ selectedEvent, sortedEvents, goiasCenter, showUCs, setS
 }
 
 export default function Dashboard() {
-  const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
+  const [date, setDate] = useState(() => {
+    const d = new Date();
+    d.setMinutes(d.getMinutes() - d.getTimezoneOffset());
+    return d.toISOString().split('T')[0];
+  });
+  
+  const [timezone, setTimezone] = useState('BRT');
   const [loading, setLoading] = useState(false);
   const [fireEvents, setFireEvents] = useState([]);
   const [selectedEvent, setSelectedEvent] = useState(null);
@@ -208,10 +214,23 @@ export default function Dashboard() {
   // Coordenadas centrais de Goiás
   const goiasCenter = [-15.8270, -49.8362];
 
-  const fetchFireData = async (selectedDate) => {
+  const fetchFireData = async (selectedDate, tz) => {
     setLoading(true);
     try {
       const wfsUrl = `https://panorama.sipam.gov.br/geoserver/painel_do_fogo/wfs`;
+      
+      let startFilter, endFilter;
+      if (tz === 'UTC') {
+        startFilter = `${selectedDate}T00:00:00Z`;
+        endFilter = `${selectedDate}T23:59:59Z`;
+      } else {
+        // BRT (UTC-3)
+        startFilter = `${selectedDate}T03:00:00Z`;
+        const d = new Date(selectedDate);
+        d.setUTCDate(d.getUTCDate() + 1);
+        const nextDateStr = d.toISOString().split('T')[0];
+        endFilter = `${nextDateStr}T02:59:59Z`;
+      }
       
       const response = await axios.get(wfsUrl, {
         params: {
@@ -221,7 +240,7 @@ export default function Dashboard() {
           typeName: 'painel_do_fogo:mv_evento_filtro',
           outputFormat: 'application/vnd.google-earth.kml+xml',
           maxFeatures: 300,
-          CQL_FILTER: `BBOX(geom,-53.25,-19.49,-45.90,-12.39) AND dt_maxima >= '${selectedDate}T00:00:00Z' AND dt_minima <= '${selectedDate}T23:59:59Z'`
+          CQL_FILTER: `BBOX(geom,-53.25,-19.49,-45.90,-12.39) AND dt_maxima >= '${startFilter}' AND dt_minima <= '${endFilter}'`
         }
       });
       
@@ -388,8 +407,8 @@ export default function Dashboard() {
   }, [fireEvents, ucGeoJSON, goiasGeoJSON]);
 
   useEffect(() => {
-    fetchFireData(date);
-  }, [date]);
+    fetchFireData(date, timezone);
+  }, [date, timezone]);
 
   useEffect(() => {
     if (refreshInterval > 0) {
@@ -444,16 +463,28 @@ export default function Dashboard() {
                 <option value={30}>A cada 30 min</option>
               </select>
           </div>
+           <div className="relative flex items-center bg-card border rounded-md shadow-sm hover:border-primary/50 transition-colors">
+             <select 
+                value={timezone}
+                onChange={(e) => setTimezone(e.target.value)}
+                className="h-10 px-3 text-sm bg-transparent border-none focus:outline-none focus:ring-0 cursor-pointer text-muted-foreground font-medium appearance-none"
+                title="Fuso Horário"
+              >
+                <option value="BRT">BRT (-3)</option>
+                <option value="UTC">UTC (0)</option>
+              </select>
+          </div>
+          
           <Input 
             type="date" 
             value={date} 
             onChange={(e) => setDate(e.target.value)}
-            className="w-auto min-w-[150px] bg-card shadow-sm cursor-pointer"
+            className="w-auto min-w-[140px] bg-card shadow-sm cursor-pointer"
           />
           <Button 
             variant="default" 
             size="icon" 
-            onClick={() => fetchFireData(date)} 
+            onClick={() => fetchFireData(date, timezone)} 
             disabled={loading} 
             className="shadow-sm flex items-center justify-center p-0"
             title="Sincronizar/Buscar dados atualizados no satélite do CENSIPAM"
