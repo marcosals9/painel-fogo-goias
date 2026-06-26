@@ -23,18 +23,18 @@ L.Icon.Default.mergeOptions({
   shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
 });
 
-// Ícone SVG Customizado de Fogo
+// Ícone SVG Customizado (Pino Clássico)
 const createPinIcon = (isSelected, isUC) => {
-  let color = '#ea580c'; // orange-600 padrão
-  if (isUC) color = '#f59e0b'; // amber-500 para Unidades de Conservação
-  if (isSelected) color = '#dc2626'; // red-600 quando selecionado (fogo intenso)
+  let color = '#f59e0b'; // amber-500 padrão para demais focos
+  if (isUC) color = '#ea580c'; // orange-600 tradicional para Unidades de Conservação
+  if (isSelected) color = '#dc2626'; // red-600 quando selecionado (destaque)
   
-  const scale = isSelected ? 1.4 : 1.1; 
-  const width = 24 * scale;
-  const height = 24 * scale;
+  const scale = isSelected ? 1.0 : 0.75; // Pino selecionado fica em tamanho original (100%)
+  const width = 25 * scale;
+  const height = 41 * scale;
   
-  const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="${width}" height="${height}" fill="${color}" stroke="#ffffff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="filter: drop-shadow(1px 2px 2px rgba(0,0,0,0.5));">
-    <path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/>
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 36" width="${width}" height="${height}" style="filter: drop-shadow(1px 2px 2px rgba(0,0,0,0.4));">
+    <path fill="${color}" stroke="#ffffff" stroke-width="1.5" d="M12 0C5.373 0 0 5.373 0 12c0 7.333 12 24 12 24s12-16.667 12-24C24 5.373 18.627 0 12 0zm0 17.5c-3.038 0-5.5-2.462-5.5-5.5S8.962 6.5 12 6.5s5.5 2.462 5.5 5.5-2.462 5.5-5.5 5.5z"/>
   </svg>`;
 
   return L.divIcon({
@@ -42,7 +42,7 @@ const createPinIcon = (isSelected, isUC) => {
     className: `bg-transparent border-0 transition-transform duration-300 ${isSelected ? 'z-50' : ''}`, 
     iconSize: [width, height],
     iconAnchor: [width / 2, height],
-    popupAnchor: [0, -height]
+    popupAnchor: [0, -(height - 5)]
   });
 };
 
@@ -478,7 +478,7 @@ export default function Dashboard() {
                       <p><span className="font-semibold">Detecções:</span> {event.qtd_deteccoes}</p>
                       <p><span className="font-semibold">Duração:</span> {event.duracao_h ? `${event.duracao_h} h` : 'N/A'}</p>
                       {event.ucText && event.ucText !== 'N/A' && (
-                         <p className="pt-1 mt-1 border-t border-muted/30 text-amber-600"><span className="font-bold">UC:</span> {event.ucText}</p>
+                         <p className="pt-1 mt-1 border-t border-muted/30 text-orange-600"><span className="font-bold">UC:</span> {event.ucText}</p>
                       )}
                     </div>
                   </Popup>
@@ -557,7 +557,7 @@ export default function Dashboard() {
                       <TableCell className="text-xs text-orange-600 font-bold">{event.qtd_deteccoes || 0}</TableCell>
                       <TableCell className="text-xs">{event.duracao_h ? `${event.duracao_h} h` : 'N/A'}</TableCell>
                       <TableCell className="font-medium text-[10px] leading-tight py-2" title={event.ucText !== 'N/A' ? event.ucText : ''}>
-                        {event.ucText !== 'N/A' ? <span className="text-amber-600 capitalize">{event.ucText.toLowerCase()}</span> : 'Não'}
+                        {event.ucText !== 'N/A' ? <span className="text-orange-600 capitalize">{event.ucText.toLowerCase()}</span> : 'Não'}
                       </TableCell>
                     </TableRow>
                   )) : (
