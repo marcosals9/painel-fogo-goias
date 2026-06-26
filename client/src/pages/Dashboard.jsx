@@ -622,7 +622,6 @@ export default function Dashboard() {
                     layer.bindPopup(`<strong>${nome}</strong><br/><span class="text-xs opacity-80">${tipo}</span>`);
                   }}
                 />
-                />
               )}
               
               {/* Manchas de Calor (Frente de Detecção - WMS) */}
