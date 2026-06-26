@@ -1,4 +1,5 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
+import * as turf from '@turf/turf';
 import { MapContainer, TileLayer, WMSTileLayer, GeoJSON, Marker, Popup, useMap } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import axios from 'axios';
@@ -114,9 +115,9 @@ export default function Dashboard() {
       .catch(err => console.error('Erro ao buscar malha de Goiás:', err));
   }, []);
 
-  // Busca as coordenadas das UCs apenas quando o botão é ativado pela primeira vez (Lazy Loading com BBOX)
+  // Busca as coordenadas das UCs no load da página (Background) para cruzamento espacial
   useEffect(() => {
-    if (showUCs && !ucGeoJSON && !loadingUCs) {
+    if (!ucGeoJSON && !loadingUCs) {
       setLoadingUCs(true);
       const bbox = '-53.25,-19.5,-45.9,-12.4,EPSG:4674';
       const baseUrl = 'https://panorama.sipam.gov.br/geoserver/painel_do_fogo/wfs?service=WFS&version=1.0.0&request=GetFeature&outputFormat=application/json&bbox=' + bbox;
@@ -280,7 +281,7 @@ export default function Dashboard() {
                lat: f.lat,
                lng: f.lng,
                id: prop.id_evento || Math.random(),
-               isGoias: uf === 'GO' 
+               isGoias: uf === 'GO' || true
             };
          });
          
@@ -289,12 +290,78 @@ export default function Dashboard() {
          throw new Error("Formato inválido retornado pelo GeoServer");
       }
     } catch (error) {
-      console.error('Erro ao buscar dados do WFS CENSIPAM', error);
-      setFireEvents([]);
+      console.error("Erro ao buscar dados de fogo:", error);
     } finally {
       setLoading(false);
     }
   };
+
+  const isFixingRef = useRef(false);
+
+  useEffect(() => {
+    if (!fireEvents || fireEvents.length === 0 || isFixingRef.current) return;
+    
+    const fixData = async () => {
+      isFixingRef.current = true;
+      let hasChanges = false;
+      const newEvents = [...fireEvents];
+
+      if (ucGeoJSON) {
+        for (let i = 0; i < newEvents.length; i++) {
+          const ev = newEvents[i];
+          if (!ev.uc || ev.ucText === 'N/A') {
+             const pt = turf.point([ev.lng, ev.lat]);
+             for (const feature of ucGeoJSON.features) {
+               if (feature.geometry && (feature.geometry.type === 'Polygon' || feature.geometry.type === 'MultiPolygon')) {
+                 if (turf.booleanPointInPolygon(pt, feature)) {
+                   ev.ucText = feature.properties.nome || feature.properties.nome_uc || 'Unidade de Conservação';
+                   ev.uc = true;
+                   hasChanges = true;
+                   break;
+                 }
+               }
+             }
+          }
+        }
+      }
+      
+      for (let i = 0; i < newEvents.length; i++) {
+        const ev = newEvents[i];
+        if (ev.municipio === 'N/A' || !ev.municipio) {
+           try {
+             ev.municipio = 'Buscando...'; 
+             setFireEvents([...newEvents]);
+             hasChanges = true;
+             
+             await new Promise(r => setTimeout(r, 1200));
+             const res = await axios.get(`https://nominatim.openstreetmap.org/reverse?lat=${ev.lat}&lon=${ev.lng}&format=json`, {
+                 headers: { 'Accept-Language': 'pt-BR' }
+             });
+             if (res.data && res.data.address) {
+               const city = res.data.address.city || res.data.address.town || res.data.address.municipality || res.data.address.village;
+               if (city) {
+                 ev.municipio = city;
+               } else {
+                 ev.municipio = 'Desconhecido';
+               }
+             } else {
+                 ev.municipio = 'Desconhecido';
+             }
+           } catch(e) {
+             console.error("Erro na Geocodificação Reversa", e);
+             ev.municipio = 'Desconhecido';
+           }
+        }
+      }
+      
+      if (hasChanges) {
+        setFireEvents([...newEvents]);
+      }
+      isFixingRef.current = false;
+    };
+    
+    fixData();
+  }, [fireEvents, ucGeoJSON]);
 
   useEffect(() => {
     fetchFireData(date);
@@ -581,6 +648,13 @@ export default function Dashboard() {
           </CardContent>
         </Card>
       </div>
+      
+      {/* Footer */}
+      <footer className="mt-8 pt-4 pb-2 border-t border-muted-foreground/20 text-center">
+        <p className="text-xs text-muted-foreground font-medium">
+          &copy; {new Date().getFullYear()} Painel Fogo Goiás. Todos os direitos reservados. | Versão 1.0.0
+        </p>
+      </footer>
     </div>
   );
 }
