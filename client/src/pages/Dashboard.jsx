@@ -281,7 +281,7 @@ export default function Dashboard() {
                lat: f.lat,
                lng: f.lng,
                id: prop.id_evento || Math.random(),
-               isGoias: uf === 'GO' || true
+               isGoias: uf === 'GO' || uf === 'N/A' // N/A passará pelo crivo do Turf.js a seguir
             };
          });
          
@@ -306,7 +306,29 @@ export default function Dashboard() {
       let hasChanges = false;
       const newEvents = [...fireEvents];
 
-      if (ucGeoJSON) {
+      // 1. Filtragem Exata de Limites Estaduais (Goiás)
+      if (goiasGeoJSON && goiasGeoJSON.features) {
+        for (let i = 0; i < newEvents.length; i++) {
+          const ev = newEvents[i];
+          const pt = turf.point([ev.lng, ev.lat]);
+          let insideGoias = false;
+          for (const feature of goiasGeoJSON.features) {
+            if (feature.geometry && (feature.geometry.type === 'Polygon' || feature.geometry.type === 'MultiPolygon')) {
+              if (turf.booleanPointInPolygon(pt, feature)) {
+                insideGoias = true;
+                break;
+              }
+            }
+          }
+          if (ev.isGoias !== insideGoias) {
+            ev.isGoias = insideGoias;
+            hasChanges = true;
+          }
+        }
+      }
+
+      // 2. Cruzamento Espacial UCs (Correção Local via Turf.js)
+      if (ucGeoJSON && ucGeoJSON.features) {
         for (let i = 0; i < newEvents.length; i++) {
           const ev = newEvents[i];
           if (!ev.uc || ev.ucText === 'N/A') {
@@ -325,9 +347,11 @@ export default function Dashboard() {
         }
       }
       
+      // 3. Geocodificação Reversa para Municípios N/A
       for (let i = 0; i < newEvents.length; i++) {
         const ev = newEvents[i];
-        if (ev.municipio === 'N/A' || !ev.municipio) {
+        // Só busca município se o evento realmente pertencer a Goiás
+        if (ev.isGoias && (ev.municipio === 'N/A' || !ev.municipio)) {
            try {
              ev.municipio = 'Buscando...'; 
              setFireEvents([...newEvents]);
@@ -361,7 +385,7 @@ export default function Dashboard() {
     };
     
     fixData();
-  }, [fireEvents, ucGeoJSON]);
+  }, [fireEvents, ucGeoJSON, goiasGeoJSON]);
 
   useEffect(() => {
     fetchFireData(date);
