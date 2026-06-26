@@ -627,12 +627,11 @@ export default function Dashboard() {
               {/* Manchas de Calor (Frente de Detecção - WMS) */}
               <WMSTileLayer
                 url="https://panorama.sipam.gov.br/geoserver/painel_do_fogo/wms"
-                layers="painel_do_fogo:mv_frente_fogo"
+                layers="painel_do_fogo:mv_frente_deteccao"
                 format="image/png"
                 transparent={true}
                 opacity={0.8}
                 zIndex={5} // Fica atrás dos pinos, mas acima da base
-                params={{ cql_filter: wmsCqlFilter }}
               />
 
               {sortedEvents.map(event => (
