@@ -607,6 +607,15 @@ export default function Dashboard() {
                 />
               )}
 
+              {/* Foguinhos Nativos do CENSIPAM (focos_ativos) */}
+              <WMSTileLayer
+                url="https://panorama.sipam.gov.br/geoserver/painel_do_fogo/wms"
+                layers="painel_do_fogo:focos_ativos"
+                format="image/png"
+                transparent={true}
+                zIndex={10}
+              />
+
               {sortedEvents.map(event => (
                 <Marker 
                   key={event.id} 
