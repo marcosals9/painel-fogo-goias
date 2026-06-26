@@ -420,11 +420,28 @@ export default function Dashboard() {
               {showUCs && ucGeoJSON && (
                 <GeoJSON 
                   data={ucGeoJSON} 
-                  style={{
-                    color: '#f59e0b', // amber-500 combinando com o botão
-                    weight: 2,
-                    fillOpacity: 0.2,
-                    fillColor: '#f59e0b'
+                  style={(feature) => {
+                    const level = (feature.properties.esfera || feature.properties.administra || '').toLowerCase();
+                    let fillColor = '#22c55e'; // green-500 default
+                    let color = '#15803d'; // green-700 default border
+                    
+                    if (level.includes('federal')) {
+                      fillColor = '#14532d'; // green-900 (Federal - Mais escuro/intenso)
+                      color = '#052e16'; // green-950
+                    } else if (level.includes('estadual')) {
+                      fillColor = '#22c55e'; // green-500 (Estadual - Médio)
+                      color = '#15803d'; // green-700
+                    } else if (level.includes('municipal')) {
+                      fillColor = '#86efac'; // green-300 (Municipal - Mais claro)
+                      color = '#22c55e'; // green-500
+                    }
+
+                    return {
+                      color: color,
+                      weight: 1,
+                      fillOpacity: 0.35,
+                      fillColor: fillColor
+                    };
                   }}
                   onEachFeature={(feature, layer) => {
                     const nome = feature.properties.nome || feature.properties.nome_uc || 'Unidade de Conservação';
