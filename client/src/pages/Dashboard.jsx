@@ -436,7 +436,7 @@ export default function Dashboard() {
                   data={goiasGeoJSON} 
                   style={{
                     color: '#3b82f6',
-                    weight: 3,
+                    weight: 1.5,
                     fillOpacity: 0.05,
                     fillColor: '#3b82f6'
                   }} 
