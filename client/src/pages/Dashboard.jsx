@@ -474,6 +474,7 @@ export default function Dashboard() {
                   <Popup>
                     <div className="text-sm font-sans space-y-1">
                       <p className="font-bold text-base border-b pb-1 mb-1">{event.municipio}</p>
+                      <p className="text-[11px] text-muted-foreground mb-1"><span className="font-semibold">Coord:</span> {Number(event.lat).toFixed(5)}, {Number(event.lng).toFixed(5)}</p>
                       <p><span className="font-semibold">Tamanho:</span> {event.tamanho_ha ? `${event.tamanho_ha} ha` : 'N/A'}</p>
                       <p><span className="font-semibold">Detecções:</span> {event.qtd_deteccoes}</p>
                       <p><span className="font-semibold">Duração:</span> {event.duracao_h ? `${event.duracao_h} h` : 'N/A'}</p>
