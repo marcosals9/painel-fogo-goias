@@ -54,7 +54,7 @@ let DefaultIcon = L.icon({
 });
 L.Marker.prototype.options.icon = DefaultIcon;
 
-function MapController({ selectedEvent, sortedEvents, goiasCenter, showUCs, setShowUCs }) {
+function MapController({ selectedEvent, sortedEvents, goiasCenter, showUCs, setShowUCs, loadingUCs }) {
   const map = useMap();
   
   useEffect(() => {
@@ -78,7 +78,7 @@ function MapController({ selectedEvent, sortedEvents, goiasCenter, showUCs, setS
         <LocateFixed className="w-4 h-4 text-foreground" />
       </Button>
       <Button variant={showUCs ? "default" : "outline"} size="icon" onClick={() => setShowUCs(!showUCs)} title={showUCs ? "Ocultar Unidades de Conservação" : "Mostrar Unidades de Conservação"} className={`h-9 w-9 flex items-center justify-center p-0 shadow-md border ${!showUCs ? 'bg-background/95 backdrop-blur-sm border-muted-foreground/20 hover:bg-accent' : ''}`}>
-        <Trees className={`w-4 h-4 ${showUCs ? 'text-white' : 'text-foreground'}`} />
+        {loadingUCs ? <Loader2 className="w-4 h-4 animate-spin text-muted-foreground" /> : <Trees className={`w-4 h-4 ${showUCs ? 'text-white' : 'text-foreground'}`} />}
       </Button>
       <div title="Dica: Segure SHIFT e arraste o mouse no mapa para dar zoom em uma área específica" className="bg-background/95 backdrop-blur-sm text-foreground border border-muted-foreground/20 rounded-md shadow-md cursor-help flex items-center justify-center h-9 w-9">
         <MousePointerSquareDashed className="w-4 h-4" />
@@ -93,7 +93,9 @@ export default function Dashboard() {
   const [fireEvents, setFireEvents] = useState([]);
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [refreshInterval, setRefreshInterval] = useState(0);
-  const [showUCs, setShowUCs] = useState(true);
+  const [showUCs, setShowUCs] = useState(false); // Inicia oculto a pedido do usuário
+  const [loadingUCs, setLoadingUCs] = useState(false);
+  const [ucGeoJSON, setUcGeoJSON] = useState(null);
   const [goiasGeoJSON, setGoiasGeoJSON] = useState(null);
 
   const [sortConfig, setSortConfig] = useState({ key: 'tamanho_ha', direction: 'desc' });
@@ -105,6 +107,33 @@ export default function Dashboard() {
       .then(data => setGoiasGeoJSON(data))
       .catch(err => console.error('Erro ao buscar malha de Goiás:', err));
   }, []);
+
+  // Busca as coordenadas das UCs apenas quando o botão é ativado pela primeira vez (Lazy Loading com BBOX)
+  useEffect(() => {
+    if (showUCs && !ucGeoJSON && !loadingUCs) {
+      setLoadingUCs(true);
+      const bbox = '-53.25,-19.5,-45.9,-12.4,EPSG:4674';
+      const baseUrl = 'https://panorama.sipam.gov.br/geoserver/painel_do_fogo/wfs?service=WFS&version=1.0.0&request=GetFeature&outputFormat=application/json&bbox=' + bbox;
+      
+      const req1 = axios.get(`${baseUrl}&typeName=painel_do_fogo:icmbio_unidade_conservacao_federal`);
+      const req2 = axios.get(`${baseUrl}&typeName=painel_do_fogo:mma_cnuc_unidade_conservacao`);
+      const req3 = axios.get(`${baseUrl}&typeName=painel_do_fogo:mma_cnuc_unidade_conservacao_municipal`);
+      
+      Promise.allSettled([req1, req2, req3]).then(results => {
+        let features = [];
+        results.forEach(res => {
+          if (res.status === 'fulfilled' && res.value.data && res.value.data.features) {
+            features = [...features, ...res.value.data.features];
+          }
+        });
+        setUcGeoJSON({ type: "FeatureCollection", features });
+      }).catch(err => {
+        console.error("Erro ao buscar UCs em vetor", err);
+      }).finally(() => {
+        setLoadingUCs(false);
+      });
+    }
+  }, [showUCs, ucGeoJSON, loadingUCs]);
 
   const sortedEvents = useMemo(() => {
     let sortableItems = fireEvents.filter(e => e.isGoias !== false);
@@ -387,13 +416,21 @@ export default function Dashboard() {
                 url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
               />
               
-              {showUCs && (
-                <WMSTileLayer
-                  url="https://panorama.sipam.gov.br/geoserver/painel_do_fogo/wms"
-                  layers="painel_do_fogo:icmbio_unidade_conservacao_federal,painel_do_fogo:mma_cnuc_unidade_conservacao,painel_do_fogo:mma_cnuc_unidade_conservacao_municipal"
-                  format="image/png"
-                  transparent={true}
-                  zIndex={5}
+              {/* Vetores Interativos de UCs do CENSIPAM (Lazy Loaded) */}
+              {showUCs && ucGeoJSON && (
+                <GeoJSON 
+                  data={ucGeoJSON} 
+                  style={{
+                    color: '#f59e0b', // amber-500 combinando com o botão
+                    weight: 2,
+                    fillOpacity: 0.2,
+                    fillColor: '#f59e0b'
+                  }}
+                  onEachFeature={(feature, layer) => {
+                    const nome = feature.properties.nome || feature.properties.nome_uc || 'Unidade de Conservação';
+                    const tipo = feature.properties.esfera || feature.properties.administra || '';
+                    layer.bindPopup(`<strong>${nome}</strong><br/><span class="text-xs opacity-80">${tipo}</span>`);
+                  }}
                 />
               )}
             <WMSTileLayer
@@ -443,7 +480,7 @@ export default function Dashboard() {
                 />
               )}
 
-              <MapController selectedEvent={selectedEvent} sortedEvents={sortedEvents} goiasCenter={goiasCenter} showUCs={showUCs} setShowUCs={setShowUCs} />
+              <MapController selectedEvent={selectedEvent} sortedEvents={sortedEvents} goiasCenter={goiasCenter} showUCs={showUCs} setShowUCs={setShowUCs} loadingUCs={loadingUCs} />
             </MapContainer>
           </CardContent>
         </Card>
