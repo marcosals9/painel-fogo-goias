@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { format, subDays, startOfDay, endOfDay } from 'date-fns';
-import { Download, Flame, Map as MapIcon, Loader2, ArrowUpDown, RefreshCw, MousePointerSquareDashed, LocateFixed, Timer } from 'lucide-react';
+import { Download, Flame, Map as MapIcon, Loader2, ArrowUpDown, RefreshCw, MousePointerSquareDashed, LocateFixed, Timer, Trees } from 'lucide-react';
 
 // Fix for Leaflet icon in React
 import L from 'leaflet';
@@ -54,7 +54,7 @@ let DefaultIcon = L.icon({
 });
 L.Marker.prototype.options.icon = DefaultIcon;
 
-function MapController({ selectedEvent, sortedEvents, goiasCenter }) {
+function MapController({ selectedEvent, sortedEvents, goiasCenter, showUCs, setShowUCs }) {
   const map = useMap();
   
   useEffect(() => {
@@ -74,8 +74,11 @@ function MapController({ selectedEvent, sortedEvents, goiasCenter }) {
 
   return (
     <div className="leaflet-top leaflet-right mt-2 mr-2 z-[1000] absolute pointer-events-auto flex flex-col gap-2">
-      <Button variant="outline" size="icon" onClick={handleReset} title="Recentralizar Mapa" className="bg-background/95 backdrop-blur-sm shadow-md border-muted-foreground/20 h-9 w-9 flex items-center justify-center p-0 hover:bg-accent">
+      <Button variant="outline" size="icon" onClick={handleReset} title="Centralizar Mapa em Goiás" className="h-9 w-9 bg-background/95 backdrop-blur-sm shadow-md border-muted-foreground/20 hover:bg-accent flex items-center justify-center p-0">
         <LocateFixed className="w-4 h-4 text-foreground" />
+      </Button>
+      <Button variant={showUCs ? "default" : "outline"} size="icon" onClick={() => setShowUCs(!showUCs)} title={showUCs ? "Ocultar Unidades de Conservação" : "Mostrar Unidades de Conservação"} className={`h-9 w-9 flex items-center justify-center p-0 shadow-md border ${!showUCs ? 'bg-background/95 backdrop-blur-sm border-muted-foreground/20 hover:bg-accent' : ''}`}>
+        <Trees className={`w-4 h-4 ${showUCs ? 'text-white' : 'text-foreground'}`} />
       </Button>
       <div title="Dica: Segure SHIFT e arraste o mouse no mapa para dar zoom em uma área específica" className="bg-background/95 backdrop-blur-sm text-foreground border border-muted-foreground/20 rounded-md shadow-md cursor-help flex items-center justify-center h-9 w-9">
         <MousePointerSquareDashed className="w-4 h-4" />
@@ -85,14 +88,23 @@ function MapController({ selectedEvent, sortedEvents, goiasCenter }) {
 }
 
 export default function Dashboard() {
-  const [date, setDate] = useState(format(new Date(), 'yyyy-MM-dd'));
+  const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
   const [loading, setLoading] = useState(false);
   const [fireEvents, setFireEvents] = useState([]);
-  const [geoData, setGeoData] = useState(null);
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [refreshInterval, setRefreshInterval] = useState(0);
+  const [showUCs, setShowUCs] = useState(true);
+  const [goiasGeoJSON, setGoiasGeoJSON] = useState(null);
 
   const [sortConfig, setSortConfig] = useState({ key: 'tamanho_ha', direction: 'desc' });
+
+  // Busca o contorno do Estado de Goiás do IBGE ao iniciar
+  useEffect(() => {
+    fetch('https://servicodados.ibge.gov.br/api/v3/malhas/estados/52?formato=application/vnd.geo+json')
+      .then(res => res.json())
+      .then(data => setGoiasGeoJSON(data))
+      .catch(err => console.error('Erro ao buscar malha de Goiás:', err));
+  }, []);
 
   const sortedEvents = useMemo(() => {
     let sortableItems = fireEvents.filter(e => e.isGoias !== false);
@@ -136,7 +148,6 @@ export default function Dashboard() {
        const selectedEvObj = sortedEvents.find(e => e.id === selectedEvent);
        if (selectedEvObj && selectedEvObj.municipio && selectedEvObj.municipio !== 'Buscando...') {
           eventsToCount = sortedEvents.filter(e => e.municipio === selectedEvObj.municipio);
-          // Usamos split para abreviar nomes muito longos se necessário, mas o tailwind cuida disso com truncate
           label = `Focos em ${selectedEvObj.municipio}`;
        } else {
           label = "Foco Selecionado";
@@ -164,11 +175,6 @@ export default function Dashboard() {
   const fetchFireData = async (selectedDate) => {
     setLoading(true);
     try {
-      // Exemplo de URL WFS para buscar dados em GeoJSON do CENSIPAM
-      // Nota: A camada específica precisa ser validada (ex: painel_do_fogo:focos_calor_ativos)
-      // Como não temos a documentação exata dos nomes das propriedades no GeoJSON do CENSIPAM,
-      // usaremos um mock representativo caso a chamada falhe por CORS ou parâmetros.
-      
       const wfsUrl = `https://panorama.sipam.gov.br/geoserver/painel_do_fogo/wfs`;
       
       const response = await axios.get(wfsUrl, {
@@ -197,7 +203,6 @@ export default function Dashboard() {
                  const name = simpleData[j].getAttribute("name");
                  let value = simpleData[j].textContent;
                  
-                 // Limpeza de erros do servidor CENSIPAM (ponteiros Java)
                  if (value && value.includes('[Ljava.lang.')) {
                      value = null;
                  } else {
@@ -240,7 +245,7 @@ export default function Dashboard() {
                lat: f.lat,
                lng: f.lng,
                id: prop.id_evento || Math.random(),
-               isGoias: uf === 'GO' // Filtro exato com base no KML
+               isGoias: uf === 'GO' 
             };
          });
          
@@ -251,7 +256,6 @@ export default function Dashboard() {
     } catch (error) {
       console.error('Erro ao buscar dados do WFS CENSIPAM', error);
       setFireEvents([]);
-      setGeoData(null);
     } finally {
       setLoading(false);
     }
@@ -271,7 +275,6 @@ export default function Dashboard() {
   }, [refreshInterval, date]);
 
   const exportToExcel = () => {
-    // Usamos sortedEvents pois já estão filtrados para Goiás e ordenados
     const exportData = sortedEvents.map(event => ({
       "Município": event.municipio,
       "UF": event.uf,
@@ -334,7 +337,6 @@ export default function Dashboard() {
         </div>
       </div>
 
-      {/* Cards de Métricas */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <Card className="shadow-sm border-l-4 border-l-primary">
           <CardContent className="p-4 flex flex-col justify-center">
@@ -366,7 +368,6 @@ export default function Dashboard() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* MAPA */}
         <Card className="lg:col-span-2 overflow-hidden flex flex-col h-[600px] border-t-4 border-t-primary shadow-lg">
           <CardHeader className="py-3 px-4 bg-muted/30">
             <CardTitle className="text-lg flex justify-between items-center">
@@ -376,25 +377,25 @@ export default function Dashboard() {
           </CardHeader>
           <CardContent className="p-0 flex-1 relative">
             <MapContainer 
-              center={[-15.8270, -49.8362]} // Centro geográfico de Goiás
+              center={[-15.8270, -49.8362]} 
               zoom={6} 
               scrollWheelZoom={true}
               className="w-full h-full z-0"
             >
-              
               <TileLayer
                 attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
                 url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
               />
               
-              {/* Camadas WMS Oficiais do CENSIPAM */}
-              <WMSTileLayer
-              url="https://panorama.sipam.gov.br/geoserver/painel_do_fogo/wms"
-              layers="painel_do_fogo:icmbio_unidade_conservacao_federal,painel_do_fogo:mma_cnuc_unidade_conservacao,painel_do_fogo:mma_cnuc_unidade_conservacao_municipal"
-              format="image/png"
-              transparent={true}
-              zIndex={5}
-            />
+              {showUCs && (
+                <WMSTileLayer
+                  url="https://panorama.sipam.gov.br/geoserver/painel_do_fogo/wms"
+                  layers="painel_do_fogo:icmbio_unidade_conservacao_federal,painel_do_fogo:mma_cnuc_unidade_conservacao,painel_do_fogo:mma_cnuc_unidade_conservacao_municipal"
+                  format="image/png"
+                  transparent={true}
+                  zIndex={5}
+                />
+              )}
             <WMSTileLayer
               url="https://panorama.sipam.gov.br/geoserver/painel_do_fogo/wms"
               layers="painel_do_fogo:focos_ativos"
@@ -410,7 +411,6 @@ export default function Dashboard() {
                 opacity={0.8}
               />
 
-              {/* Marcadores Interativos para os Focos Selecionados e Visíveis */}
               {sortedEvents.map(event => (
                 <Marker 
                   key={event.id} 
@@ -431,12 +431,23 @@ export default function Dashboard() {
                 </Marker>
               ))}
 
-              <MapController selectedEvent={selectedEvent} sortedEvents={sortedEvents} goiasCenter={goiasCenter} />
+              {goiasGeoJSON && (
+                <GeoJSON 
+                  data={goiasGeoJSON} 
+                  style={{
+                    color: '#3b82f6',
+                    weight: 3,
+                    fillOpacity: 0.05,
+                    fillColor: '#3b82f6'
+                  }} 
+                />
+              )}
+
+              <MapController selectedEvent={selectedEvent} sortedEvents={sortedEvents} goiasCenter={goiasCenter} showUCs={showUCs} setShowUCs={setShowUCs} />
             </MapContainer>
           </CardContent>
         </Card>
 
-        {/* TABELA E EXPORTAÇÃO */}
         <Card className="flex flex-col h-[600px] shadow-lg">
           <CardHeader className="py-3 px-4 bg-muted/30 flex flex-row justify-between items-center">
             <CardTitle className="text-lg">Dados do Evento</CardTitle>
