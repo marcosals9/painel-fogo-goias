@@ -30,18 +30,31 @@ const GOIAS_BOUNDS = [
   [-12.3950, -45.9060]
 ];
 
-// Ícone SVG Customizado para permitir cor e tamanho dinâmicos
-const createPinIcon = (isSelected, isUC) => {
-  let color = '#3b82f6'; // blue-500 padrão
-  if (isUC) color = '#f59e0b'; // amber-500 para Unidades de Conservação (mesma cor da tabela)
-  if (isSelected) color = '#ef4444'; // red-500 quando selecionado (destaque máximo)
+const getEventColorHex = (ageHours) => {
+  if (ageHours === null || ageHours === undefined) return '#737373'; // Default Cinza
+  if (ageHours <= 3) return '#8B0000'; // Dark Red
+  if (ageHours <= 6) return '#DC2626'; // Red
+  if (ageHours <= 12) return '#F97316'; // Orange
+  if (ageHours <= 24) return '#F59E0B'; // Amber
+  return '#737373'; // Grey
+};
+
+// Ícone SVG Customizado para permitir cor dinâmica e marcador de UC
+const createPinIcon = (isSelected, isUC, ageHours) => {
+  const color = getEventColorHex(ageHours);
   
-  const scale = 0.75; // Reduz o tamanho do pino para 75% do original
+  const scale = 0.75; 
   const width = 25 * scale;
   const height = 41 * scale;
   
-  const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 36" width="${width}" height="${height}" style="filter: drop-shadow(1px 2px 2px rgba(0,0,0,0.4));">
-    <path fill="${color}" stroke="#ffffff" stroke-width="1.5" d="M12 0C5.373 0 0 5.373 0 12c0 7.333 12 24 12 24s12-16.667 12-24C24 5.373 18.627 0 12 0zm0 17.5c-3.038 0-5.5-2.462-5.5-5.5S8.962 6.5 12 6.5s5.5 2.462 5.5 5.5-2.462 5.5-5.5 5.5z"/>
+  // Destaque visual: borda branca mais grossa se selecionado. Se for UC, coloca um ponto branco no meio.
+  const strokeColor = isSelected ? '#ffffff' : (isUC ? '#1f2937' : '#ffffff');
+  const strokeWidth = isSelected ? '2.5' : (isUC ? '2.0' : '1.5');
+  const innerDot = isUC ? `<circle cx="12" cy="12" r="5" fill="#ffffff" opacity="1.0" />` : '';
+  
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 36" width="${width}" height="${height}" style="filter: drop-shadow(1px 2px 2px rgba(0,0,0,0.5));">
+    <path fill="${color}" stroke="${strokeColor}" stroke-width="${strokeWidth}" d="M12 0C5.373 0 0 5.373 0 12c0 7.333 12 24 12 24s12-16.667 12-24C24 5.373 18.627 0 12 0zm0 17.5c-3.038 0-5.5-2.462-5.5-5.5S8.962 6.5 12 6.5s5.5 2.462 5.5 5.5-2.462 5.5-5.5 5.5z"/>
+    ${innerDot}
   </svg>`;
 
   return L.divIcon({
@@ -289,6 +302,17 @@ export default function Dashboard() {
             const uf = prop.sigla_uf || 'N/A';
             const mun = prop.nome_municipio || 'N/A';
             
+            // Calcula a idade do foco de calor
+            let ageHours = null;
+            if (prop.dt_maxima) {
+                const dt = new Date(prop.dt_maxima);
+                const todayStr = new Date().toISOString().split('T')[0];
+                const referenceTime = date === todayStr ? Date.now() : new Date(endFilter).getTime();
+                if (!isNaN(dt.getTime())) {
+                    ageHours = (referenceTime - dt.getTime()) / (1000 * 60 * 60);
+                }
+            }
+            
             return {
                municipio: mun,
                uf: uf,
@@ -299,6 +323,8 @@ export default function Dashboard() {
                ucText: prop.nome_unidade_conservacao || 'N/A',
                lat: f.lat,
                lng: f.lng,
+               dt_maxima: prop.dt_maxima,
+               ageHours: ageHours,
                id: prop.id_evento || Math.random(),
                isGoias: uf === 'GO' || uf === 'N/A' // N/A passará pelo crivo do Turf.js a seguir
             };
@@ -599,7 +625,7 @@ export default function Dashboard() {
                 <Marker 
                   key={event.id} 
                   position={[event.lat, event.lng]}
-                  icon={createPinIcon(selectedEvent === event.id, event.uc)}
+                  icon={createPinIcon(selectedEvent === event.id, event.uc, event.ageHours)}
                 >
                   <Popup>
                     <div className="text-sm font-sans space-y-1">
@@ -630,6 +656,22 @@ export default function Dashboard() {
               )}
 
               <MapController selectedEvent={selectedEvent} sortedEvents={sortedEvents} goiasCenter={goiasCenter} showUCs={showUCs} setShowUCs={setShowUCs} loadingUCs={loadingUCs} />
+              
+              {/* Legenda de Detecção de Fogo */}
+              <div className="absolute bottom-4 right-4 z-[400] bg-card/95 backdrop-blur-sm p-3 rounded-md shadow-md border border-border text-xs w-[240px]">
+                 <h4 className="font-bold mb-3 border-b pb-1">Frente de Fogo - 24h</h4>
+                 <div className="space-y-1.5">
+                    <div className="flex items-center gap-2"><span className="w-3 h-3 rounded bg-[#8B0000] border border-black/20"></span> Detecção em até 3 Horas</div>
+                    <div className="flex items-center gap-2"><span className="w-3 h-3 rounded bg-[#DC2626] border border-black/20"></span> Detecção entre 3 e 6 horas</div>
+                    <div className="flex items-center gap-2"><span className="w-3 h-3 rounded bg-[#F97316] border border-black/20"></span> Detecção entre 6 e 12 horas</div>
+                    <div className="flex items-center gap-2"><span className="w-3 h-3 rounded bg-[#F59E0B] border border-black/20"></span> Detecção entre 12 e 24 horas</div>
+                    <div className="flex items-center gap-2"><span className="w-3 h-3 rounded bg-[#737373] border border-black/20"></span> Detecção a mais de 24 horas</div>
+                 </div>
+                 <div className="mt-3 pt-2 border-t text-[10px] text-muted-foreground italic flex items-center gap-2">
+                   <div className="w-3 h-3 rounded-full border-[1.5px] border-gray-800 flex items-center justify-center"><div className="w-1.5 h-1.5 bg-white rounded-full"></div></div>
+                   Focos em Unidade de Conservação
+                 </div>
+              </div>
             </MapContainer>
           </CardContent>
         </Card>
@@ -684,12 +726,15 @@ export default function Dashboard() {
                       className={`cursor-pointer transition-colors ${selectedEvent === event.id ? 'bg-primary/20' : 'hover:bg-muted/50'}`}
                       onClick={() => setSelectedEvent(selectedEvent === event.id ? null : event.id)}
                     >
-                      <TableCell className="font-medium text-xs">{event.municipio || event.municipio_nome || 'N/A'}</TableCell>
+                      <TableCell className="font-medium text-xs flex items-center gap-2 min-h-[40px]">
+                        <span className="w-2.5 h-2.5 rounded-full flex-shrink-0 shadow-sm border border-black/10" style={{ backgroundColor: getEventColorHex(event.ageHours) }} title={event.ageHours ? `Idade: ~${Math.round(event.ageHours)}h` : ''}></span>
+                        <span className="truncate">{event.municipio || 'N/A'}</span>
+                      </TableCell>
                       <TableCell className="text-xs font-semibold">{event.tamanho_ha ? `${event.tamanho_ha} ha` : 'N/A'}</TableCell>
                       <TableCell className="text-xs text-orange-600 font-bold">{event.qtd_deteccoes || 0}</TableCell>
                       <TableCell className="text-xs">{event.duracao_h ? `${event.duracao_h} h` : 'N/A'}</TableCell>
                       <TableCell className="font-medium text-[10px] leading-tight py-2" title={event.ucText !== 'N/A' ? event.ucText : ''}>
-                        {event.ucText !== 'N/A' ? <span className="text-amber-600 capitalize">{event.ucText.toLowerCase()}</span> : 'Não'}
+                        {event.ucText !== 'N/A' ? <span className="font-bold text-gray-900 capitalize">{event.ucText.toLowerCase()}</span> : 'Não'}
                       </TableCell>
                     </TableRow>
                   )) : (
