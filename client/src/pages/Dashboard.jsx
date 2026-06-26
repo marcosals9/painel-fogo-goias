@@ -23,26 +23,26 @@ L.Icon.Default.mergeOptions({
   shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
 });
 
-// Ícone SVG Customizado para permitir cor e tamanho dinâmicos
+// Ícone SVG Customizado de Fogo
 const createPinIcon = (isSelected, isUC) => {
-  let color = '#3b82f6'; // blue-500 padrão
-  if (isUC) color = '#f59e0b'; // amber-500 para Unidades de Conservação (mesma cor da tabela)
-  if (isSelected) color = '#ef4444'; // red-500 quando selecionado (destaque máximo)
+  let color = '#ea580c'; // orange-600 padrão
+  if (isUC) color = '#f59e0b'; // amber-500 para Unidades de Conservação
+  if (isSelected) color = '#dc2626'; // red-600 quando selecionado (fogo intenso)
   
-  const scale = 0.75; // Reduz o tamanho do pino para 75% do original
-  const width = 25 * scale;
-  const height = 41 * scale;
+  const scale = isSelected ? 1.4 : 1.1; 
+  const width = 24 * scale;
+  const height = 24 * scale;
   
-  const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 36" width="${width}" height="${height}" style="filter: drop-shadow(1px 2px 2px rgba(0,0,0,0.4));">
-    <path fill="${color}" stroke="#ffffff" stroke-width="1.5" d="M12 0C5.373 0 0 5.373 0 12c0 7.333 12 24 12 24s12-16.667 12-24C24 5.373 18.627 0 12 0zm0 17.5c-3.038 0-5.5-2.462-5.5-5.5S8.962 6.5 12 6.5s5.5 2.462 5.5 5.5-2.462 5.5-5.5 5.5z"/>
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="${width}" height="${height}" fill="${color}" stroke="#ffffff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="filter: drop-shadow(1px 2px 2px rgba(0,0,0,0.5));">
+    <path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/>
   </svg>`;
 
   return L.divIcon({
     html: svg,
-    className: 'bg-transparent border-0', // Remove fundo branco padrão do divIcon
+    className: `bg-transparent border-0 transition-transform duration-300 ${isSelected ? 'z-50' : ''}`, 
     iconSize: [width, height],
     iconAnchor: [width / 2, height],
-    popupAnchor: [0, -(height - 5)]
+    popupAnchor: [0, -height]
   });
 };
 
