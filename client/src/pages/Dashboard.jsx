@@ -26,8 +26,8 @@ L.Icon.Default.mergeOptions({
 // Ícone SVG Customizado para permitir cor e tamanho dinâmicos
 const createPinIcon = (isSelected, isUC) => {
   let color = '#3b82f6'; // blue-500 padrão
-  if (isUC) color = '#dc2626'; // red-600 para Unidades de Conservação (Prioridade)
-  if (isSelected) color = '#ea580c'; // orange-600 quando selecionado
+  if (isUC) color = '#f59e0b'; // amber-500 para Unidades de Conservação (mesma cor da tabela)
+  if (isSelected) color = '#ef4444'; // red-500 quando selecionado (destaque máximo)
   
   const scale = 0.75; // Reduz o tamanho do pino para 75% do original
   const width = 25 * scale;
@@ -389,12 +389,19 @@ export default function Dashboard() {
               
               {/* Camadas WMS Oficiais do CENSIPAM */}
               <WMSTileLayer
-                url="https://panorama.sipam.gov.br/geoserver/painel_do_fogo/wms"
-                layers="painel_do_fogo:mv_evento_filtro"
-                format="image/png"
-                transparent={true}
-                opacity={0.6}
-              />
+              url="https://panorama.sipam.gov.br/geoserver/painel_do_fogo/wms"
+              layers="painel_do_fogo:icmbio_unidade_conservacao_federal,painel_do_fogo:mma_cnuc_unidade_conservacao,painel_do_fogo:mma_cnuc_unidade_conservacao_municipal"
+              format="image/png"
+              transparent={true}
+              zIndex={5}
+            />
+            <WMSTileLayer
+              url="https://panorama.sipam.gov.br/geoserver/painel_do_fogo/wms"
+              layers="painel_do_fogo:focos_ativos"
+              format="image/png"
+              transparent={true}
+              zIndex={10}
+            />
               <WMSTileLayer
                 url="https://panorama.sipam.gov.br/geoserver/painel_do_fogo/wms"
                 layers="painel_do_fogo:mv_frente_deteccao"
