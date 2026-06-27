@@ -22,6 +22,29 @@ db.serialize(() => {
         )
     `);
 
+    // Tabela de informativos
+    db.run(`
+        CREATE TABLE IF NOT EXISTS informativos (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            titulo TEXT NOT NULL,
+            texto_boletim TEXT NOT NULL,
+            imagem_base64 TEXT,
+            destinatario TEXT,
+            status_envio TEXT,
+            criado_em DATETIME DEFAULT CURRENT_TIMESTAMP
+        )
+    `);
+
+    // Tabela de eventos diários
+    db.run(`
+        CREATE TABLE IF NOT EXISTS eventos_diarios (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            descricao TEXT NOT NULL,
+            data_evento DATE NOT NULL,
+            criado_em DATETIME DEFAULT CURRENT_TIMESTAMP
+        )
+    `);
+
     // Inserir usuário mock (admin / admin) se não existir
     db.get("SELECT count(*) as count FROM users WHERE username = 'admin'", (err, row) => {
         if (row && row.count === 0) {

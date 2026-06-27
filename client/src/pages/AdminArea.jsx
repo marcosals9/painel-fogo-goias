@@ -48,10 +48,15 @@ export default function AdminArea() {
           <h2 className="text-3xl font-bold tracking-tight">Painel Administrativo</h2>
           <p className="text-muted-foreground">Gerenciamento da Sala de Situação</p>
         </div>
-        <Button variant="outline" onClick={handleLogout} className="gap-2">
-          <LogOut className="w-4 h-4" />
-          Sair
-        </Button>
+        <div className="flex gap-2">
+          <Button variant="default" onClick={() => navigate('/')} className="gap-2">
+            Voltar para o Mapa
+          </Button>
+          <Button variant="outline" onClick={handleLogout} className="gap-2">
+            <LogOut className="w-4 h-4" />
+            Sair
+          </Button>
+        </div>
       </div>
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">

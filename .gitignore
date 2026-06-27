@@ -4,3 +4,6 @@ dist-ssr
 *.local
 .env
 .DS_Store
+server/.wwebjs_auth/
+server/.wwebjs_cache/
+server/codec.db

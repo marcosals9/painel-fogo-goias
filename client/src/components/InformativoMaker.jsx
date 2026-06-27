@@ -5,7 +5,8 @@ import { format } from 'date-fns';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Flame, Download, X, Upload, Calendar, ThermometerSun, CheckCircle2, FileSpreadsheet, Trees, Truck, Sun } from 'lucide-react';
+import { Download, X, Upload, FileSpreadsheet, CheckCircle2, Flame, ThermometerSun, Loader2, Calendar, Trees, Truck, Sun } from 'lucide-react';
+import WhatsAppSender from './WhatsAppSender';
 
 export default function InformativoMaker({ isOpen, onClose, fireEvents, date }) {
   const canvasRef = useRef(null);
@@ -26,6 +27,7 @@ export default function InformativoMaker({ isOpen, onClose, fireEvents, date }) 
   // Estados dos Dados SSP
   const [sspFile, setSspFile] = useState(null);
   const [totalAtendimentos, setTotalAtendimentos] = useState(0);
+  const [activeTab, setActiveTab] = useState('dados');
   const [sspMuni, setSspMuni] = useState([]);
   const [sspNat, setSspNat] = useState([]);
 
@@ -38,9 +40,9 @@ export default function InformativoMaker({ isOpen, onClose, fireEvents, date }) 
     SUDOESTE: 0,
     SUL: 0
   });
-  
+
   const displayDate = date.split('-').reverse().join('/');
-  
+
   // Mantém a data no formato YYYY-MM-DD para o input type="date"
   const [cimehgoDate, setCimehgoDate] = useState(date);
 
@@ -83,7 +85,7 @@ export default function InformativoMaker({ isOpen, onClose, fireEvents, date }) 
       for (let i = 0; i < Math.min(data.length, 20); i++) {
         const row = data[i];
         if (!row || !Array.isArray(row)) continue;
-        
+
         for (let j = 0; j < row.length; j++) {
           const cell = String(row[j] || '').toUpperCase().trim();
           if (cell === 'MUNICÍPIO' || cell === 'MUNICIPIO') munColIdx = j;
@@ -121,7 +123,7 @@ export default function InformativoMaker({ isOpen, onClose, fireEvents, date }) 
         if (natColIdx !== -1) {
           const natStr = String(row[natColIdx] || '');
           let parsedNat = "OUTROS";
-          
+
           if (natStr) {
             const upperNat = natStr.toUpperCase();
             if (upperNat.includes('TERRENO BALDIO')) parsedNat = 'TERRENO BALDIO';
@@ -195,12 +197,33 @@ export default function InformativoMaker({ isOpen, onClose, fireEvents, date }) 
             <h2 className="text-lg font-bold">Gerador de Informativo</h2>
             <p className="text-xs text-muted-foreground">Preencha os dados manuais</p>
           </div>
-          <Button variant="ghost" size="icon" onClick={onClose}><X className="w-5 h-5" /></Button>
+          <div className="flex gap-1">
+            <Button variant="outline" size="icon" className="text-primary hover:text-primary" onClick={downloadImage} disabled={downloading} title="Baixar Imagem Manualmente">
+              {downloading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Download className="w-4 h-4" />}
+            </Button>
+            <Button variant="ghost" size="icon" onClick={onClose}><X className="w-5 h-5" /></Button>
+          </div>
+        </div>
+
+        <div className="flex border-b bg-muted/10 shrink-0">
+          <button 
+            className={`flex-1 py-3 text-sm font-semibold border-b-2 transition-colors ${activeTab === 'dados' ? 'border-primary text-primary bg-primary/5' : 'border-transparent text-muted-foreground hover:bg-muted/30'}`} 
+            onClick={() => setActiveTab('dados')}
+          >
+            📋 Dados 
+          </button>
+          <button 
+            className={`flex-1 py-3 text-sm font-semibold border-b-2 transition-colors ${activeTab === 'whatsapp' ? 'border-green-600 text-green-700 bg-green-50' : 'border-transparent text-muted-foreground hover:bg-muted/30'}`} 
+            onClick={() => setActiveTab('whatsapp')}
+          >
+            💬 WhatsApp
+          </button>
         </div>
 
         <div className="p-4 flex-1 overflow-y-auto space-y-6">
-
-          <div className="space-y-3">
+          {activeTab === 'dados' && (
+            <>
+              <div className="space-y-3">
             <h3 className="font-semibold text-sm flex items-center gap-2"><Upload className="w-4 h-4" /> 1. Ocorrências (SSP)</h3>
             <div className="border-2 border-dashed rounded-lg p-4 text-center hover:bg-muted/50 transition-colors">
               <Input type="file" accept=".xls,.xlsx,.csv" id="ssp-file" className="hidden" onChange={handleFileUpload} />
@@ -219,13 +242,13 @@ export default function InformativoMaker({ isOpen, onClose, fireEvents, date }) 
 
           <div className="space-y-3">
             <h3 className="font-semibold text-sm flex items-center gap-2"><ThermometerSun className="w-4 h-4" /> 3. Dias Sem Chuva (CIMEHGO)</h3>
-            
+
             <div className="flex items-center gap-2 pb-2">
               <Label className="text-xs whitespace-nowrap">Data do Boletim:</Label>
-              <Input 
-                type="date" 
-                value={cimehgoDate} 
-                onChange={(e) => setCimehgoDate(e.target.value)} 
+              <Input
+                type="date"
+                value={cimehgoDate}
+                onChange={(e) => setCimehgoDate(e.target.value)}
                 className="h-8 text-xs w-[130px]"
               />
             </div>
@@ -243,26 +266,29 @@ export default function InformativoMaker({ isOpen, onClose, fireEvents, date }) 
               ))}
             </div>
           </div>
+            </>
+          )}
 
-        </div>
-
-        <div className="p-4 border-t bg-muted/30">
-          <Button className="w-full font-bold h-12 text-md" onClick={downloadImage} disabled={downloading}>
-            {downloading ? 'Gerando Imagem...' : 'Baixar Imagem para WhatsApp'} <Download className="w-5 h-5 ml-2" />
-          </Button>
+          {activeTab === 'whatsapp' && (
+            <WhatsAppSender canvasRef={canvasRef} date={date} />
+          )}
         </div>
       </div>
 
       {/* Preview (Direita) */}
       <div className="flex-1 bg-black/5 overflow-y-auto flex justify-center py-8">
 
-        {/* Container do Canvas A4/Poster - Aspect Ratio aproximado 800x1130 */}
-        <div
-          ref={canvasRef}
-          className="bg-white shadow-2xl shrink-0 relative flex flex-col font-sans overflow-hidden"
+        {/* Wrapper para os efeitos visuais (sombra e escala) sem afetar a imagem exportada */}
+        <div 
+          className="shadow-2xl shrink-0"
           style={{ width: '800px', height: '1130px', transformOrigin: 'top center', transform: 'scale(0.85)' }}
         >
-          {/* Camada do Template do Canva (Enviado pelo usuário) */}
+          {/* Container do Canvas A4/Poster (Este é o que será exportado) */}
+          <div
+            ref={canvasRef}
+            className="bg-white relative flex flex-col font-sans overflow-hidden w-full h-full"
+          >
+            {/* Camada do Template do Canva (Enviado pelo usuário) */}
           <img src="/template.png" className="absolute inset-0 w-full h-full z-0 pointer-events-none object-cover" alt="Template Canva" onError={(e) => e.target.style.display = 'none'} />
 
           {/* Header - Agora Transparente para mostrar o fundo da imagem */}
@@ -302,7 +328,7 @@ export default function InformativoMaker({ isOpen, onClose, fireEvents, date }) 
                 </div>
               </div>
               <div className="opacity-0 h-[22px]"></div>
-              <div className="px-2 flex-1 flex flex-col justify-center pb-6 gap-0.5">
+              <div className="px-2 flex-1 flex flex-col justify-center pb-4 gap-0.5">
                 {sspMuni.slice(0, 5).map(([mun, val]) => renderBar(mun, val, maxSspMuni, 'bg-[#76e5d7]'))}
                 {sspMuni.length === 0 && <div className="text-center text-gray-400 font-bold">Anexe a planilha SSP</div>}
               </div>
@@ -354,6 +380,8 @@ export default function InformativoMaker({ isOpen, onClose, fireEvents, date }) 
           {/* Footer do Template Original vai sobrepor o rodapé */}
           <div className="mt-2 h-[120px] bg-transparent">
             {/* O espaço em branco é preenchido pela imagem do template (z-50) */}
+          </div>
+
           </div>
 
         </div>
