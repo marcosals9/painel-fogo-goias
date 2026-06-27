@@ -63,36 +63,71 @@ export default function InformativoMaker({ isOpen, onClose, fireEvents, date }) 
       const wb = XLSX.read(bstr, { type: 'binary' });
       const wsname = wb.SheetNames[0];
       const ws = wb.Sheets[wsname];
-      const data = XLSX.utils.sheet_to_json(ws);
+      const data = XLSX.utils.sheet_to_json(ws, { header: 1 });
+
+      let headerRowIndex = -1;
+      let munColIdx = -1;
+      let natColIdx = -1;
+
+      // Procura a linha de cabeçalho nas primeiras 20 linhas
+      for (let i = 0; i < Math.min(data.length, 20); i++) {
+        const row = data[i];
+        if (!row || !Array.isArray(row)) continue;
+        
+        for (let j = 0; j < row.length; j++) {
+          const cell = String(row[j] || '').toUpperCase().trim();
+          if (cell === 'MUNICÍPIO' || cell === 'MUNICIPIO') munColIdx = j;
+          if (cell === 'NATUREZAS' || cell === 'NATUREZA' || cell.includes('NATUREZA')) natColIdx = j;
+        }
+
+        if (munColIdx !== -1) {
+          headerRowIndex = i;
+          break;
+        }
+      }
+
+      if (headerRowIndex === -1) {
+        alert('Não foi possível encontrar a coluna MUNICÍPIO na planilha anexada. Verifique o formato do arquivo.');
+        return;
+      }
 
       let total = 0;
       const muniCounts = {};
       const natCounts = {};
 
-      data.forEach(row => {
+      for (let i = headerRowIndex + 1; i < data.length; i++) {
+        const row = data[i];
+        if (!row || row.length === 0) continue;
+
+        const munVal = row[munColIdx];
+        if (!munVal) continue; // Pula linhas vazias
+
         total++;
-        const mun = row['MUNICÍPIO'];
-        if (mun) {
-          muniCounts[mun] = (muniCounts[mun] || 0) + 1;
+        const munStr = String(munVal).trim();
+        // Capitaliza a primeira letra de cada palavra para ficar bonito
+        const munFormated = munStr.toLowerCase().replace(/(?:^|\s)\S/g, a => a.toUpperCase());
+        muniCounts[munFormated] = (muniCounts[munFormated] || 0) + 1;
+
+        if (natColIdx !== -1) {
+          const natStr = String(row[natColIdx] || '');
+          let parsedNat = "OUTROS";
+          
+          if (natStr) {
+            const upperNat = natStr.toUpperCase();
+            if (upperNat.includes('TERRENO BALDIO')) parsedNat = 'TERRENO BALDIO';
+            else if (upperNat.includes('PROPRIEDADE RURAL')) parsedNat = 'PROPRIEDADE RURAL';
+            else if (upperNat.includes('ÁREA VERDE') || upperNat.includes('AREA VERDE')) parsedNat = 'ÁREA VERDE';
+            else if (upperNat.includes('TERRAS DEVOLUTAS')) parsedNat = 'TERRAS DEVOLUTAS';
+            else if (upperNat.includes('ESTRADA') || upperNat.includes('RODOVIA')) parsedNat = 'ESTRADA/RODOVIA';
+            else {
+              const parts = natStr.split('->');
+              const lastPart = parts[parts.length - 1].trim();
+              parsedNat = lastPart.replace(/\(\d+\)/g, '').trim().toUpperCase();
+            }
+          }
+          natCounts[parsedNat] = (natCounts[parsedNat] || 0) + 1;
         }
-
-        let natStr = row['NATUREZAS'] || '';
-        let parsedNat = "OUTROS";
-
-        const upperNat = natStr.toUpperCase();
-        if (upperNat.includes('TERRENO BALDIO')) parsedNat = 'TERRENO BALDIO';
-        else if (upperNat.includes('PROPRIEDADE RURAL')) parsedNat = 'PROPRIEDADE RURAL';
-        else if (upperNat.includes('ÁREA VERDE')) parsedNat = 'ÁREA VERDE';
-        else if (upperNat.includes('TERRAS DEVOLUTAS')) parsedNat = 'TERRAS DEVOLUTAS';
-        else if (upperNat.includes('ESTRADA') || upperNat.includes('RODOVIA')) parsedNat = 'ESTRADA/RODOVIA';
-        else if (natStr) {
-          const parts = natStr.split('->');
-          const lastPart = parts[parts.length - 1].trim();
-          parsedNat = lastPart.replace(/\(\d+\)/g, '').trim().toUpperCase();
-        }
-
-        natCounts[parsedNat] = (natCounts[parsedNat] || 0) + 1;
-      });
+      }
 
       setSspMuni(Object.entries(muniCounts).sort((a, b) => b[1] - a[1]).slice(0, 5));
       setSspNat(Object.entries(natCounts).sort((a, b) => b[1] - a[1]).slice(0, 5));
