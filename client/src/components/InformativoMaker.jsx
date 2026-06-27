@@ -261,10 +261,10 @@ export default function InformativoMaker({ isOpen, onClose, fireEvents, date }) 
 
                 {/* Q3: Naturezas */}
                 <div className="bg-transparent rounded-xl flex flex-col overflow-hidden z-10 pt-[10px]">
-                    <div className="text-white flex items-center justify-center h-[90px] pl-[100px] pt-4">
-                        <h3 className="text-[22px] font-bold uppercase leading-[1.1] text-left drop-shadow-md w-full">Natureza das Ocorrências<br/>Atendidas</h3>
+                    <div className="text-white flex items-center justify-center h-[90px] pl-[110px] pr-4 pt-2">
+                        <h3 className="text-[18px] font-bold uppercase leading-tight text-left w-full">Natureza das Ocorrências<br/>Atendidas</h3>
                     </div>
-                    <div className="px-4 flex-1 flex flex-col justify-end pb-1 pt-6">
+                    <div className="px-4 flex-1 flex flex-col justify-center pb-2 pt-2">
                         {sspNat.map(([nat, val]) => renderBar(nat, val, maxSspNat, 'bg-[#f47f20]'))}
                         {sspNat.length === 0 && <div className="text-center text-gray-400 font-bold mt-10">Anexe a planilha SSP</div>}
                     </div>
@@ -273,10 +273,10 @@ export default function InformativoMaker({ isOpen, onClose, fireEvents, date }) 
 
                 {/* Q4: CIMEHGO */}
                 <div className="bg-transparent rounded-xl flex flex-col overflow-hidden z-10 pt-[10px]">
-                    <div className="text-white flex items-center justify-center h-[90px] pl-[100px] pt-4">
-                        <h3 className="text-[22px] font-bold uppercase leading-[1.1] text-left drop-shadow-md w-full">Dias sem Chuvas por<br/>Região do Estado</h3>
+                    <div className="text-white flex items-center justify-center h-[90px] pl-[110px] pr-4 pt-2">
+                        <h3 className="text-[18px] font-bold uppercase leading-tight text-left w-full">Dias sem Chuvas por<br/>Região do Estado</h3>
                     </div>
-                    <div className="px-4 flex-1 flex flex-col justify-end pb-1 pt-6">
+                    <div className="px-4 flex-1 flex flex-col justify-center pb-2 pt-2">
                         {['OESTE','NORTE','LESTE','SUL','CENTRAL','SUDOESTE'].map(reg => renderBar(reg, diasSeca[reg] || 0, maxDias, 'bg-[#3bbbf6]'))}
                     </div>
                     <div className="text-center font-bold text-[11px] pb-1 text-[#002b5e]">FONTE: CIMEHGO ({displayDate})</div>
