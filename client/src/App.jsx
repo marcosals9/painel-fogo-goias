@@ -34,10 +34,10 @@ function App() {
               </div>
               <h1 className="text-xl font-bold tracking-tight">Sala de Situação CODEC</h1>
             </div>
-            <div className="text-sm font-semibold text-slate-200 hidden sm:flex items-center gap-2 bg-slate-800 px-3 py-1.5 rounded-full border border-slate-700 shadow-inner tracking-wide">
+            <div className="text-sm font-semibold text-slate-200 hidden sm:flex items-center gap-3 tracking-wide">
               {theme === 'theme-cerrado-vivo' ? (
                 <>
-                  <img src="/cbmgo.png" alt="CBMGO" className="w-4 h-4 object-contain" />
+                  <img src="/cbmgo.png" alt="CBMGO" className="w-10 h-10 object-contain drop-shadow-md" />
                   Corpo de Bombeiros Militar do Estado de Goiás
                 </>
               ) : '🌧️ Operação Tempestade'}
