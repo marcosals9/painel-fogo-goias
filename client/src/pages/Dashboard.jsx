@@ -471,21 +471,17 @@ export default function Dashboard() {
             <Flame className="w-8 h-8 text-primary" />
             Monitoramento de Focos
           </h2>
-          <div className="flex flex-col gap-1 mt-1">
-             <p className="text-muted-foreground">Estado de Goiás - Visualização de Eventos de Fogo</p>
-             <p className="text-xs text-muted-foreground font-medium bg-muted/60 inline-flex items-center px-2 py-1 rounded w-fit border border-border/50">
-               Período de {date.split('-').reverse().join('/')} das 00:00 às 23:59 ({timezone === 'BRT' ? 'Horário de Brasília' : 'UTC Global'})
-             </p>
-          </div>
+          <p className="text-muted-foreground mt-1">Estado de Goiás - Visualização de Eventos de Fogo</p>
         </div>
         
-        <div className="flex items-center gap-3 flex-wrap justify-end">
-          <div className="relative flex items-center bg-card border rounded-md shadow-sm pr-2 hover:border-primary/50 transition-colors">
+        <div className="flex flex-col items-end gap-1.5">
+          <div className="flex items-center gap-3 flex-wrap justify-end">
+            <div className="relative flex items-center bg-card border rounded-md shadow-sm pr-2 hover:border-primary/50 transition-colors">
              <Timer className="w-4 h-4 ml-3 text-muted-foreground absolute pointer-events-none" />
              <select 
                 value={refreshInterval}
                 onChange={(e) => setRefreshInterval(Number(e.target.value))}
-                className="h-10 pl-9 pr-3 text-sm bg-transparent border-none focus:outline-none focus:ring-0 cursor-pointer text-muted-foreground appearance-none"
+                className="h-9 pl-9 pr-3 text-sm bg-transparent border-none focus:outline-none focus:ring-0 cursor-pointer text-muted-foreground appearance-none"
                 title="Atualização Automática"
               >
                 <option value={0}>Auto Refresh: OFF</option>
@@ -498,7 +494,7 @@ export default function Dashboard() {
              <select 
                 value={timezone}
                 onChange={(e) => setTimezone(e.target.value)}
-                className="h-10 px-3 text-sm bg-transparent border-none focus:outline-none focus:ring-0 cursor-pointer text-muted-foreground font-medium appearance-none"
+                className="h-9 px-3 text-sm bg-transparent border-none focus:outline-none focus:ring-0 cursor-pointer text-muted-foreground font-medium appearance-none"
                 title="Fuso Horário"
               >
                 <option value="BRT">BRT (-3)</option>
@@ -510,18 +506,22 @@ export default function Dashboard() {
             type="date" 
             value={date} 
             onChange={(e) => setDate(e.target.value)}
-            className="w-auto min-w-[140px] bg-card shadow-sm cursor-pointer"
+            className="h-9 w-auto min-w-[140px] bg-card shadow-sm cursor-pointer"
           />
           <Button 
             variant="default" 
             size="icon" 
             onClick={() => fetchFireData(date, timezone)} 
             disabled={loading} 
-            className="shadow-sm flex items-center justify-center p-0"
+            className="h-9 w-9 shadow-sm flex items-center justify-center p-0"
             title="Sincronizar/Buscar dados atualizados no satélite do CENSIPAM"
           >
             {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <RefreshCw className="w-4 h-4" />}
           </Button>
+          </div>
+          <p className="text-[11px] text-muted-foreground font-medium bg-muted/60 px-2 py-0.5 rounded border border-border/50">
+            Período: {date.split('-').reverse().join('/')} das 00:00 às 23:59 ({timezone === 'BRT' ? 'Horário de Brasília' : 'UTC Global'})
+          </p>
         </div>
       </div>
 
