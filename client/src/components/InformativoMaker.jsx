@@ -227,36 +227,36 @@ export default function InformativoMaker({ isOpen, onClose, fireEvents, date }) 
                 
                 {/* Q1: Atendimentos SSP */}
                 <div className="bg-transparent rounded-xl flex flex-col overflow-hidden z-10 pt-[10px]">
-                    <div className="text-white flex items-center h-[80px]">
+                    <div className="text-white flex items-center h-[90px] pt-4">
                         <div className="w-[100px] h-[70px] shrink-0"></div>
                         <div className="flex gap-4 items-center w-full pl-2">
-                            <span className="text-[75px] font-black leading-none drop-shadow-lg">{totalAtendimentos.toString().padStart(2, '0')}</span>
-                            <span className="text-sm font-bold uppercase leading-tight w-full drop-shadow-md">Atendimentos Relacionados<br/>A Incêndios em Vegetação</span>
+                            <span className="text-[60px] font-black leading-none drop-shadow-lg">{totalAtendimentos.toString().padStart(2, '0')}</span>
+                            <span className="text-[13px] font-bold uppercase leading-tight w-full drop-shadow-md">Atendimentos Relacionados<br/>A Incêndios em Vegetação</span>
                         </div>
                     </div>
                     <div className="text-white text-center py-1 font-bold text-sm uppercase opacity-0">Municípios Mais Atendidos</div>
-                    <div className="px-4 flex-1 flex flex-col justify-end pb-1 pt-4">
+                    <div className="px-4 flex-1 flex flex-col justify-end pb-4 pt-2">
                         {sspMuni.map(([mun, val]) => renderBar(mun, val, maxSspMuni, 'bg-[#76e5d7]'))}
                         {sspMuni.length === 0 && <div className="text-center text-gray-400 font-bold mt-10">Anexe a planilha SSP</div>}
                     </div>
-                    <div className="text-center font-bold text-[11px] pb-1 text-[#002b5e]">FONTE: CBMGO - TOP 5</div>
+                    <div className="text-center font-bold text-[11px] pb-2 text-[#002b5e]">FONTE: CBMGO - TOP 5</div>
                 </div>
 
                 {/* Q2: Focos CENSIPAM */}
                 <div className="bg-transparent rounded-xl flex flex-col overflow-hidden z-10 pt-[10px]">
-                    <div className="text-white flex items-center h-[80px]">
+                    <div className="text-white flex items-center h-[90px] pt-4">
                         <div className="w-[120px] h-[70px] shrink-0"></div>
                         <div className="flex gap-4 items-center w-full pl-2">
-                            <span className="text-[75px] font-black leading-none drop-shadow-lg">{censipamDados.total.toString().padStart(2, '0')}</span>
-                            <span className="text-sm font-bold uppercase leading-tight w-full drop-shadow-md">Eventos de Fogo<br/>Identificados por Satélites</span>
+                            <span className="text-[60px] font-black leading-none drop-shadow-lg">{censipamDados.total.toString().padStart(2, '0')}</span>
+                            <span className="text-[13px] font-bold uppercase leading-tight w-full drop-shadow-md">Eventos de Fogo<br/>Identificados por Satélites</span>
                         </div>
                     </div>
                     <div className="text-white text-center py-1 font-bold text-sm uppercase opacity-0">Municípios Mais Registrados</div>
-                    <div className="px-4 flex-1 flex flex-col justify-end pb-1 pt-4">
+                    <div className="px-4 flex-1 flex flex-col justify-end pb-4 pt-2">
                         {censipamDados.top.map(([mun, val]) => renderBar(mun, val, maxCenMuni, 'bg-[#76e5d7]', 'w-[90%]'))}
                         {censipamDados.top.length === 0 && <div className="text-center text-gray-400 font-bold mt-10">Sem focos na data</div>}
                     </div>
-                    <div className="text-center font-bold text-[11px] pb-1 text-[#002b5e]">FONTE: CENSIPAM</div>
+                    <div className="text-center font-bold text-[11px] pb-2 text-[#002b5e]">FONTE: CENSIPAM</div>
                 </div>
 
                 {/* Q3: Naturezas */}
