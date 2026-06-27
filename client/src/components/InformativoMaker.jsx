@@ -198,16 +198,19 @@ export default function InformativoMaker({ isOpen, onClose, fireEvents, date }) 
             {/* Camada do Template do Canva (Enviado pelo usuário) */}
             <img src="/template.png" className="absolute inset-0 w-full h-full z-0 pointer-events-none object-cover" alt="Template Canva" onError={(e) => e.target.style.display = 'none'} />
 
-            {/* Header - Agora Vazio, o template já tem as logos e textos */}
-            <div className="bg-transparent h-[180px] p-6 relative z-10">
+            {/* Header - Agora Transparente para mostrar o fundo da imagem */}
+            <div className="bg-transparent text-white flex justify-between h-[180px] p-6 relative z-10">
+                {/* Textos removidos pois já estão na imagem de fundo */}
+                <div className="z-10 opacity-90 brightness-0 invert">
+                   {/* Mapa de goiás removido para evitar bloqueio de CORS no html-to-image */}
+                </div>
             </div>
 
             {/* Fita Laranja Data */}
-            <div className="mx-4 mt-[-10px] z-20">
+            <div className="mx-4 mt-[-15px] z-20">
                 <div className="bg-transparent rounded-2xl flex items-center h-[70px]">
                     <div className="w-[100px] h-[70px] shrink-0"></div>
-                    <div className="flex-1 py-2 flex flex-col justify-center pl-6">
-                        <h3 className="text-xl font-black text-[#002b5e] leading-tight">DADOS DO DIA {displayDate}</h3>
+                    <div className="flex-1 text-center flex flex-col justify-end h-full pb-2">
                     </div>
                 </div>
             </div>
@@ -216,42 +219,46 @@ export default function InformativoMaker({ isOpen, onClose, fireEvents, date }) 
             <div className="grid grid-cols-2 gap-4 p-4 flex-1 mt-2">
                 
                 {/* Q1: Atendimentos SSP */}
-                <div className="bg-transparent rounded-xl flex flex-col overflow-hidden z-10 relative">
-                    <div className="text-white flex items-center p-2 h-[100px] absolute top-1 left-28">
-                        <div className="flex gap-3 items-center w-full pl-2">
-                            <span className="text-[60px] font-black leading-none drop-shadow-md text-white">{totalAtendimentos.toString().padStart(2, '0')}</span>
+                <div className="bg-transparent rounded-xl flex flex-col overflow-hidden z-10 pt-[10px]">
+                    <div className="text-white flex items-center h-[80px]">
+                        <div className="w-[100px] h-[70px] shrink-0"></div>
+                        <div className="flex gap-3 items-center w-full">
+                            <span className="text-[75px] font-black leading-none drop-shadow-lg">{totalAtendimentos.toString().padStart(2, '0')}</span>
                         </div>
                     </div>
-                    <div className="p-3 flex-1 flex flex-col justify-end pb-12 pt-[130px]">
+                    <div className="text-white text-center py-1 font-bold text-sm uppercase opacity-0">Municípios Mais Atendidos</div>
+                    <div className="px-4 flex-1 flex flex-col justify-end pb-4 pt-4">
                         {sspMuni.map(([mun, val]) => renderBar(mun, val, maxSspMuni, 'bg-[#76e5d7]'))}
                         {sspMuni.length === 0 && <div className="text-center text-gray-400 font-bold mt-10">Anexe a planilha SSP</div>}
                     </div>
                 </div>
 
                 {/* Q2: Focos CENSIPAM */}
-                <div className="bg-transparent rounded-xl flex flex-col overflow-hidden z-10 relative">
-                    <div className="text-white flex items-center p-2 h-[100px] absolute top-1 left-28">
-                        <div className="flex gap-3 items-center w-full pl-2">
-                            <span className="text-[60px] font-black leading-none drop-shadow-md text-white">{censipamDados.total.toString().padStart(2, '0')}</span>
+                <div className="bg-transparent rounded-xl flex flex-col overflow-hidden z-10 pt-[10px]">
+                    <div className="text-white flex items-center h-[80px]">
+                        <div className="w-[120px] h-[70px] shrink-0"></div>
+                        <div className="flex gap-3 items-center w-full pl-6">
+                            <span className="text-[75px] font-black leading-none drop-shadow-lg">{censipamDados.total.toString().padStart(2, '0')}</span>
                         </div>
                     </div>
-                    <div className="p-3 flex-1 flex flex-col justify-end pb-12 pt-[130px]">
+                    <div className="text-white text-center py-1 font-bold text-sm uppercase opacity-0">Municípios Mais Registrados</div>
+                    <div className="px-4 flex-1 flex flex-col justify-end pb-4 pt-4">
                         {censipamDados.top.map(([mun, val]) => renderBar(mun, val, maxCenMuni, 'bg-[#76e5d7]', 'w-[90%]'))}
                         {censipamDados.top.length === 0 && <div className="text-center text-gray-400 font-bold mt-10">Sem focos na data</div>}
                     </div>
                 </div>
 
                 {/* Q3: Naturezas */}
-                <div className="bg-transparent rounded-xl flex flex-col overflow-hidden z-10 relative">
-                    <div className="p-3 flex-1 flex flex-col justify-end pb-14 pt-[130px]">
+                <div className="bg-transparent rounded-xl flex flex-col overflow-hidden z-10 pt-[50px]">
+                    <div className="px-4 flex-1 flex flex-col justify-end pb-4 pt-8">
                         {sspNat.map(([nat, val]) => renderBar(nat, val, maxSspNat, 'bg-[#f47f20]'))}
                         {sspNat.length === 0 && <div className="text-center text-gray-400 font-bold mt-10">Anexe a planilha SSP</div>}
                     </div>
                 </div>
 
                 {/* Q4: CIMEHGO */}
-                <div className="bg-transparent rounded-xl flex flex-col overflow-hidden z-10 relative">
-                    <div className="p-3 flex-1 flex flex-col justify-end pb-14 pt-[130px]">
+                <div className="bg-transparent rounded-xl flex flex-col overflow-hidden z-10 pt-[50px]">
+                    <div className="px-4 flex-1 flex flex-col justify-end pb-4 pt-8">
                         {['OESTE','NORTE','LESTE','SUL','CENTRAL','SUDOESTE'].map(reg => renderBar(reg, diasSeca[reg] || 0, maxDias, 'bg-[#3bbbf6]'))}
                     </div>
                 </div>
