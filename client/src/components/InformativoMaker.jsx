@@ -200,22 +200,14 @@ export default function InformativoMaker({ isOpen, onClose, fireEvents, date }) 
 
             {/* Header - Agora Transparente para mostrar o fundo da imagem */}
             <div className="bg-transparent text-white flex justify-between h-[180px] p-6 relative z-10">
-                <div className="flex items-center gap-6 z-10 pl-[160px]">
-                    <div>
-                        <h1 className="text-[65px] font-black leading-[0.9] tracking-tighter shadow-sm" style={{ textShadow: '2px 2px 4px rgba(0,0,0,0.5)' }}>
-                            DEFESA<br/>
-                            <span className="text-white">CIVIL </span><span className="text-[#ff7f00]">GOIÁS</span>
-                        </h1>
-                        <p className="text-xl font-medium mt-1 tracking-wider text-gray-200">Proteger vidas é nossa missão!</p>
-                    </div>
-                </div>
+                {/* Textos do cabeçalho removidos pois já estão na imagem de fundo */}
             </div>
 
             {/* Fita Laranja Data */}
-            <div className="mx-4 mt-[-15px] z-20">
-                <div className="bg-transparent rounded-2xl flex items-center h-[70px]">
-                    <div className="w-[100px] h-[70px] shrink-0"></div>
-                    <div className="flex-1 text-center flex flex-col justify-center h-full pt-2">
+            <div className="mx-4 mt-[35px] z-20">
+                <div className="bg-transparent rounded-2xl flex items-center h-[90px]">
+                    <div className="w-[120px] h-[90px] shrink-0"></div>
+                    <div className="flex-1 text-center flex flex-col justify-center h-full">
                         <h2 className="text-[26px] font-black text-[#002b5e] leading-tight drop-shadow-sm">INFORMATIVO - PERÍODO DE ESTIAGEM</h2>
                         <h3 className="text-xl font-black text-[#002b5e] leading-tight">DADOS DO DIA {displayDate}</h3>
                     </div>
@@ -226,8 +218,8 @@ export default function InformativoMaker({ isOpen, onClose, fireEvents, date }) 
             <div className="grid grid-cols-2 gap-4 p-4 flex-1 mt-2">
                 
                 {/* Q1: Atendimentos SSP */}
-                <div className="bg-transparent rounded-xl flex flex-col overflow-hidden z-10">
-                    <div className="text-white flex items-center h-[90px] pt-2">
+                <div className="bg-transparent rounded-xl flex flex-col overflow-hidden z-10 pt-[10px]">
+                    <div className="text-white flex items-center h-[90px] pt-4">
                         <div className="w-[100px] h-[70px] shrink-0"></div>
                         <div className="flex gap-4 items-center w-full pl-2">
                             <span className="text-[60px] font-black leading-none drop-shadow-lg">{totalAtendimentos.toString().padStart(2, '0')}</span>
@@ -243,8 +235,8 @@ export default function InformativoMaker({ isOpen, onClose, fireEvents, date }) 
                 </div>
 
                 {/* Q2: Focos CENSIPAM */}
-                <div className="bg-transparent rounded-xl flex flex-col overflow-hidden z-10">
-                    <div className="text-white flex items-center h-[90px] pt-2">
+                <div className="bg-transparent rounded-xl flex flex-col overflow-hidden z-10 pt-[10px]">
+                    <div className="text-white flex items-center h-[90px] pt-4">
                         <div className="w-[120px] h-[70px] shrink-0"></div>
                         <div className="flex gap-4 items-center w-full pl-2">
                             <span className="text-[60px] font-black leading-none drop-shadow-lg">{censipamDados.total.toString().padStart(2, '0')}</span>
@@ -260,9 +252,9 @@ export default function InformativoMaker({ isOpen, onClose, fireEvents, date }) 
                 </div>
 
                 {/* Q3: Naturezas */}
-                <div className="bg-transparent rounded-xl flex flex-col overflow-hidden z-10">
-                    <div className="text-white flex items-center justify-center h-[90px] pl-[110px] pr-4 pt-1">
-                        <h3 className="text-[16px] font-bold uppercase leading-tight text-left w-full">Natureza das Ocorrências<br/>Atendidas</h3>
+                <div className="bg-transparent rounded-xl flex flex-col overflow-hidden z-10 pt-[10px]">
+                    <div className="text-white flex items-center justify-center h-[90px] pl-[110px] pr-4 pt-2">
+                        <h3 className="text-[18px] font-bold uppercase leading-tight text-left w-full">Natureza das Ocorrências<br/>Atendidas</h3>
                     </div>
                     <div className="px-4 flex-1 flex flex-col justify-center pb-2 pt-2">
                         {sspNat.map(([nat, val]) => renderBar(nat, val, maxSspNat, 'bg-[#f47f20]'))}
@@ -272,9 +264,9 @@ export default function InformativoMaker({ isOpen, onClose, fireEvents, date }) 
                 </div>
 
                 {/* Q4: CIMEHGO */}
-                <div className="bg-transparent rounded-xl flex flex-col overflow-hidden z-10">
-                    <div className="text-white flex items-center justify-center h-[90px] pl-[110px] pr-4 pt-1">
-                        <h3 className="text-[16px] font-bold uppercase leading-tight text-left w-full">Dias sem Chuvas por<br/>Região do Estado</h3>
+                <div className="bg-transparent rounded-xl flex flex-col overflow-hidden z-10 pt-[10px]">
+                    <div className="text-white flex items-center justify-center h-[90px] pl-[110px] pr-4 pt-2">
+                        <h3 className="text-[18px] font-bold uppercase leading-tight text-left w-full">Dias sem Chuvas por<br/>Região do Estado</h3>
                     </div>
                     <div className="px-4 flex-1 flex flex-col justify-center pb-2 pt-2">
                         {['OESTE','NORTE','LESTE','SUL','CENTRAL','SUDOESTE'].map(reg => renderBar(reg, diasSeca[reg] || 0, maxDias, 'bg-[#3bbbf6]'))}
