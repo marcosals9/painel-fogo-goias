@@ -10,6 +10,18 @@ export default function DataExplorer({ isOpen, onClose, fireEvents }) {
   const [sortKey, setSortKey]         = useState('municipio');
   const [sortDir, setSortDir]         = useState('asc');
 
+  // Bloqueia o scroll do body quando o drawer estiver aberto
+  React.useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [isOpen]);
+
   // Lista única de UFs para o select
   const ufs = useMemo(() => {
     const set = new Set((fireEvents || []).map(e => e.uf).filter(Boolean));
