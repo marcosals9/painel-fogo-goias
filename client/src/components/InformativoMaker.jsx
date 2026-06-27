@@ -12,7 +12,7 @@ export default function InformativoMaker({ isOpen, onClose, fireEvents, date }) 
   const [downloading, setDownloading] = useState(false);
 
   // Bloqueia o scroll do body quando o modal estiver aberto
-  useEffect(() => {
+  React.useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = 'hidden';
     } else {
