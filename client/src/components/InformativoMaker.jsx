@@ -38,6 +38,14 @@ export default function InformativoMaker({ isOpen, onClose, fireEvents, date }) 
     SUDOESTE: 0,
     SUL: 0
   });
+  
+  const displayDate = date.split('-').reverse().join('/');
+  const [cimehgoDate, setCimehgoDate] = useState(displayDate);
+
+  // Atualiza a data do CIMEHGO caso a data do painel mude e o modal seja reaberto
+  React.useEffect(() => {
+    setCimehgoDate(date.split('-').reverse().join('/'));
+  }, [date]);
 
   // Cálculo CENSIPAM (Focos de Calor)
   const censipamDados = useMemo(() => {
@@ -155,8 +163,6 @@ export default function InformativoMaker({ isOpen, onClose, fireEvents, date }) 
 
   if (!isOpen) return null;
 
-  const displayDate = date.split('-').reverse().join('/');
-
   // Helpers de Renderização das Barras
   const renderBar = (label, value, max, colorClass) => (
     <div key={label} className="flex items-center mb-1 w-full">
@@ -211,6 +217,18 @@ export default function InformativoMaker({ isOpen, onClose, fireEvents, date }) 
 
           <div className="space-y-3">
             <h3 className="font-semibold text-sm flex items-center gap-2"><ThermometerSun className="w-4 h-4" /> 3. Dias Sem Chuva (CIMEHGO)</h3>
+            
+            <div className="flex items-center gap-2 pb-2">
+              <Label className="text-xs whitespace-nowrap">Data do Boletim:</Label>
+              <Input 
+                type="text" 
+                value={cimehgoDate} 
+                onChange={(e) => setCimehgoDate(e.target.value)} 
+                className="h-7 text-xs w-32"
+                placeholder="DD/MM/AAAA"
+              />
+            </div>
+
             <div className="grid grid-cols-2 gap-3">
               {Object.keys(diasSeca).map(regiao => (
                 <div key={regiao} className="space-y-1">
@@ -327,7 +345,7 @@ export default function InformativoMaker({ isOpen, onClose, fireEvents, date }) 
               <div className="px-2 flex-1 flex flex-col justify-center pb-4 gap-0.5">
                 {['OESTE', 'NORTE', 'LESTE', 'SUL', 'CENTRAL', 'SUDOESTE'].map(reg => renderBar(reg, diasSeca[reg] || 0, maxDias, 'bg-[#3bbbf6]'))}
               </div>
-              <div className="text-center font-bold text-[10px] pb-1 text-[#002b5e]">FONTE: CIMEHGO ({displayDate})</div>
+              <div className="text-center font-bold text-[10px] pb-1 text-[#002b5e]">FONTE: CIMEHGO ({cimehgoDate})</div>
             </div>
 
           </div>
