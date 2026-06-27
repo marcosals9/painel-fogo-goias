@@ -471,11 +471,11 @@ export default function Dashboard() {
   return (
     <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-        <div className="flex items-start gap-3">
-          <img src="/cbmgo.png" alt="CBMGO" className="w-12 h-12 object-contain mt-0.5 drop-shadow-sm" />
+        <div className="flex items-start gap-2.5">
+          <Flame className="w-9 h-9 text-primary mt-0.5 drop-shadow-sm" />
           <div className="flex flex-col">
             <h2 className="text-3xl font-black tracking-tight flex items-center gap-2">
-              Corpo de Bombeiros Militar do Estado de Goiás
+              Monitoramento de Focos
               <Button variant="outline" size="sm" className="ml-4 h-8 gap-2 flex flex-row items-center bg-orange-50 text-orange-600 border-orange-200 hover:bg-orange-100 hover:text-orange-700 shadow-sm" onClick={() => setIsMakerOpen(true)}>
                 <Smartphone className="w-4 h-4" /> Informativo WhatsApp
               </Button>
