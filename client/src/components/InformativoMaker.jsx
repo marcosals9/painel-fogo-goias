@@ -19,12 +19,12 @@ export default function InformativoMaker({ isOpen, onClose, fireEvents, date }) 
 
   // Estados dos Dias Secos (CIMEHGO)
   const [diasSeca, setDiasSeca] = useState({
-    OESTE: 0,
     NORTE: 0,
     LESTE: 0,
-    SUL: 0,
+    OESTE: 0,
     CENTRAL: 0,
-    SUDOESTE: 0
+    SUDOESTE: 0,
+    SUL: 0
   });
 
   // Cálculo CENSIPAM (Focos de Calor)
@@ -36,55 +36,55 @@ export default function InformativoMaker({ isOpen, onClose, fireEvents, date }) 
       const mun = e.municipio || 'NÃO IDENTIFICADO';
       counts[mun] = (counts[mun] || 0) + 1;
     });
-    const top = Object.entries(counts).sort((a,b) => b[1]-a[1]).slice(0, 5);
+    const top = Object.entries(counts).sort((a, b) => b[1] - a[1]).slice(0, 5);
     return { total, top };
   }, [fireEvents]);
 
   const handleFileUpload = (e) => {
     const file = e.target.files[0];
-    if(!file) return;
+    if (!file) return;
     setSspFile(file.name);
-    
+
     const reader = new FileReader();
     reader.onload = (evt) => {
-        const bstr = evt.target.result;
-        const wb = XLSX.read(bstr, { type: 'binary' });
-        const wsname = wb.SheetNames[0];
-        const ws = wb.Sheets[wsname];
-        const data = XLSX.utils.sheet_to_json(ws);
-        
-        let total = 0;
-        const muniCounts = {};
-        const natCounts = {};
+      const bstr = evt.target.result;
+      const wb = XLSX.read(bstr, { type: 'binary' });
+      const wsname = wb.SheetNames[0];
+      const ws = wb.Sheets[wsname];
+      const data = XLSX.utils.sheet_to_json(ws);
 
-        data.forEach(row => {
-            total++;
-            const mun = row['MUNICÍPIO'];
-            if(mun) {
-                muniCounts[mun] = (muniCounts[mun] || 0) + 1;
-            }
+      let total = 0;
+      const muniCounts = {};
+      const natCounts = {};
 
-            let natStr = row['NATUREZAS'] || '';
-            let parsedNat = "OUTROS";
-            
-            const upperNat = natStr.toUpperCase();
-            if(upperNat.includes('TERRENO BALDIO')) parsedNat = 'TERRENO BALDIO';
-            else if(upperNat.includes('PROPRIEDADE RURAL')) parsedNat = 'PROPRIEDADE RURAL';
-            else if(upperNat.includes('ÁREA VERDE')) parsedNat = 'ÁREA VERDE';
-            else if(upperNat.includes('TERRAS DEVOLUTAS')) parsedNat = 'TERRAS DEVOLUTAS';
-            else if(upperNat.includes('ESTRADA') || upperNat.includes('RODOVIA')) parsedNat = 'ESTRADA/RODOVIA';
-            else if(natStr) {
-                const parts = natStr.split('->');
-                const lastPart = parts[parts.length - 1].trim();
-                parsedNat = lastPart.replace(/\(\d+\)/g, '').trim().toUpperCase();
-            }
+      data.forEach(row => {
+        total++;
+        const mun = row['MUNICÍPIO'];
+        if (mun) {
+          muniCounts[mun] = (muniCounts[mun] || 0) + 1;
+        }
 
-            natCounts[parsedNat] = (natCounts[parsedNat] || 0) + 1;
-        });
+        let natStr = row['NATUREZAS'] || '';
+        let parsedNat = "OUTROS";
 
-        setSspMuni(Object.entries(muniCounts).sort((a,b)=>b[1]-a[1]).slice(0,5));
-        setSspNat(Object.entries(natCounts).sort((a,b)=>b[1]-a[1]).slice(0,5));
-        setTotalAtendimentos(total);
+        const upperNat = natStr.toUpperCase();
+        if (upperNat.includes('TERRENO BALDIO')) parsedNat = 'TERRENO BALDIO';
+        else if (upperNat.includes('PROPRIEDADE RURAL')) parsedNat = 'PROPRIEDADE RURAL';
+        else if (upperNat.includes('ÁREA VERDE')) parsedNat = 'ÁREA VERDE';
+        else if (upperNat.includes('TERRAS DEVOLUTAS')) parsedNat = 'TERRAS DEVOLUTAS';
+        else if (upperNat.includes('ESTRADA') || upperNat.includes('RODOVIA')) parsedNat = 'ESTRADA/RODOVIA';
+        else if (natStr) {
+          const parts = natStr.split('->');
+          const lastPart = parts[parts.length - 1].trim();
+          parsedNat = lastPart.replace(/\(\d+\)/g, '').trim().toUpperCase();
+        }
+
+        natCounts[parsedNat] = (natCounts[parsedNat] || 0) + 1;
+      });
+
+      setSspMuni(Object.entries(muniCounts).sort((a, b) => b[1] - a[1]).slice(0, 5));
+      setSspNat(Object.entries(natCounts).sort((a, b) => b[1] - a[1]).slice(0, 5));
+      setTotalAtendimentos(total);
     };
     reader.readAsBinaryString(file);
   };
@@ -117,7 +117,7 @@ export default function InformativoMaker({ isOpen, onClose, fireEvents, date }) 
       <div className="flex items-center bg-gray-200 h-7" style={{ width: 'calc(100% - 90px)' }}>
         <div
           className={`${colorClass} h-full flex items-center justify-end pr-1.5 text-[10px] text-black/80 font-extrabold shrink-0`}
-          style={{ width: max > 0 ? `${(value/max)*100}%` : '0%', minWidth: '18px' }}
+          style={{ width: max > 0 ? `${(value / max) * 100}%` : '0%', minWidth: '18px' }}
         >
           {value}
         </div>
@@ -132,7 +132,7 @@ export default function InformativoMaker({ isOpen, onClose, fireEvents, date }) 
 
   return (
     <div className="fixed inset-0 z-[999] bg-background/95 backdrop-blur-sm flex overflow-hidden">
-      
+
       {/* Controles (Esquerda) */}
       <div className="w-[400px] bg-card border-r shadow-xl flex flex-col h-full">
         <div className="p-4 border-b flex justify-between items-center bg-muted/30">
@@ -140,13 +140,13 @@ export default function InformativoMaker({ isOpen, onClose, fireEvents, date }) 
             <h2 className="text-lg font-bold">Gerador de Informativo</h2>
             <p className="text-xs text-muted-foreground">Preencha os dados manuais</p>
           </div>
-          <Button variant="ghost" size="icon" onClick={onClose}><X className="w-5 h-5"/></Button>
+          <Button variant="ghost" size="icon" onClick={onClose}><X className="w-5 h-5" /></Button>
         </div>
-        
+
         <div className="p-4 flex-1 overflow-y-auto space-y-6">
-          
+
           <div className="space-y-3">
-            <h3 className="font-semibold text-sm flex items-center gap-2"><Upload className="w-4 h-4"/> 1. Ocorrências (SSP)</h3>
+            <h3 className="font-semibold text-sm flex items-center gap-2"><Upload className="w-4 h-4" /> 1. Ocorrências (SSP)</h3>
             <div className="border-2 border-dashed rounded-lg p-4 text-center hover:bg-muted/50 transition-colors">
               <Input type="file" accept=".xls,.xlsx,.csv" id="ssp-file" className="hidden" onChange={handleFileUpload} />
               <Label htmlFor="ssp-file" className="cursor-pointer flex flex-col items-center gap-2">
@@ -158,138 +158,137 @@ export default function InformativoMaker({ isOpen, onClose, fireEvents, date }) 
           </div>
 
           <div className="space-y-3">
-            <h3 className="font-semibold text-sm flex items-center gap-2"><Flame className="w-4 h-4"/> 2. Focos de Calor (CENSIPAM)</h3>
+            <h3 className="font-semibold text-sm flex items-center gap-2"><Flame className="w-4 h-4" /> 2. Focos de Calor (CENSIPAM)</h3>
             <p className="text-xs text-muted-foreground bg-muted p-2 rounded border">Dados coletados automaticamente do mapa (Total: {censipamDados.total} focos na data {displayDate}). Nenhuma ação necessária.</p>
           </div>
 
           <div className="space-y-3">
-            <h3 className="font-semibold text-sm flex items-center gap-2"><ThermometerSun className="w-4 h-4"/> 3. Seca CIMEHGO (Dias)</h3>
+            <h3 className="font-semibold text-sm flex items-center gap-2"><ThermometerSun className="w-4 h-4" /> 3. Dias Sem Chuva (CIMEHGO)</h3>
             <div className="grid grid-cols-2 gap-3">
               {Object.keys(diasSeca).map(regiao => (
                 <div key={regiao} className="space-y-1">
                   <Label className="text-xs">{regiao}</Label>
-                  <Input 
-                    type="number" min="0" value={diasSeca[regiao]} 
-                    onChange={(e) => setDiasSeca({...diasSeca, [regiao]: Number(e.target.value)})} 
+                  <Input
+                    type="number" min="0" value={diasSeca[regiao]}
+                    onChange={(e) => setDiasSeca({ ...diasSeca, [regiao]: Number(e.target.value) })}
                     className="h-8"
                   />
                 </div>
               ))}
             </div>
           </div>
-          
+
         </div>
 
         <div className="p-4 border-t bg-muted/30">
           <Button className="w-full font-bold h-12 text-md" onClick={downloadImage} disabled={downloading}>
-            {downloading ? 'Gerando Imagem...' : 'Baixar Imagem para WhatsApp'} <Download className="w-5 h-5 ml-2"/>
+            {downloading ? 'Gerando Imagem...' : 'Baixar Imagem para WhatsApp'} <Download className="w-5 h-5 ml-2" />
           </Button>
         </div>
       </div>
 
       {/* Preview (Direita) */}
       <div className="flex-1 bg-black/5 overflow-y-auto flex justify-center py-8">
-        
+
         {/* Container do Canvas A4/Poster - Aspect Ratio aproximado 800x1130 */}
-        <div 
-            ref={canvasRef} 
-            className="bg-white shadow-2xl shrink-0 relative flex flex-col font-sans overflow-hidden"
-            style={{ width: '800px', height: '1130px', transformOrigin: 'top center', transform: 'scale(0.85)' }}
+        <div
+          ref={canvasRef}
+          className="bg-white shadow-2xl shrink-0 relative flex flex-col font-sans overflow-hidden"
+          style={{ width: '800px', height: '1130px', transformOrigin: 'top center', transform: 'scale(0.85)' }}
         >
-            {/* Camada do Template do Canva (Enviado pelo usuário) */}
-            <img src="/template.png" className="absolute inset-0 w-full h-full z-0 pointer-events-none object-cover" alt="Template Canva" onError={(e) => e.target.style.display = 'none'} />
+          {/* Camada do Template do Canva (Enviado pelo usuário) */}
+          <img src="/template.png" className="absolute inset-0 w-full h-full z-0 pointer-events-none object-cover" alt="Template Canva" onError={(e) => e.target.style.display = 'none'} />
 
-            {/* Header - transparente, todo conteudo ja esta no template */}
-            <div className="bg-transparent h-[180px] relative z-10"></div>
+          {/* Header - Agora Transparente para mostrar o fundo da imagem */}
+          <div className="bg-transparent text-white flex justify-between h-[180px] p-6 relative z-10">
+            <div className="flex items-center gap-6 z-10 pl-[160px]">
+              <div>
+                <h1 className="text-[65px] font-black leading-[0.9] tracking-tighter shadow-sm" style={{ textShadow: '2px 2px 4px rgba(0,0,0,0.5)' }}>
+                  DEFESA<br />
+                  <span className="text-white">CIVIL </span><span className="text-[#ff7f00]">GOIÁS</span>
+                </h1>
+                <p className="text-xl font-medium mt-1 tracking-wider text-gray-200">Proteger vidas é nossa missão!</p>
+              </div>
+            </div>
+          </div>
 
-            {/* Fita Laranja - apenas a data, o titulo ja esta no template */}
-            <div className="mx-4 mt-[-15px] z-20">
-                <div className="bg-transparent rounded-2xl flex items-center h-[70px]">
-                    <div className="w-[100px] h-[70px] shrink-0"></div>
-                    <div className="flex-1 text-center flex flex-col justify-end h-full pb-2">
-                        <h3 className="text-[20px] font-black text-[#002b5e] leading-tight">DADOS DO DIA {displayDate}</h3>
-                    </div>
+          {/* Fita Laranja Data */}
+          <div className="mx-4 mt-[-15px] z-20">
+            <div className="bg-transparent rounded-2xl flex items-center h-[70px]">
+              <div className="w-[100px] h-[70px] shrink-0"></div>
+              <div className="flex-1 text-center flex flex-col justify-center h-full pt-[5.5rem]">
+                <h2 className="text-[26px] font-black text-[#002b5e] leading-tight drop-shadow-sm">INFORMATIVO - PERÍODO DE ESTIAGEM</h2>
+                <h3 className="text-xl font-black text-[#002b5e] leading-tight">DADOS DO DIA {displayDate}</h3>
+              </div>
+            </div>
+          </div>
+
+          {/* Grid 2x2 Quadrantes */}
+          <div className="grid grid-cols-2 gap-4 p-4 flex-1 mt-2">
+
+            {/* Q1: Atendimentos SSP */}
+            <div className="bg-transparent flex flex-col overflow-hidden z-10 pt-[10px]">
+              <div className="text-white flex items-center h-[85px] pt-3 gap-3">
+                <div className="w-[95px] h-[70px] shrink-0"></div>
+                <div className="flex gap-2 items-center w-full pr-1">
+                  <span className="text-[52px] font-black leading-none drop-shadow-lg shrink-0">{totalAtendimentos.toString().padStart(2, '00')}</span>
+                  <span className="text-[11px] font-bold uppercase leading-tight drop-shadow-md">Atendimentos Relacionados<br />a Incêndios em Vegetação</span>
                 </div>
+              </div>
+              <div className="opacity-0 h-[22px]"></div>
+              <div className="px-2 flex-1 flex flex-col justify-center pb-6 gap-0.5">
+                {sspMuni.slice(0, 5).map(([mun, val]) => renderBar(mun, val, maxSspMuni, 'bg-[#76e5d7]'))}
+                {sspMuni.length === 0 && <div className="text-center text-gray-400 font-bold">Anexe a planilha SSP</div>}
+              </div>
+              <div className="text-center font-bold text-[10px] pb-2 text-[#002b5e]">FONTE: CBMGO - TOP 5</div>
             </div>
 
-            {/* Grid 2x2 Quadrantes */}
-            <div className="grid grid-cols-2 gap-4 p-4 flex-1 mt-2">
-                
-                {/* Q1: Atendimentos SSP */}
-                <div className="bg-transparent flex flex-col overflow-hidden z-10 pt-[10px]">
-                    <div className="text-white flex items-center h-[85px] pt-3">
-                        <div className="w-[95px] h-[70px] shrink-0"></div>
-                        <div className="flex gap-2 items-center w-full pr-1">
-                            <span className="text-[52px] font-black leading-none drop-shadow-lg shrink-0">{totalAtendimentos.toString().padStart(2, '00')}</span>
-                            <span className="text-[10.5px] font-bold uppercase leading-tight drop-shadow-md">Atendimentos Relacionados<br/>a Incêndios em Vegetação</span>
-                        </div>
-                    </div>
-                    <div className="opacity-0 h-[22px]"></div>
-                    <div className="px-2 flex-1 flex flex-col justify-center pb-6 gap-0.5">
-                        {sspMuni.slice(0,5).map(([mun, val]) => renderBar(mun, val, maxSspMuni, 'bg-[#76e5d7]'))}
-                        {sspMuni.length === 0 && <div className="text-center text-gray-400 font-bold">Anexe a planilha SSP</div>}
-                    </div>
-                    <div className="text-center font-bold text-[10px] pb-2 text-[#002b5e]">FONTE: CBMGO - TOP 5</div>
+            {/* Q2: Focos CENSIPAM */}
+            <div className="bg-transparent flex flex-col overflow-hidden z-10 pt-[10px]">
+              <div className="text-white flex items-center h-[85px] pt-3">
+                <div className="w-[95px] h-[70px] shrink-0"></div>
+                <div className="flex gap-2 items-center w-full pr-1">
+                  <span className="text-[52px] font-black leading-none drop-shadow-lg shrink-0">{censipamDados.total.toString().padStart(2, '00')}</span>
+                  <span className="text-[11px] font-bold uppercase leading-tight drop-shadow-md">Eventos de Fogo<br />Identificados por Satélites</span>
                 </div>
-
-                {/* Q2: Focos CENSIPAM */}
-                <div className="bg-transparent flex flex-col overflow-hidden z-10 pt-[10px]">
-                    <div className="text-white flex items-center h-[85px] pt-3">
-                        <div className="w-[95px] h-[70px] shrink-0"></div>
-                        <div className="flex gap-2 items-center w-full pr-1">
-                            <span className="text-[52px] font-black leading-none drop-shadow-lg shrink-0">{censipamDados.total.toString().padStart(2, '00')}</span>
-                            <span className="text-[10.5px] font-bold uppercase leading-tight drop-shadow-md">Eventos de Fogo<br/>Identificados por Satélites</span>
-                        </div>
-                    </div>
-                    <div className="opacity-0 h-[22px]"></div>
-                    <div className="px-2 flex-1 flex flex-col justify-center pb-6 gap-0.5">
-                        {censipamDados.top.slice(0,5).map(([mun, val]) => renderBar(mun, val, maxCenMuni, 'bg-[#76e5d7]'))}
-                        {censipamDados.top.length === 0 && <div className="text-center text-gray-400 font-bold">Sem focos na data</div>}
-                    </div>
-                    <div className="text-center font-bold text-[10px] pb-2 text-[#002b5e]">FONTE: CENSIPAM</div>
-                </div>
-
-                {/* Q3: Naturezas */}
-                <div className="bg-transparent flex flex-col overflow-hidden z-10 pt-[8px]">
-                    <div className="text-white flex items-center h-[75px] pt-1 pl-[95px] pr-2">
-                        <h3 className="text-[14px] font-bold uppercase leading-tight">Natureza das<br/>Ocorrências Atendidas</h3>
-                    </div>
-                    <div className="px-2 flex-1 flex flex-col justify-center pb-3 gap-0.5">
-                        {sspNat.slice(0,5).map(([nat, val]) => renderBar(nat, val, maxSspNat, 'bg-[#f47f20]'))}
-                        {sspNat.length === 0 && <div className="text-center text-gray-400 font-bold">Anexe a planilha SSP</div>}
-                    </div>
-                    <div className="text-center font-bold text-[10px] pb-2 text-[#002b5e]">FONTE: CBMGO</div>
-                </div>
-
-                {/* Q4: CIMEHGO - 6 barras, usar h-6 para caber */}
-                <div className="bg-transparent flex flex-col overflow-hidden z-10 pt-[8px]">
-                    <div className="text-white flex items-center h-[75px] pt-1 pl-[95px] pr-2">
-                        <h3 className="text-[14px] font-bold uppercase leading-tight">Dias sem Chuvas por<br/>Região do Estado</h3>
-                    </div>
-                    <div className="px-2 flex-1 flex flex-col justify-center pb-3 gap-0.5">
-                        {['OESTE','NORTE','LESTE','SUL','CENTRAL','SUDOESTE'].map(reg => (
-                            <div key={reg} className="flex items-center mb-0.5 w-full">
-                                <div className="w-[90px] shrink-0 text-right pr-2 text-[#002b5e] font-bold text-[9.5px] leading-tight">{reg}</div>
-                                <div className="flex items-center bg-gray-200 h-6" style={{ width: 'calc(100% - 90px)' }}>
-                                    <div
-                                        className="bg-[#3bbbf6] h-full flex items-center justify-end pr-1.5 text-[10px] text-black/80 font-extrabold shrink-0"
-                                        style={{ width: maxDias > 0 ? `${(diasSeca[reg]||0)/maxDias*100}%` : '0%', minWidth: '18px' }}
-                                    >
-                                        {diasSeca[reg] || 0}
-                                    </div>
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-                    <div className="text-center font-bold text-[10px] pb-2 text-[#002b5e]">FONTE: CIMEHGO ({displayDate})</div>
-                </div>
-
+              </div>
+              <div className="opacity-0 h-[22px]"></div>
+              <div className="px-2 flex-1 flex flex-col justify-center pb-6 gap-0.5">
+                {censipamDados.top.slice(0, 5).map(([mun, val]) => renderBar(mun, val, maxCenMuni, 'bg-[#76e5d7]'))}
+                {censipamDados.top.length === 0 && <div className="text-center text-gray-400 font-bold">Sem focos na data</div>}
+              </div>
+              <div className="text-center font-bold text-[10px] pb-2 text-[#002b5e]">FONTE: CENSIPAM</div>
             </div>
 
-            {/* Footer do Template Original vai sobrepor o rodapé */}
-            <div className="mt-2 h-[120px] bg-transparent">
-                {/* O espaço em branco é preenchido pela imagem do template (z-50) */}
+            {/* Q3: Naturezas */}
+            <div className="bg-transparent flex flex-col overflow-hidden z-10 pt-[10px]">
+              <div className="text-white flex items-center h-[90px] pt-2 pl-[110px] pr-3">
+                <h3 className="text-[16px] font-bold uppercase leading-tight">Natureza das Ocorrências<br />Atendidas</h3>
+              </div>
+              <div className="px-2 flex-1 flex flex-col justify-center pb-4 gap-0.5">
+                {sspNat.slice(0, 5).map(([nat, val]) => renderBar(nat, val, maxSspNat, 'bg-[#f47f20]'))}
+                {sspNat.length === 0 && <div className="text-center text-gray-400 font-bold">Anexe a planilha SSP</div>}
+              </div>
+              <div className="text-center font-bold text-[10px] pb-1 text-[#002b5e]">FONTE: CBMGO</div>
             </div>
+
+            {/* Q4: CIMEHGO */}
+            <div className="bg-transparent flex flex-col overflow-hidden z-10 pt-[10px]">
+              <div className="text-white flex items-center h-[90px] pt-2 pl-[110px] pr-3">
+                <h3 className="text-[16px] font-bold uppercase leading-tight">Dias sem Chuvas por<br />Região do Estado</h3>
+              </div>
+              <div className="px-2 flex-1 flex flex-col justify-center pb-4 gap-0.5">
+                {['OESTE', 'NORTE', 'LESTE', 'SUL', 'CENTRAL', 'SUDOESTE'].map(reg => renderBar(reg, diasSeca[reg] || 0, maxDias, 'bg-[#3bbbf6]'))}
+              </div>
+              <div className="text-center font-bold text-[10px] pb-1 text-[#002b5e]">FONTE: CIMEHGO ({displayDate})</div>
+            </div>
+
+          </div>
+
+          {/* Footer do Template Original vai sobrepor o rodapé */}
+          <div className="mt-2 h-[120px] bg-transparent">
+            {/* O espaço em branco é preenchido pela imagem do template (z-50) */}
+          </div>
 
         </div>
 
