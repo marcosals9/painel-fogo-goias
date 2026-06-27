@@ -112,12 +112,12 @@ export default function InformativoMaker({ isOpen, onClose, fireEvents, date }) 
 
   // Helpers de Renderização das Barras
   const renderBar = (label, value, max, colorClass) => (
-    <div key={label} className="flex items-center mb-1.5">
-      <div className="w-[130px] shrink-0 text-right pr-2 text-[#002b5e] font-bold text-[10px] leading-tight">{label}</div>
-      <div className="flex-1 flex items-center bg-gray-100 h-5">
+    <div key={label} className="flex items-center mb-1.5 w-full">
+      <div className="w-[110px] shrink-0 text-right pr-2 text-[#002b5e] font-bold text-[10px] leading-tight">{label}</div>
+      <div className="flex items-center bg-gray-200 h-6" style={{ width: 'calc(100% - 110px)' }}>
         <div
-          className={`${colorClass} h-full flex items-center justify-end pr-1.5 text-[10px] text-black/80 font-extrabold`}
-          style={{ width: max > 0 ? `${Math.max((value/max)*100, 8)}%` : '8%' }}
+          className={`${colorClass} h-full flex items-center justify-end pr-1.5 text-[10px] text-black/80 font-extrabold shrink-0`}
+          style={{ width: max > 0 ? `${(value/max)*100}%` : '0%', minWidth: '18px' }}
         >
           {value}
         </div>
@@ -232,11 +232,11 @@ export default function InformativoMaker({ isOpen, onClose, fireEvents, date }) 
                         <div className="w-[100px] h-[70px] shrink-0"></div>
                         <div className="flex gap-3 items-center w-full pl-1 pr-2">
                             <span className="text-[58px] font-black leading-none drop-shadow-lg shrink-0">{totalAtendimentos.toString().padStart(2, '0')}</span>
-                            <span className="text-[11px] font-bold uppercase leading-tight drop-shadow-md">Atendimentos Relacionados<br/>A Incêndios em Vegetação</span>
+                            <span className="text-[11px] font-bold uppercase leading-tight drop-shadow-md">Atendimentos<br/>Relacionados a<br/>Incêndios</span>
                         </div>
                     </div>
-                    <div className="text-white text-center py-1 font-bold text-sm uppercase opacity-0 h-[20px]">Municípios Mais Atendidos</div>
-                    <div className="px-2 flex-1 flex flex-col justify-center pb-4 gap-0.5">
+                    <div className="text-white text-center py-1 font-bold text-sm uppercase opacity-0 h-[20px]">top</div>
+                    <div className="px-3 flex-1 flex flex-col justify-center pb-4 gap-0">
                         {sspMuni.slice(0,5).map(([mun, val]) => renderBar(mun, val, maxSspMuni, 'bg-[#76e5d7]'))}
                         {sspMuni.length === 0 && <div className="text-center text-gray-400 font-bold">Anexe a planilha SSP</div>}
                     </div>
@@ -246,14 +246,14 @@ export default function InformativoMaker({ isOpen, onClose, fireEvents, date }) 
                 {/* Q2: Focos CENSIPAM */}
                 <div className="bg-transparent flex flex-col overflow-hidden z-10 pt-[10px]">
                     <div className="text-white flex items-center h-[90px] pt-4">
-                        <div className="w-[120px] h-[70px] shrink-0"></div>
-                        <div className="flex gap-3 items-center w-full pl-1 pr-2">
+                        <div className="w-[100px] h-[70px] shrink-0"></div>
+                        <div className="flex gap-2 items-center w-full pl-1 pr-2">
                             <span className="text-[58px] font-black leading-none drop-shadow-lg shrink-0">{censipamDados.total.toString().padStart(2, '0')}</span>
-                            <span className="text-[11px] font-bold uppercase leading-tight drop-shadow-md">Eventos de Fogo<br/>Identificados por Satélites</span>
+                            <span className="text-[11px] font-bold uppercase leading-tight drop-shadow-md">Eventos<br/>de Fogo<br/>por Satélites</span>
                         </div>
                     </div>
-                    <div className="text-white text-center py-1 font-bold text-sm uppercase opacity-0 h-[20px]">Municípios Mais Registrados</div>
-                    <div className="px-2 flex-1 flex flex-col justify-center pb-4 gap-0.5">
+                    <div className="text-white text-center py-1 font-bold text-sm uppercase opacity-0 h-[20px]">top</div>
+                    <div className="px-3 flex-1 flex flex-col justify-center pb-4 gap-0">
                         {censipamDados.top.slice(0,5).map(([mun, val]) => renderBar(mun, val, maxCenMuni, 'bg-[#76e5d7]'))}
                         {censipamDados.top.length === 0 && <div className="text-center text-gray-400 font-bold">Sem focos na data</div>}
                     </div>
