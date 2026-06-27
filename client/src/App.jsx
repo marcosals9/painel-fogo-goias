@@ -29,8 +29,8 @@ function App() {
         <header className="border-b-2 border-primary bg-slate-900 sticky top-0 z-50 text-slate-100 shadow-md">
           <div className="container mx-auto px-4 h-16 flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 flex items-center justify-center rounded-full overflow-hidden bg-white shadow-sm ring-2 ring-slate-900">
-                <img src="/defesa-civil.png" alt="Defesa Civil" className="w-full h-full object-cover" />
+              <div className="w-10 h-10 flex items-center justify-center rounded-full overflow-hidden bg-white shadow-sm p-1 ring-2 ring-slate-900 shrink-0">
+                <img src="/defesa-civil.png" alt="Defesa Civil" className="w-full h-full object-contain" />
               </div>
               <h1 className="text-xl font-bold tracking-tight">Sala de Situação CODEC</h1>
             </div>
@@ -40,7 +40,7 @@ function App() {
                   <div className="w-10 h-10 flex items-center justify-center rounded-full bg-white shadow-sm p-1 ring-2 ring-slate-900 shrink-0">
                     <img src="/cbmgo.png" alt="CBMGO" className="w-full h-full object-contain" />
                   </div>
-
+                  Corpo de Bombeiros Militar do Estado de Goiás
                 </>
               ) : '🌧️ Operação Tempestade'}
             </div>

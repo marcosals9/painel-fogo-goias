@@ -487,7 +487,7 @@ export default function Dashboard() {
               <span className="bg-primary/10 text-primary font-bold text-[10px] tracking-wider uppercase px-2 py-0.5 rounded border border-primary/20">
                 Operação Cerrado Vivo
               </span>
-              <span className="text-xs text-muted-foreground font-medium">Estado de Goiás</span>
+              <span className="text-xs text-muted-foreground font-medium">Corpo de Bombeiros Militar do Estado de Goiás</span>
             </div>
           </div>
         </div>
