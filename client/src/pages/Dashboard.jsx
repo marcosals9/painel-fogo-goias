@@ -9,8 +9,9 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { format, subDays, startOfDay, endOfDay } from 'date-fns';
-import { Download, Flame, Map as MapIcon, Loader2, ArrowUpDown, RefreshCw, MousePointerSquareDashed, LocateFixed, Timer, Trees, Smartphone } from 'lucide-react';
+import { Download, Flame, Map as MapIcon, Loader2, ArrowUpDown, RefreshCw, MousePointerSquareDashed, LocateFixed, Timer, Trees, Smartphone, Database } from 'lucide-react';
 import InformativoMaker from '../components/InformativoMaker';
+import DataExplorer from '../components/DataExplorer';
 
 // Fix for Leaflet icon in React
 import L from 'leaflet';
@@ -110,6 +111,7 @@ function MapController({ selectedEvent, sortedEvents, goiasCenter, showUCs, setS
 
 export default function Dashboard() {
   const [isMakerOpen, setIsMakerOpen] = useState(false);
+  const [isExplorerOpen, setIsExplorerOpen] = useState(false);
   const [date, setDate] = useState(() => {
     const d = new Date();
     d.setMinutes(d.getMinutes() - d.getTimezoneOffset());
@@ -475,6 +477,9 @@ export default function Dashboard() {
             <Button variant="outline" size="sm" className="ml-4 h-8 gap-2 bg-orange-50 text-orange-600 border-orange-200 hover:bg-orange-100 hover:text-orange-700" onClick={() => setIsMakerOpen(true)}>
                <Smartphone className="w-4 h-4" /> Informativo WhatsApp
             </Button>
+            <Button variant="outline" size="sm" className="h-8 gap-2 bg-blue-50 text-blue-600 border-blue-200 hover:bg-blue-100 hover:text-blue-700" onClick={() => setIsExplorerOpen(true)}>
+               <Database className="w-4 h-4" /> Dados KML
+            </Button>
           </h2>
           <p className="text-muted-foreground mt-1">Estado de Goiás - Visualização de Eventos de Fogo</p>
         </div>
@@ -688,7 +693,17 @@ export default function Dashboard() {
 
         <Card className="flex flex-col h-[600px] shadow-lg">
           <CardHeader className="py-3 px-4 bg-muted/30 flex flex-row justify-between items-center">
-            <CardTitle className="text-lg">Dados do Evento</CardTitle>
+            <div>
+              <CardTitle className="text-lg">Dados do Evento</CardTitle>
+              {!loading && (
+                <p className="text-xs text-muted-foreground mt-0.5">
+                  <span className="font-semibold text-foreground">{sortedEvents.length}</span> eventos em Goiás
+                  {fireEvents.length > sortedEvents.length && (
+                    <> · <span className="text-muted-foreground">{fireEvents.length} no total</span></>
+                  )}
+                </p>
+              )}
+            </div>
             <Button 
               variant="secondary" 
               size="sm" 
@@ -771,6 +786,7 @@ export default function Dashboard() {
       </footer>
 
       <InformativoMaker isOpen={isMakerOpen} onClose={() => setIsMakerOpen(false)} fireEvents={sortedEvents} date={date} />
+      <DataExplorer isOpen={isExplorerOpen} onClose={() => setIsExplorerOpen(false)} fireEvents={fireEvents} />
     </div>
   );
 }

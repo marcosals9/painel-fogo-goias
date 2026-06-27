@@ -113,8 +113,8 @@ export default function InformativoMaker({ isOpen, onClose, fireEvents, date }) 
   // Helpers de Renderização das Barras
   const renderBar = (label, value, max, colorClass) => (
     <div key={label} className="flex items-center mb-1 w-full">
-      <div className="w-[90px] shrink-0 text-right pr-2 text-[#002b5e] font-bold text-[9.5px] leading-tight">{label}</div>
-      <div className="flex items-center bg-gray-200 h-7" style={{ width: 'calc(100% - 90px)' }}>
+      <div className="w-[100px] shrink-0 text-right pr-2 text-[#002b5e] font-bold text-[9.5px] leading-tight">{label}</div>
+      <div className="flex items-center bg-gray-200 h-7" style={{ width: 'calc(100% - 140px)' }}>
         <div
           className={`${colorClass} h-full flex items-center justify-end pr-1.5 text-[10px] text-black/80 font-extrabold shrink-0`}
           style={{ width: max > 0 ? `${(value / max) * 100}%` : '0%', minWidth: '18px' }}
