@@ -44,16 +44,16 @@ const getEventColorHex = (ageHours) => {
 // Ícone SVG Customizado para permitir cor dinâmica e marcador de UC
 const createPinIcon = (isSelected, isUC, ageHours) => {
   const color = getEventColorHex(ageHours);
-  
-  const scale = 0.75; 
+
+  const scale = 0.75;
   const width = 25 * scale;
   const height = 41 * scale;
-  
+
   // Destaque visual: borda branca mais grossa se selecionado. Se for UC, coloca um ponto branco no meio.
   const strokeColor = isSelected ? '#ffffff' : (isUC ? '#1f2937' : '#ffffff');
   const strokeWidth = isSelected ? '2.5' : (isUC ? '2.0' : '1.5');
   const innerDot = isUC ? `<circle cx="12" cy="12" r="5" fill="#ffffff" opacity="1.0" />` : '';
-  
+
   const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 36" width="${width}" height="${height}" style="filter: drop-shadow(1px 2px 2px rgba(0,0,0,0.5));">
     <path fill="${color}" stroke="${strokeColor}" stroke-width="${strokeWidth}" d="M12 0C5.373 0 0 5.373 0 12c0 7.333 12 24 12 24s12-16.667 12-24C24 5.373 18.627 0 12 0zm0 17.5c-3.038 0-5.5-2.462-5.5-5.5S8.962 6.5 12 6.5s5.5 2.462 5.5 5.5-2.462 5.5-5.5 5.5z"/>
     ${innerDot}
@@ -69,16 +69,16 @@ const createPinIcon = (isSelected, isUC, ageHours) => {
 };
 
 let DefaultIcon = L.icon({
-    iconUrl: icon,
-    shadowUrl: iconShadow,
-    iconSize: [25, 41],
-    iconAnchor: [12, 41]
+  iconUrl: icon,
+  shadowUrl: iconShadow,
+  iconSize: [25, 41],
+  iconAnchor: [12, 41]
 });
 L.Marker.prototype.options.icon = DefaultIcon;
 
 function MapController({ selectedEvent, sortedEvents, goiasCenter, showUCs, setShowUCs, loadingUCs }) {
   const map = useMap();
-  
+
   useEffect(() => {
     if (selectedEvent) {
       const ev = sortedEvents.find(e => e.id === selectedEvent);
@@ -117,7 +117,7 @@ export default function Dashboard() {
     d.setMinutes(d.getMinutes() - d.getTimezoneOffset());
     return d.toISOString().split('T')[0];
   });
-  
+
   const [timezone, setTimezone] = useState('BRT');
   const [loading, setLoading] = useState(false);
   const [fireEvents, setFireEvents] = useState([]);
@@ -144,11 +144,11 @@ export default function Dashboard() {
       setLoadingUCs(true);
       const bbox = '-53.25,-19.5,-45.9,-12.4,EPSG:4674';
       const baseUrl = 'https://panorama.sipam.gov.br/geoserver/painel_do_fogo/wfs?service=WFS&version=1.0.0&request=GetFeature&outputFormat=application/json&bbox=' + bbox;
-      
+
       const req1 = axios.get(`${baseUrl}&typeName=painel_do_fogo:icmbio_unidade_conservacao_federal`);
       const req2 = axios.get(`${baseUrl}&typeName=painel_do_fogo:mma_cnuc_unidade_conservacao`);
       const req3 = axios.get(`${baseUrl}&typeName=painel_do_fogo:mma_cnuc_unidade_conservacao_municipal`);
-      
+
       Promise.allSettled([req1, req2, req3]).then(results => {
         let features = [];
         results.forEach(res => {
@@ -171,7 +171,7 @@ export default function Dashboard() {
       sortableItems.sort((a, b) => {
         let aVal = a[sortConfig.key];
         let bVal = b[sortConfig.key];
-        
+
         if (aVal === null || aVal === undefined) aVal = '';
         if (bVal === null || bVal === undefined) bVal = '';
 
@@ -204,27 +204,27 @@ export default function Dashboard() {
     let label = "Focos Ativos";
 
     if (selectedEvent) {
-       const selectedEvObj = sortedEvents.find(e => e.id === selectedEvent);
-       if (selectedEvObj && selectedEvObj.municipio && selectedEvObj.municipio !== 'Buscando...') {
-          eventsToCount = sortedEvents.filter(e => e.municipio === selectedEvObj.municipio);
-          label = `Focos em ${selectedEvObj.municipio}`;
-       } else {
-          label = "Foco Selecionado";
-       }
+      const selectedEvObj = sortedEvents.find(e => e.id === selectedEvent);
+      if (selectedEvObj && selectedEvObj.municipio && selectedEvObj.municipio !== 'Buscando...') {
+        eventsToCount = sortedEvents.filter(e => e.municipio === selectedEvObj.municipio);
+        label = `Focos em ${selectedEvObj.municipio}`;
+      } else {
+        label = "Foco Selecionado";
+      }
     }
 
     const focos = eventsToCount.length;
     const area = eventsToCount.reduce((acc, curr) => acc + (curr.tamanho_ha || 0), 0);
     const areaKm2 = area / 100; // 1 km² = 100 ha
     const cidades = new Set(eventsToCount.map(e => e.municipio).filter(m => m !== 'N/A' && m !== 'Desconhecido' && m !== 'Buscando...')).size;
-    
-    return { 
-       totalStateEvents: totalState,
-       locationLabel: label,
-       totalFocos: focos, 
-       areaTotal: area.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }), 
-       areaTotalKm2: areaKm2.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
-       cidadesAfetadas: cidades 
+
+    return {
+      totalStateEvents: totalState,
+      locationLabel: label,
+      totalFocos: focos,
+      areaTotal: area.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
+      areaTotalKm2: areaKm2.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
+      cidadesAfetadas: cidades
     };
   }, [sortedEvents, selectedEvent]);
 
@@ -235,7 +235,7 @@ export default function Dashboard() {
     setLoading(true);
     try {
       const wfsUrl = `https://panorama.sipam.gov.br/geoserver/painel_do_fogo/wfs`;
-      
+
       let startFilter, endFilter;
       if (tz === 'UTC') {
         startFilter = `${selectedDate}T00:00:00Z`;
@@ -248,7 +248,7 @@ export default function Dashboard() {
         const nextDateStr = d.toISOString().split('T')[0];
         endFilter = `${nextDateStr}T02:59:59Z`;
       }
-      
+
       const response = await axios.get(wfsUrl, {
         params: {
           service: 'WFS',
@@ -260,84 +260,84 @@ export default function Dashboard() {
           CQL_FILTER: `BBOX(geom,-53.25,-19.49,-45.90,-12.39) AND dt_maxima >= '${startFilter}' AND dt_minima <= '${endFilter}'`
         }
       });
-      
-      if (response.data && response.data.includes('<kml')) {
-         const parser = new DOMParser();
-         const xmlDoc = parser.parseFromString(response.data, "text/xml");
-         const placemarks = xmlDoc.getElementsByTagName("Placemark");
-         
-         const features = [];
-         for (let i = 0; i < placemarks.length; i++) {
-             const placemark = placemarks[i];
-             const simpleData = placemark.getElementsByTagName("SimpleData");
-             const props = {};
-             for (let j = 0; j < simpleData.length; j++) {
-                 const name = simpleData[j].getAttribute("name");
-                 let value = simpleData[j].textContent;
-                 
-                 if (value && value.includes('[Ljava.lang.')) {
-                     value = null;
-                 } else {
-                     if (value && value.startsWith('{') && value.endsWith('}')) {
-                         value = value.slice(1, -1);
-                     }
-                     if (value === 'NULL') value = null;
-                 }
-                 props[name] = value;
-             }
-             
-             const coordNode = placemark.getElementsByTagName("coordinates")[0];
-             let lat = 0, lng = 0;
-             if (coordNode) {
-                 const coordsStr = coordNode.textContent.trim().split(' ');
-                 if (coordsStr.length > 0) {
-                     const firstCoord = coordsStr[0].split(',');
-                     if (firstCoord.length >= 2) {
-                         lng = parseFloat(firstCoord[0]);
-                         lat = parseFloat(firstCoord[1]);
-                     }
-                 }
-             }
-             features.push({ properties: props, lat, lng });
-         }
 
-         const mappedEvents = features.map(f => {
-            const prop = f.properties;
-            const uf = prop.sigla_uf || 'N/A';
-            const mun = prop.nome_municipio || 'N/A';
-            
-            // Calcula a idade do foco de calor
-            let ageHours = null;
-            if (prop.dt_maxima) {
-                const dt = new Date(prop.dt_maxima);
-                const todayStr = new Date().toISOString().split('T')[0];
-                const referenceTime = date === todayStr ? Date.now() : new Date(endFilter).getTime();
-                if (!isNaN(dt.getTime())) {
-                    ageHours = (referenceTime - dt.getTime()) / (1000 * 60 * 60);
-                }
+      if (response.data && response.data.includes('<kml')) {
+        const parser = new DOMParser();
+        const xmlDoc = parser.parseFromString(response.data, "text/xml");
+        const placemarks = xmlDoc.getElementsByTagName("Placemark");
+
+        const features = [];
+        for (let i = 0; i < placemarks.length; i++) {
+          const placemark = placemarks[i];
+          const simpleData = placemark.getElementsByTagName("SimpleData");
+          const props = {};
+          for (let j = 0; j < simpleData.length; j++) {
+            const name = simpleData[j].getAttribute("name");
+            let value = simpleData[j].textContent;
+
+            if (value && value.includes('[Ljava.lang.')) {
+              value = null;
+            } else {
+              if (value && value.startsWith('{') && value.endsWith('}')) {
+                value = value.slice(1, -1);
+              }
+              if (value === 'NULL') value = null;
             }
-            
-            return {
-               municipio: mun,
-               uf: uf,
-               tamanho_ha: prop.area_total_evento ? parseFloat(parseFloat(prop.area_total_evento).toFixed(2)) : null,
-               duracao_h: prop.persistencia_dias ? parseInt(prop.persistencia_dias) * 24 : null,
-               qtd_deteccoes: prop.qtd_deteccoes ? parseInt(prop.qtd_deteccoes, 10) : 0,
-               uc: !!prop.nome_unidade_conservacao,
-               ucText: prop.nome_unidade_conservacao || 'N/A',
-               lat: f.lat,
-               lng: f.lng,
-               dt_minima: prop.dt_minima,
-               dt_maxima: prop.dt_maxima,
-               ageHours: ageHours,
-               id: prop.id_evento || Math.random(),
-               isGoias: uf === 'GO' || uf === 'N/A' // N/A passará pelo crivo do Turf.js a seguir
-            };
-         });
-         
-         setFireEvents(mappedEvents);
+            props[name] = value;
+          }
+
+          const coordNode = placemark.getElementsByTagName("coordinates")[0];
+          let lat = 0, lng = 0;
+          if (coordNode) {
+            const coordsStr = coordNode.textContent.trim().split(' ');
+            if (coordsStr.length > 0) {
+              const firstCoord = coordsStr[0].split(',');
+              if (firstCoord.length >= 2) {
+                lng = parseFloat(firstCoord[0]);
+                lat = parseFloat(firstCoord[1]);
+              }
+            }
+          }
+          features.push({ properties: props, lat, lng });
+        }
+
+        const mappedEvents = features.map(f => {
+          const prop = f.properties;
+          const uf = prop.sigla_uf || 'N/A';
+          const mun = prop.nome_municipio || 'N/A';
+
+          // Calcula a idade do foco de calor
+          let ageHours = null;
+          if (prop.dt_maxima) {
+            const dt = new Date(prop.dt_maxima);
+            const todayStr = new Date().toISOString().split('T')[0];
+            const referenceTime = date === todayStr ? Date.now() : new Date(endFilter).getTime();
+            if (!isNaN(dt.getTime())) {
+              ageHours = (referenceTime - dt.getTime()) / (1000 * 60 * 60);
+            }
+          }
+
+          return {
+            municipio: mun,
+            uf: uf,
+            tamanho_ha: prop.area_total_evento ? parseFloat(parseFloat(prop.area_total_evento).toFixed(2)) : null,
+            duracao_h: prop.persistencia_dias ? parseInt(prop.persistencia_dias) * 24 : null,
+            qtd_deteccoes: prop.qtd_deteccoes ? parseInt(prop.qtd_deteccoes, 10) : 0,
+            uc: !!prop.nome_unidade_conservacao,
+            ucText: prop.nome_unidade_conservacao || 'N/A',
+            lat: f.lat,
+            lng: f.lng,
+            dt_minima: prop.dt_minima,
+            dt_maxima: prop.dt_maxima,
+            ageHours: ageHours,
+            id: prop.id_evento || Math.random(),
+            isGoias: uf === 'GO' || uf === 'N/A' // N/A passará pelo crivo do Turf.js a seguir
+          };
+        });
+
+        setFireEvents(mappedEvents);
       } else {
-         throw new Error("Formato inválido retornado pelo GeoServer");
+        throw new Error("Formato inválido retornado pelo GeoServer");
       }
     } catch (error) {
       console.error("Erro ao buscar dados de fogo:", error);
@@ -350,7 +350,7 @@ export default function Dashboard() {
 
   useEffect(() => {
     if (!fireEvents || fireEvents.length === 0 || isFixingRef.current) return;
-    
+
     const fixData = async () => {
       isFixingRef.current = true;
       let hasChanges = false;
@@ -382,58 +382,58 @@ export default function Dashboard() {
         for (let i = 0; i < newEvents.length; i++) {
           const ev = newEvents[i];
           if (!ev.uc || ev.ucText === 'N/A') {
-             const pt = turf.point([ev.lng, ev.lat]);
-             for (const feature of ucGeoJSON.features) {
-               if (feature.geometry && (feature.geometry.type === 'Polygon' || feature.geometry.type === 'MultiPolygon')) {
-                 if (turf.booleanPointInPolygon(pt, feature)) {
-                   ev.ucText = feature.properties.nome || feature.properties.nome_uc || 'Unidade de Conservação';
-                   ev.uc = true;
-                   hasChanges = true;
-                   break;
-                 }
-               }
-             }
+            const pt = turf.point([ev.lng, ev.lat]);
+            for (const feature of ucGeoJSON.features) {
+              if (feature.geometry && (feature.geometry.type === 'Polygon' || feature.geometry.type === 'MultiPolygon')) {
+                if (turf.booleanPointInPolygon(pt, feature)) {
+                  ev.ucText = feature.properties.nome || feature.properties.nome_uc || 'Unidade de Conservação';
+                  ev.uc = true;
+                  hasChanges = true;
+                  break;
+                }
+              }
+            }
           }
         }
       }
-      
+
       // 3. Geocodificação Reversa para Municípios N/A
       for (let i = 0; i < newEvents.length; i++) {
         const ev = newEvents[i];
         // Só busca município se o evento realmente pertencer a Goiás
         if (ev.isGoias && (ev.municipio === 'N/A' || !ev.municipio)) {
-           try {
-             ev.municipio = 'Buscando...'; 
-             setFireEvents([...newEvents]);
-             hasChanges = true;
-             
-             await new Promise(r => setTimeout(r, 1200));
-             const res = await axios.get(`https://nominatim.openstreetmap.org/reverse?lat=${ev.lat}&lon=${ev.lng}&format=json`, {
-                 headers: { 'Accept-Language': 'pt-BR' }
-             });
-             if (res.data && res.data.address) {
-               const city = res.data.address.city || res.data.address.town || res.data.address.municipality || res.data.address.village;
-               if (city) {
-                 ev.municipio = city;
-               } else {
-                 ev.municipio = 'Desconhecido';
-               }
-             } else {
-                 ev.municipio = 'Desconhecido';
-             }
-           } catch(e) {
-             console.error("Erro na Geocodificação Reversa", e);
-             ev.municipio = 'Desconhecido';
-           }
+          try {
+            ev.municipio = 'Buscando...';
+            setFireEvents([...newEvents]);
+            hasChanges = true;
+
+            await new Promise(r => setTimeout(r, 1200));
+            const res = await axios.get(`https://nominatim.openstreetmap.org/reverse?lat=${ev.lat}&lon=${ev.lng}&format=json`, {
+              headers: { 'Accept-Language': 'pt-BR' }
+            });
+            if (res.data && res.data.address) {
+              const city = res.data.address.city || res.data.address.town || res.data.address.municipality || res.data.address.village;
+              if (city) {
+                ev.municipio = city;
+              } else {
+                ev.municipio = 'Desconhecido';
+              }
+            } else {
+              ev.municipio = 'Desconhecido';
+            }
+          } catch (e) {
+            console.error("Erro na Geocodificação Reversa", e);
+            ev.municipio = 'Desconhecido';
+          }
         }
       }
-      
+
       if (hasChanges) {
         setFireEvents([...newEvents]);
       }
       isFixingRef.current = false;
     };
-    
+
     fixData();
   }, [fireEvents, ucGeoJSON, goiasGeoJSON]);
 
@@ -476,20 +476,20 @@ export default function Dashboard() {
             <Flame className="w-8 h-8 text-primary" />
             Monitoramento de Focos
             <Button variant="outline" size="sm" className="ml-4 h-8 gap-2 flex flex-row items-center bg-orange-50 text-orange-600 border-orange-200 hover:bg-orange-100 hover:text-orange-700" onClick={() => setIsMakerOpen(true)}>
-               <Smartphone className="w-4 h-4" /> Informativo WhatsApp
+              <Smartphone className="w-4 h-4" /> Informativo WhatsApp
             </Button>
             <Button variant="outline" size="sm" className="h-8 gap-2 flex flex-row items-center bg-blue-50 text-blue-600 border-blue-200 hover:bg-blue-100 hover:text-blue-700" onClick={() => setIsExplorerOpen(true)}>
-               <Database className="w-4 h-4" /> Dados KML
+              <Database className="w-4 h-4" /> Dados KML
             </Button>
           </h2>
-          <p className="text-muted-foreground mt-1">Estado de Goiás - Visualização de Eventos de Fogo</p>
+          <p className="text-muted-foreground mt-1">CBMGO - Operação Cerrado Vivo</p>
         </div>
-        
+
         <div className="flex flex-col items-end gap-1.5">
           <div className="flex items-center gap-3 flex-wrap justify-end">
             <div className="relative flex items-center bg-card border rounded-md shadow-sm pr-2 hover:border-primary/50 transition-colors">
-             <Timer className="w-4 h-4 ml-3 text-muted-foreground absolute pointer-events-none" />
-             <select 
+              <Timer className="w-4 h-4 ml-3 text-muted-foreground absolute pointer-events-none" />
+              <select
                 value={refreshInterval}
                 onChange={(e) => setRefreshInterval(Number(e.target.value))}
                 className="h-9 pl-9 pr-3 text-sm bg-transparent border-none focus:outline-none focus:ring-0 cursor-pointer text-muted-foreground appearance-none"
@@ -500,9 +500,9 @@ export default function Dashboard() {
                 <option value={15}>A cada 15 min</option>
                 <option value={30}>A cada 30 min</option>
               </select>
-          </div>
-           <div className="relative flex items-center bg-card border rounded-md shadow-sm hover:border-primary/50 transition-colors">
-             <select 
+            </div>
+            <div className="relative flex items-center bg-card border rounded-md shadow-sm hover:border-primary/50 transition-colors">
+              <select
                 value={timezone}
                 onChange={(e) => setTimezone(e.target.value)}
                 className="h-9 px-3 text-sm bg-transparent border-none focus:outline-none focus:ring-0 cursor-pointer text-muted-foreground font-medium appearance-none"
@@ -511,24 +511,24 @@ export default function Dashboard() {
                 <option value="BRT">BRT (-3)</option>
                 <option value="UTC">UTC (0)</option>
               </select>
-          </div>
-          
-          <Input 
-            type="date" 
-            value={date} 
-            onChange={(e) => setDate(e.target.value)}
-            className="h-9 w-auto min-w-[140px] bg-card shadow-sm cursor-pointer"
-          />
-          <Button 
-            variant="default" 
-            size="icon" 
-            onClick={() => fetchFireData(date, timezone)} 
-            disabled={loading} 
-            className="h-9 w-9 shadow-sm flex items-center justify-center p-0"
-            title="Sincronizar/Buscar dados atualizados no satélite do CENSIPAM"
-          >
-            {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <RefreshCw className="w-4 h-4" />}
-          </Button>
+            </div>
+
+            <Input
+              type="date"
+              value={date}
+              onChange={(e) => setDate(e.target.value)}
+              className="h-9 w-auto min-w-[140px] bg-card shadow-sm cursor-pointer"
+            />
+            <Button
+              variant="default"
+              size="icon"
+              onClick={() => fetchFireData(date, timezone)}
+              disabled={loading}
+              className="h-9 w-9 shadow-sm flex items-center justify-center p-0"
+              title="Sincronizar/Buscar dados atualizados no satélite do CENSIPAM"
+            >
+              {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <RefreshCw className="w-4 h-4" />}
+            </Button>
           </div>
           <p className="text-[11px] text-muted-foreground font-medium bg-muted/60 px-2 py-0.5 rounded border border-border/50">
             Período: {date.split('-').reverse().join('/')} das 00:00 às 23:59 ({timezone === 'BRT' ? 'Horário de Brasília' : 'UTC Global'})
@@ -575,7 +575,7 @@ export default function Dashboard() {
             </CardTitle>
           </CardHeader>
           <CardContent className="p-0 flex-1 relative">
-            <MapContainer 
+            <MapContainer
               bounds={GOIAS_BOUNDS}
               boundsOptions={{ padding: [10, 10] }}
               zoomSnap={0.1}
@@ -587,16 +587,16 @@ export default function Dashboard() {
                 attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
                 url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
               />
-              
+
               {/* Vetores Interativos de UCs do CENSIPAM (Lazy Loaded) */}
               {showUCs && ucGeoJSON && (
-                <GeoJSON 
-                  data={ucGeoJSON} 
+                <GeoJSON
+                  data={ucGeoJSON}
                   style={(feature) => {
                     const level = (feature.properties.esfera || feature.properties.administra || '').toLowerCase();
                     let fillColor = '#22c55e'; // green-500 default
                     let color = '#15803d'; // green-700 default border
-                    
+
                     if (level.includes('federal')) {
                       fillColor = '#14532d'; // green-900 (Federal - Mais escuro/intenso)
                       color = '#052e16'; // green-950
@@ -622,13 +622,13 @@ export default function Dashboard() {
                   }}
                 />
               )}
-            <WMSTileLayer
-              url="https://panorama.sipam.gov.br/geoserver/painel_do_fogo/wms"
-              layers="painel_do_fogo:focos_ativos"
-              format="image/png"
-              transparent={true}
-              zIndex={10}
-            />
+              <WMSTileLayer
+                url="https://panorama.sipam.gov.br/geoserver/painel_do_fogo/wms"
+                layers="painel_do_fogo:focos_ativos"
+                format="image/png"
+                transparent={true}
+                zIndex={10}
+              />
               <WMSTileLayer
                 url="https://panorama.sipam.gov.br/geoserver/painel_do_fogo/wms"
                 layers="painel_do_fogo:mv_frente_deteccao"
@@ -638,8 +638,8 @@ export default function Dashboard() {
               />
 
               {sortedEvents.map(event => (
-                <Marker 
-                  key={event.id} 
+                <Marker
+                  key={event.id}
                   position={[event.lat, event.lng]}
                   icon={createPinIcon(selectedEvent === event.id, event.uc, event.ageHours)}
                 >
@@ -652,7 +652,7 @@ export default function Dashboard() {
                       <p><span className="font-semibold">Detecções:</span> {event.qtd_deteccoes}</p>
                       <p><span className="font-semibold">Duração:</span> {event.duracao_h ? `${event.duracao_h} h` : 'N/A'}</p>
                       {event.ucText && event.ucText !== 'N/A' && (
-                         <p className="pt-1 mt-1 border-t border-muted/30 text-amber-600"><span className="font-bold">UC:</span> {event.ucText}</p>
+                        <p className="pt-1 mt-1 border-t border-muted/30 text-amber-600"><span className="font-bold">UC:</span> {event.ucText}</p>
                       )}
                     </div>
                   </Popup>
@@ -660,33 +660,33 @@ export default function Dashboard() {
               ))}
 
               {goiasGeoJSON && (
-                <GeoJSON 
-                  data={goiasGeoJSON} 
+                <GeoJSON
+                  data={goiasGeoJSON}
                   style={{
                     color: '#3b82f6',
                     weight: 1.5,
                     fillOpacity: 0.05,
                     fillColor: '#3b82f6'
-                  }} 
+                  }}
                 />
               )}
 
               <MapController selectedEvent={selectedEvent} sortedEvents={sortedEvents} goiasCenter={goiasCenter} showUCs={showUCs} setShowUCs={setShowUCs} loadingUCs={loadingUCs} />
-              
+
               {/* Legenda de Detecção de Fogo */}
               <div className="absolute bottom-4 right-4 z-[400] bg-card/95 backdrop-blur-sm p-3 rounded-md shadow-md border border-border text-xs w-[240px]">
-                 <h4 className="font-bold mb-3 border-b pb-1">Frente de Fogo - 24h</h4>
-                 <div className="space-y-1.5">
-                    <div className="flex items-center gap-2"><span className="w-3 h-3 rounded bg-[#8B0000] border border-black/20"></span> Detecção em até 3 Horas</div>
-                    <div className="flex items-center gap-2"><span className="w-3 h-3 rounded bg-[#DC2626] border border-black/20"></span> Detecção entre 3 e 6 horas</div>
-                    <div className="flex items-center gap-2"><span className="w-3 h-3 rounded bg-[#F97316] border border-black/20"></span> Detecção entre 6 e 12 horas</div>
-                    <div className="flex items-center gap-2"><span className="w-3 h-3 rounded bg-[#F59E0B] border border-black/20"></span> Detecção entre 12 e 24 horas</div>
-                    <div className="flex items-center gap-2"><span className="w-3 h-3 rounded bg-[#737373] border border-black/20"></span> Detecção a mais de 24 horas</div>
-                 </div>
-                 <div className="mt-3 pt-2 border-t text-[10px] text-muted-foreground italic flex items-center gap-2">
-                   <div className="w-3 h-3 rounded-full border-[1.5px] border-gray-800 flex items-center justify-center"><div className="w-1.5 h-1.5 bg-white rounded-full"></div></div>
-                   Focos em Unidade de Conservação
-                 </div>
+                <h4 className="font-bold mb-3 border-b pb-1">Frente de Fogo - 24h</h4>
+                <div className="space-y-1.5">
+                  <div className="flex items-center gap-2"><span className="w-3 h-3 rounded bg-[#8B0000] border border-black/20"></span> Detecção em até 3 Horas</div>
+                  <div className="flex items-center gap-2"><span className="w-3 h-3 rounded bg-[#DC2626] border border-black/20"></span> Detecção entre 3 e 6 horas</div>
+                  <div className="flex items-center gap-2"><span className="w-3 h-3 rounded bg-[#F97316] border border-black/20"></span> Detecção entre 6 e 12 horas</div>
+                  <div className="flex items-center gap-2"><span className="w-3 h-3 rounded bg-[#F59E0B] border border-black/20"></span> Detecção entre 12 e 24 horas</div>
+                  <div className="flex items-center gap-2"><span className="w-3 h-3 rounded bg-[#737373] border border-black/20"></span> Detecção a mais de 24 horas</div>
+                </div>
+                <div className="mt-3 pt-2 border-t text-[10px] text-muted-foreground italic flex items-center gap-2">
+                  <div className="w-3 h-3 rounded-full border-[1.5px] border-gray-800 flex items-center justify-center"><div className="w-1.5 h-1.5 bg-white rounded-full"></div></div>
+                  Focos em Unidade de Conservação
+                </div>
               </div>
             </MapContainer>
           </CardContent>
@@ -705,10 +705,10 @@ export default function Dashboard() {
                 </p>
               )}
             </div>
-            <Button 
-              variant="secondary" 
-              size="sm" 
-              onClick={exportToExcel} 
+            <Button
+              variant="secondary"
+              size="sm"
+              onClick={exportToExcel}
               className="flex flex-row items-center gap-2 h-8 px-3"
               title="Baixar os dados visíveis na tabela em formato Excel (.xlsx)"
             >
@@ -728,14 +728,14 @@ export default function Dashboard() {
                       <div className="flex items-center">Município <ArrowUpDown className="w-3 h-3 ml-1" /></div>
                     </TableHead>
                     <TableHead className="cursor-pointer hover:bg-muted/50 text-xs" onClick={() => requestSort('tamanho_ha')}>
-                        Tamanho (ha) {sortConfig.key === 'tamanho_ha' && <ArrowUpDown className="inline w-3 h-3 ml-1" />}
+                      Tamanho (ha) {sortConfig.key === 'tamanho_ha' && <ArrowUpDown className="inline w-3 h-3 ml-1" />}
                     </TableHead>
-                    <TableHead 
-                      className="cursor-pointer hover:bg-muted/50 text-xs" 
+                    <TableHead
+                      className="cursor-pointer hover:bg-muted/50 text-xs"
                       onClick={() => requestSort('qtd_deteccoes')}
                       title="Quantidade de registros/pixels de calor detectados por satélite neste foco. Valores altos indicam incêndios de maior gravidade, intensidade ou extensão."
                     >
-                        Detecções {sortConfig.key === 'qtd_deteccoes' && <ArrowUpDown className="inline w-3 h-3 ml-1" />}
+                      Detecções {sortConfig.key === 'qtd_deteccoes' && <ArrowUpDown className="inline w-3 h-3 ml-1" />}
                     </TableHead>
                     <TableHead className="cursor-pointer hover:bg-muted/50 text-xs" onClick={() => requestSort('duracao_h')}>
                       <div className="flex items-center">Duração <ArrowUpDown className="w-3 h-3 ml-1" /></div>
@@ -747,8 +747,8 @@ export default function Dashboard() {
                 </TableHeader>
                 <TableBody>
                   {sortedEvents.length > 0 ? sortedEvents.map((event, index) => (
-                    <TableRow 
-                      key={event.id || index} 
+                    <TableRow
+                      key={event.id || index}
                       className={`cursor-pointer transition-colors ${selectedEvent === event.id ? 'bg-primary/20' : 'hover:bg-muted/50'}`}
                       onClick={() => setSelectedEvent(selectedEvent === event.id ? null : event.id)}
                     >
@@ -778,7 +778,7 @@ export default function Dashboard() {
           </CardContent>
         </Card>
       </div>
-      
+
       {/* Footer */}
       <footer className="mt-8 pt-4 pb-2 border-t border-muted-foreground/20 text-center">
         <p className="text-xs text-muted-foreground font-medium">

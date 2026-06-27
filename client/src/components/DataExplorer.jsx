@@ -110,8 +110,10 @@ export default function DataExplorer({ isOpen, onClose, fireEvents, date }) {
 
         {/* Header */}
         <div className="flex items-center justify-between px-5 py-3 border-b bg-muted/30">
-          <div className="flex items-center gap-3">
-            <Database className="w-5 h-5 text-primary" />
+          <div className="flex items-center gap-4">
+            <div className="bg-primary/10 p-2 rounded-lg">
+              <Database className="w-7 h-7 text-primary" />
+            </div>
             <div>
               <h2 className="font-bold text-base">Explorador de Dados KML</h2>
               <p className="text-xs text-muted-foreground mt-0.5">
