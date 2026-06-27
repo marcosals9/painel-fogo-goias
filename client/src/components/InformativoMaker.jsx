@@ -215,7 +215,7 @@ export default function InformativoMaker({ isOpen, onClose, fireEvents, date }) 
                     </div>
                 </div>
                 <div className="z-10 opacity-90 brightness-0 invert">
-                   <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/1/1a/Goias_in_Brazil.svg/500px-Goias_in_Brazil.svg.png" className="w-[150px] object-contain drop-shadow-lg" />
+                   {/* Mapa de goiás removido para evitar bloqueio de CORS no html-to-image */}
                 </div>
             </div>
 
