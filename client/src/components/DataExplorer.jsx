@@ -113,15 +113,14 @@ export default function DataExplorer({ isOpen, onClose, fireEvents, date }) {
           <div className="flex items-center gap-3">
             <Database className="w-5 h-5 text-primary" />
             <div>
-              <h2 className="font-bold text-base flex items-center gap-2">
-                Explorador de Dados KML
-                {date && (
-                  <span className="text-[10px] font-semibold bg-primary/10 text-primary border-primary/20 border px-2 py-0.5 rounded-full whitespace-nowrap">
-                    Período: {date.split('-').reverse().join('/')} (BRT)
-                  </span>
-                )}
-              </h2>
+              <h2 className="font-bold text-base">Explorador de Dados KML</h2>
               <p className="text-xs text-muted-foreground mt-0.5">
+                {date && (
+                  <>
+                    <span className="font-medium text-foreground">Período: {date.split('-').reverse().join('/')}</span>
+                    <span className="mx-2 text-muted-foreground/40">&bull;</span>
+                  </>
+                )}
                 <span className="font-semibold text-foreground">{filtered.length}</span> exibidos
                 &nbsp;de&nbsp;
                 <span className="font-semibold text-foreground">{total}</span> totais
