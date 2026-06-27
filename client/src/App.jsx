@@ -26,15 +26,15 @@ function App() {
   return (
     <Router>
       <div className="min-h-screen bg-background text-foreground flex flex-col">
-        <header className="border-b bg-card/50 backdrop-blur-md sticky top-0 z-50">
+        <header className="border-b-2 border-primary bg-slate-900 sticky top-0 z-50 text-slate-100 shadow-md">
           <div className="container mx-auto px-4 h-16 flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center">
+            <div className="flex items-center gap-3">
+              <div className="w-9 h-9 rounded-full bg-primary flex items-center justify-center shadow-sm ring-2 ring-slate-900">
                 <span className="text-primary-foreground font-bold text-sm">CD</span>
               </div>
               <h1 className="text-xl font-bold tracking-tight">Sala de Situação CODEC</h1>
             </div>
-            <div className="text-sm font-medium text-muted-foreground hidden sm:block">
+            <div className="text-sm font-semibold text-slate-200 hidden sm:block bg-slate-800 px-3 py-1.5 rounded-full border border-slate-700 shadow-inner tracking-wide">
               {theme === 'theme-cerrado-vivo' ? '🔥 Operação Cerrado Vivo' : '🌧️ Operação Tempestade'}
             </div>
           </div>
