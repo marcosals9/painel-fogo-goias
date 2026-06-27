@@ -439,11 +439,11 @@ export default function Dashboard() {
   useEffect(() => {
     if (refreshInterval > 0) {
       const intervalId = setInterval(() => {
-        fetchFireData(date);
+        fetchFireData(date, timezone);
       }, refreshInterval * 60 * 1000);
       return () => clearInterval(intervalId);
     }
-  }, [refreshInterval, date]);
+  }, [refreshInterval, date, timezone]);
 
   const exportToExcel = () => {
     const exportData = sortedEvents.map(event => ({
@@ -471,7 +471,12 @@ export default function Dashboard() {
             <Flame className="w-8 h-8 text-primary" />
             Monitoramento de Focos
           </h2>
-          <p className="text-muted-foreground">Estado de Goiás - Visualização de Eventos de Fogo</p>
+          <div className="flex flex-col gap-1 mt-1">
+             <p className="text-muted-foreground">Estado de Goiás - Visualização de Eventos de Fogo</p>
+             <p className="text-xs text-muted-foreground font-medium bg-muted/60 inline-flex items-center px-2 py-1 rounded w-fit border border-border/50">
+               Período de {date.split('-').reverse().join('/')} das 00:00 às 23:59 ({timezone === 'BRT' ? 'Horário de Brasília' : 'UTC Global'})
+             </p>
+          </div>
         </div>
         
         <div className="flex items-center gap-3 flex-wrap justify-end">
