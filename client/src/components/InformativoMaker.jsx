@@ -196,10 +196,10 @@ export default function InformativoMaker({ isOpen, onClose, fireEvents, date }) 
             style={{ width: '800px', height: '1130px', transformOrigin: 'top center', transform: 'scale(0.85)' }}
         >
             {/* Camada do Template do Canva (Enviado pelo usuário) */}
-            <img src="/template.png" className="absolute inset-0 w-full h-full z-50 pointer-events-none object-contain" alt="Template Canva" onError={(e) => e.target.style.display = 'none'} />
+            <img src="/template.png" className="absolute inset-0 w-full h-full z-0 pointer-events-none object-cover" alt="Template Canva" onError={(e) => e.target.style.display = 'none'} />
 
-            {/* Header */}
-            <div className="bg-[#0b162c] text-white flex justify-between h-[180px] p-6 relative">
+            {/* Header - Agora Transparente para mostrar o fundo da imagem */}
+            <div className="bg-transparent text-white flex justify-between h-[180px] p-6 relative z-10">
                 {/* Linhas decorativas */}
                 <div className="absolute top-0 right-0 w-[500px] h-[500px] border-[3px] border-orange-500 rounded-full opacity-20 -translate-y-1/2 translate-x-1/4"></div>
                 <div className="absolute top-0 right-0 w-[400px] h-[400px] border-[3px] border-orange-500 rounded-full opacity-20 -translate-y-1/2 translate-x-1/4"></div>
@@ -220,13 +220,11 @@ export default function InformativoMaker({ isOpen, onClose, fireEvents, date }) 
 
             {/* Fita Laranja Data */}
             <div className="mx-4 mt-[-15px] z-20">
-                <div className="border-[3px] border-orange-500 bg-white rounded-2xl flex items-center shadow-md">
-                    <div className="bg-orange-500 p-3 rounded-l-xl flex items-center justify-center w-[70px] h-[70px]">
-                        {/* Ícone vem do template overlay */}
-                    </div>
-                    <div className="flex-1 text-center py-2">
+                <div className="bg-transparent rounded-2xl flex items-center h-[70px]">
+                    <div className="w-[70px] h-[70px] shrink-0"></div>
+                    <div className="flex-1 text-center py-2 flex flex-col justify-center">
                         <h2 className="text-[26px] font-black text-[#002b5e] leading-tight">INFORMATIVO - PERÍODO DE ESTIAGEM</h2>
-                        <h3 className="text-lg font-bold text-[#002b5e] leading-tight">DADOS DO DIA {displayDate}</h3>
+                        <h3 className="text-lg font-bold text-[#002b5e] leading-tight mt-[-4px]">DADOS DO DIA {displayDate}</h3>
                     </div>
                 </div>
             </div>
@@ -235,17 +233,15 @@ export default function InformativoMaker({ isOpen, onClose, fireEvents, date }) 
             <div className="grid grid-cols-2 gap-4 p-4 flex-1 mt-2">
                 
                 {/* Q1: Atendimentos SSP */}
-                <div className="border-[3px] border-[#002b5e] rounded-xl flex flex-col overflow-hidden bg-white z-10">
-                    <div className="bg-[#002b5e] text-white flex items-center p-2 h-[100px]">
-                        <div className="w-[70px] h-[70px] shrink-0 mx-2">
-                            {/* Ícone da árvore vem do template */}
-                        </div>
+                <div className="bg-transparent rounded-xl flex flex-col overflow-hidden z-10">
+                    <div className="text-white flex items-center p-2 h-[100px]">
+                        <div className="w-[70px] h-[70px] shrink-0 mx-2"></div>
                         <div className="flex gap-3 items-center w-full pl-2">
-                            <span className="text-[60px] font-black leading-none">{totalAtendimentos.toString().padStart(2, '0')}</span>
-                            <span className="text-sm font-bold uppercase leading-tight w-full">Atendimentos Relacionados<br/>A Incêndios em Vegetação</span>
+                            <span className="text-[60px] font-black leading-none drop-shadow-md">{totalAtendimentos.toString().padStart(2, '0')}</span>
+                            <span className="text-sm font-bold uppercase leading-tight w-full drop-shadow-md">Atendimentos Relacionados<br/>A Incêndios em Vegetação</span>
                         </div>
                     </div>
-                    <div className="bg-[#002b5e] text-white text-center py-1 font-bold text-sm uppercase">Municípios Mais Atendidos</div>
+                    <div className="text-white text-center py-1 font-bold text-sm uppercase opacity-0">Municípios Mais Atendidos</div>
                     <div className="p-3 flex-1 flex flex-col justify-end pb-8">
                         {sspMuni.map(([mun, val]) => renderBar(mun, val, maxSspMuni, 'bg-[#76e5d7]'))}
                         {sspMuni.length === 0 && <div className="text-center text-gray-400 font-bold mt-10">Anexe a planilha SSP</div>}
@@ -254,17 +250,15 @@ export default function InformativoMaker({ isOpen, onClose, fireEvents, date }) 
                 </div>
 
                 {/* Q2: Focos CENSIPAM */}
-                <div className="border-[3px] border-[#002b5e] rounded-xl flex flex-col overflow-hidden bg-white z-10">
-                    <div className="bg-[#002b5e] text-white flex items-center p-2 h-[100px]">
-                        <div className="w-[70px] h-[70px] shrink-0 mx-2">
-                            {/* Ícone de fogo vem do template */}
-                        </div>
+                <div className="bg-transparent rounded-xl flex flex-col overflow-hidden z-10">
+                    <div className="text-white flex items-center p-2 h-[100px]">
+                        <div className="w-[70px] h-[70px] shrink-0 mx-2"></div>
                         <div className="flex gap-3 items-center w-full pl-2">
-                            <span className="text-[60px] font-black leading-none">{censipamDados.total.toString().padStart(2, '0')}</span>
-                            <span className="text-sm font-bold uppercase leading-tight w-full">Eventos de Fogo<br/>Identificados por Satélites</span>
+                            <span className="text-[60px] font-black leading-none drop-shadow-md">{censipamDados.total.toString().padStart(2, '0')}</span>
+                            <span className="text-sm font-bold uppercase leading-tight w-full drop-shadow-md">Eventos de Fogo<br/>Identificados por Satélites</span>
                         </div>
                     </div>
-                    <div className="bg-orange-500 text-white text-center py-1 font-bold text-sm uppercase rounded-full mx-8 mt-2 shadow-sm">Municípios Mais Registrados</div>
+                    <div className="text-white text-center py-1 font-bold text-sm uppercase rounded-full mx-8 mt-2 opacity-0">Municípios Mais Registrados</div>
                     <div className="p-3 flex-1 flex flex-col justify-end pb-8">
                         {censipamDados.top.map(([mun, val]) => renderBar(mun, val, maxCenMuni, 'bg-[#76e5d7]', 'w-[90%]'))}
                         {censipamDados.top.length === 0 && <div className="text-center text-gray-400 font-bold mt-10">Sem focos na data</div>}
@@ -273,9 +267,9 @@ export default function InformativoMaker({ isOpen, onClose, fireEvents, date }) 
                 </div>
 
                 {/* Q3: Naturezas */}
-                <div className="border-[3px] border-[#002b5e] rounded-xl flex flex-col overflow-hidden bg-white z-10">
-                    <div className="bg-[#002b5e] text-white flex items-center justify-center gap-4 p-4 h-[110px] pl-[70px]">
-                        <h3 className="text-xl font-bold uppercase leading-tight text-center">Natureza das Ocorrências<br/>Atendidas</h3>
+                <div className="bg-transparent rounded-xl flex flex-col overflow-hidden z-10">
+                    <div className="text-white flex items-center justify-center gap-4 p-4 h-[110px] pl-[70px]">
+                        <h3 className="text-xl font-bold uppercase leading-tight text-center drop-shadow-md">Natureza das Ocorrências<br/>Atendidas</h3>
                     </div>
                     <div className="p-3 flex-1 flex flex-col justify-end pb-8 pt-4">
                         {sspNat.map(([nat, val]) => renderBar(nat, val, maxSspNat, 'bg-[#f47f20]'))}
@@ -285,9 +279,9 @@ export default function InformativoMaker({ isOpen, onClose, fireEvents, date }) 
                 </div>
 
                 {/* Q4: CIMEHGO */}
-                <div className="border-[3px] border-[#002b5e] rounded-xl flex flex-col overflow-hidden bg-white z-10">
-                    <div className="bg-[#002b5e] text-white flex items-center justify-center gap-4 p-4 h-[110px] pl-[70px]">
-                        <h3 className="text-xl font-bold uppercase leading-tight text-center">Dias sem Chuvas por<br/>Região do Estado</h3>
+                <div className="bg-transparent rounded-xl flex flex-col overflow-hidden z-10">
+                    <div className="text-white flex items-center justify-center gap-4 p-4 h-[110px] pl-[70px]">
+                        <h3 className="text-xl font-bold uppercase leading-tight text-center drop-shadow-md">Dias sem Chuvas por<br/>Região do Estado</h3>
                     </div>
                     <div className="p-3 flex-1 flex flex-col justify-end pb-8 pt-4">
                         {['OESTE','NORTE','LESTE','SUL','CENTRAL','SUDOESTE'].map(reg => renderBar(reg, diasSeca[reg] || 0, maxDias, 'bg-[#3bbbf6]'))}
