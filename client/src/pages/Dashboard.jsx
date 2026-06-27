@@ -471,18 +471,25 @@ export default function Dashboard() {
   return (
     <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-        <div>
-          <h2 className="text-3xl font-bold tracking-tight flex items-center gap-2">
-            <Flame className="w-8 h-8 text-primary" />
-            Monitoramento de Focos
-            <Button variant="outline" size="sm" className="ml-4 h-8 gap-2 flex flex-row items-center bg-orange-50 text-orange-600 border-orange-200 hover:bg-orange-100 hover:text-orange-700" onClick={() => setIsMakerOpen(true)}>
-              <Smartphone className="w-4 h-4" /> Informativo WhatsApp
-            </Button>
-            <Button variant="outline" size="sm" className="h-8 gap-2 flex flex-row items-center bg-blue-50 text-blue-600 border-blue-200 hover:bg-blue-100 hover:text-blue-700" onClick={() => setIsExplorerOpen(true)}>
-              <Database className="w-4 h-4" /> Dados KML
-            </Button>
-          </h2>
-          <p className="text-muted-foreground mt-1">CBMGO - Operação Cerrado Vivo</p>
+        <div className="flex items-start gap-2.5">
+          <Flame className="w-9 h-9 text-primary mt-0.5 drop-shadow-sm" />
+          <div className="flex flex-col">
+            <h2 className="text-3xl font-black tracking-tight flex items-center gap-2">
+              Monitoramento de Focos
+              <Button variant="outline" size="sm" className="ml-4 h-8 gap-2 flex flex-row items-center bg-orange-50 text-orange-600 border-orange-200 hover:bg-orange-100 hover:text-orange-700 shadow-sm" onClick={() => setIsMakerOpen(true)}>
+                <Smartphone className="w-4 h-4" /> Informativo WhatsApp
+              </Button>
+              <Button variant="outline" size="sm" className="h-8 gap-2 flex flex-row items-center bg-blue-50 text-blue-600 border-blue-200 hover:bg-blue-100 hover:text-blue-700 shadow-sm" onClick={() => setIsExplorerOpen(true)}>
+                <Database className="w-4 h-4" /> Dados KML
+              </Button>
+            </h2>
+            <div className="flex items-center gap-2 mt-1">
+              <span className="bg-primary/10 text-primary font-bold text-[10px] tracking-wider uppercase px-2 py-0.5 rounded border border-primary/20">
+                Operação Cerrado Vivo
+              </span>
+              <span className="text-xs text-muted-foreground font-medium">Estado de Goiás</span>
+            </div>
+          </div>
         </div>
 
         <div className="flex flex-col items-end gap-1.5">
