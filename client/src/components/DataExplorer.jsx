@@ -3,7 +3,7 @@ import { X, Download, Filter, Database, Search, ChevronUp, ChevronDown } from 'l
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 
-export default function DataExplorer({ isOpen, onClose, fireEvents }) {
+export default function DataExplorer({ isOpen, onClose, fireEvents, date }) {
   const [search, setSearch]           = useState('');
   const [filterUF, setFilterUF]       = useState('TODOS');
   const [filterGoias, setFilterGoias] = useState('TODOS'); // TODOS | GOIAS | OUTROS
@@ -113,8 +113,15 @@ export default function DataExplorer({ isOpen, onClose, fireEvents }) {
           <div className="flex items-center gap-3">
             <Database className="w-5 h-5 text-primary" />
             <div>
-              <h2 className="font-bold text-base">Explorador de Dados KML</h2>
-              <p className="text-xs text-muted-foreground">
+              <h2 className="font-bold text-base flex items-center gap-2">
+                Explorador de Dados KML
+                {date && (
+                  <span className="text-[10px] font-semibold bg-primary/10 text-primary border-primary/20 border px-2 py-0.5 rounded-full whitespace-nowrap">
+                    Período: {date.split('-').reverse().join('/')} (BRT)
+                  </span>
+                )}
+              </h2>
+              <p className="text-xs text-muted-foreground mt-0.5">
                 <span className="font-semibold text-foreground">{filtered.length}</span> exibidos
                 &nbsp;de&nbsp;
                 <span className="font-semibold text-foreground">{total}</span> totais

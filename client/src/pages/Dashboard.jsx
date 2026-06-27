@@ -787,7 +787,7 @@ export default function Dashboard() {
       </footer>
 
       <InformativoMaker isOpen={isMakerOpen} onClose={() => setIsMakerOpen(false)} fireEvents={sortedEvents} date={date} />
-      <DataExplorer isOpen={isExplorerOpen} onClose={() => setIsExplorerOpen(false)} fireEvents={fireEvents} />
+      <DataExplorer isOpen={isExplorerOpen} onClose={() => setIsExplorerOpen(false)} fireEvents={fireEvents} date={date} />
     </div>
   );
 }
