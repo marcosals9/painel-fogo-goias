@@ -475,10 +475,10 @@ export default function Dashboard() {
           <h2 className="text-3xl font-bold tracking-tight flex items-center gap-2">
             <Flame className="w-8 h-8 text-primary" />
             Monitoramento de Focos
-            <Button variant="outline" size="sm" className="ml-4 h-8 gap-2 bg-orange-50 text-orange-600 border-orange-200 hover:bg-orange-100 hover:text-orange-700" onClick={() => setIsMakerOpen(true)}>
+            <Button variant="outline" size="sm" className="ml-4 h-8 gap-2 flex flex-row items-center bg-orange-50 text-orange-600 border-orange-200 hover:bg-orange-100 hover:text-orange-700" onClick={() => setIsMakerOpen(true)}>
                <Smartphone className="w-4 h-4" /> Informativo WhatsApp
             </Button>
-            <Button variant="outline" size="sm" className="h-8 gap-2 bg-blue-50 text-blue-600 border-blue-200 hover:bg-blue-100 hover:text-blue-700" onClick={() => setIsExplorerOpen(true)}>
+            <Button variant="outline" size="sm" className="h-8 gap-2 flex flex-row items-center bg-blue-50 text-blue-600 border-blue-200 hover:bg-blue-100 hover:text-blue-700" onClick={() => setIsExplorerOpen(true)}>
                <Database className="w-4 h-4" /> Dados KML
             </Button>
           </h2>

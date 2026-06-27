@@ -114,10 +114,10 @@ export default function DataExplorer({ isOpen, onClose, fireEvents }) {
             </div>
           </div>
           <div className="flex items-center gap-2">
-            <Button variant="outline" size="sm" className="gap-1.5 h-8" onClick={exportCSV}>
+            <Button variant="outline" size="sm" className="flex flex-row items-center gap-1.5 h-8" onClick={exportCSV}>
               <Download className="w-3.5 h-3.5" /> Exportar CSV
             </Button>
-            <Button variant="ghost" size="icon" className="h-8 w-8" onClick={onClose}>
+            <Button variant="ghost" size="icon" className="flex flex-row items-center justify-center h-8 w-8" onClick={onClose}>
               <X className="w-4 h-4" />
             </Button>
           </div>
