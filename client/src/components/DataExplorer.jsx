@@ -59,7 +59,7 @@ export default function DataExplorer({ isOpen, onClose, fireEvents }) {
   };
 
   const exportCSV = () => {
-    const header = ['Município','UF','Goiás?','Tamanho (ha)','Detecções','Duração (h)','UC','Lat','Lng','Data Máxima'];
+    const header = ['Município','UF','Goiás?','Tamanho (ha)','Detecções','Duração (h)','UC','Lat','Lng','Data Inicial', 'Data Máxima'];
     const rows = filtered.map(e => [
       e.municipio ?? '',
       e.uf ?? '',
@@ -70,6 +70,7 @@ export default function DataExplorer({ isOpen, onClose, fireEvents }) {
       e.ucText ?? '',
       e.lat ?? '',
       e.lng ?? '',
+      e.dt_minima ?? '',
       e.dt_maxima ?? '',
     ]);
     const csv = [header, ...rows].map(r => r.map(v => `"${String(v).replace(/"/g,'""')}"`).join(',')).join('\n');
@@ -180,7 +181,7 @@ export default function DataExplorer({ isOpen, onClose, fireEvents }) {
                 <th className={thCls} onClick={() => toggleSort('qtd_deteccoes')}>Detecções <SortIcon col="qtd_deteccoes"/></th>
                 <th className={thCls} onClick={() => toggleSort('duracao_h')}>Duração (h) <SortIcon col="duracao_h"/></th>
                 <th className={thCls}>UC</th>
-                <th className={thCls} onClick={() => toggleSort('dt_maxima')}>Data Máxima <SortIcon col="dt_maxima"/></th>
+                <th className={thCls} onClick={() => toggleSort('dt_maxima')}>Período do Evento <SortIcon col="dt_maxima"/></th>
                 <th className={thCls}>Lat / Lng</th>
               </tr>
             </thead>
@@ -212,7 +213,12 @@ export default function DataExplorer({ isOpen, onClose, fireEvents }) {
                       : <span className="text-muted-foreground text-[11px]">Não</span>
                     }
                   </td>
-                  <td className={tdCls + " whitespace-nowrap text-[11px]"}>{e.dt_maxima ? new Date(e.dt_maxima).toLocaleString('pt-BR') : '—'}</td>
+                  <td className={tdCls + " whitespace-nowrap text-[11px]"}>
+                    <div className="flex flex-col">
+                      <span className="text-muted-foreground">Início: {e.dt_minima ? new Date(e.dt_minima).toLocaleString('pt-BR', { dateStyle: 'short', timeStyle: 'short' }) : '—'}</span>
+                      <span className="font-semibold text-foreground">Fim: {e.dt_maxima ? new Date(e.dt_maxima).toLocaleString('pt-BR', { dateStyle: 'short', timeStyle: 'short' }) : '—'}</span>
+                    </div>
+                  </td>
                   <td className={tdCls + " text-[10px] text-muted-foreground whitespace-nowrap font-mono"}>
                     {e.lat?.toFixed(4)}, {e.lng?.toFixed(4)}
                   </td>

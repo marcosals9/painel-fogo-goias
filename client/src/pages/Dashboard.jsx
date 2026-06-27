@@ -327,6 +327,7 @@ export default function Dashboard() {
                ucText: prop.nome_unidade_conservacao || 'N/A',
                lat: f.lat,
                lng: f.lng,
+               dt_minima: prop.dt_minima,
                dt_maxima: prop.dt_maxima,
                ageHours: ageHours,
                id: prop.id_evento || Math.random(),
