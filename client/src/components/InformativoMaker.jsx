@@ -111,20 +111,18 @@ export default function InformativoMaker({ isOpen, onClose, fireEvents, date }) 
   const displayDate = date.split('-').reverse().join('/');
 
   // Helpers de Renderização das Barras
-    const renderBar = (label, value, max, colorClass, widthClass = "w-full") => {
-        const percentage = max > 0 ? (value / max) * 100 : 0;
-        return (
-            <div key={label} className={`flex items-center gap-2 mb-[5px] ${widthClass}`}>
-                <div className="w-[130px] text-right text-[11px] font-bold text-[#002b5e] uppercase leading-tight shrink-0">{label}</div>
-                <div className="flex-1 bg-gray-100 rounded-sm h-[24px] relative">
-                    <div className={`h-full ${colorClass} rounded-sm transition-all duration-1000 ease-out`} style={{ width: `${percentage}%` }}></div>
-                    <div className="absolute inset-0 flex items-center justify-end pr-2">
-                        <span className="text-[12px] font-black text-[#002b5e]">{value}</span>
-                    </div>
-                </div>
-            </div>
-        );
-    };
+  const renderBar = (label, value, max, colorClass, widthClass = 'w-full') => (
+    <div key={label} className="flex flex-col mb-1 text-sm font-bold">
+      <div className="flex items-center">
+        <div className="w-[120px] text-right pr-2 text-[#002b5e] leading-none text-[11px] truncate">{label}</div>
+        <div className={`flex-1 flex items-center bg-gray-100 h-6 ${widthClass}`}>
+          <div className={`${colorClass} h-full flex items-center justify-end pr-2 text-black/80 font-extrabold`} style={{ width: max > 0 ? `${(value/max)*100}%` : '0%', minWidth: '24px' }}>
+             {value}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
 
   const maxSspMuni = Math.max(...sspMuni.map(d => d[1]), 1);
   const maxCenMuni = Math.max(...censipamDados.top.map(d => d[1]), 1);
@@ -202,13 +200,25 @@ export default function InformativoMaker({ isOpen, onClose, fireEvents, date }) 
 
             {/* Header - Agora Transparente para mostrar o fundo da imagem */}
             <div className="bg-transparent text-white flex justify-between h-[180px] p-6 relative z-10">
-                {/* Textos removidos pois já estão na imagem de fundo */}
+                <div className="flex items-center gap-6 z-10 pl-[160px]">
+                    <div>
+                        <h1 className="text-[65px] font-black leading-[0.9] tracking-tighter shadow-sm" style={{ textShadow: '2px 2px 4px rgba(0,0,0,0.5)' }}>
+                            DEFESA<br/>
+                            <span className="text-white">CIVIL </span><span className="text-[#ff7f00]">GOIÁS</span>
+                        </h1>
+                        <p className="text-xl font-medium mt-1 tracking-wider text-gray-200">Proteger vidas é nossa missão!</p>
+                    </div>
+                </div>
             </div>
 
             {/* Fita Laranja Data */}
             <div className="mx-4 mt-[-15px] z-20">
-                <div className="bg-transparent rounded-2xl flex items-center justify-center h-[70px] relative">
-                    <h3 className="text-[19px] font-black text-[#002b5e] tracking-wide absolute bottom-[10px] pl-[60px]">DADOS DO DIA {displayDate}</h3>
+                <div className="bg-transparent rounded-2xl flex items-center h-[70px]">
+                    <div className="w-[100px] h-[70px] shrink-0"></div>
+                    <div className="flex-1 text-center flex flex-col justify-center h-full pt-2">
+                        <h2 className="text-[26px] font-black text-[#002b5e] leading-tight drop-shadow-sm">INFORMATIVO - PERÍODO DE ESTIAGEM</h2>
+                        <h3 className="text-xl font-black text-[#002b5e] leading-tight">DADOS DO DIA {displayDate}</h3>
+                    </div>
                 </div>
             </div>
 
@@ -216,56 +226,60 @@ export default function InformativoMaker({ isOpen, onClose, fireEvents, date }) 
             <div className="grid grid-cols-2 gap-4 p-4 flex-1 mt-2">
                 
                 {/* Q1: Atendimentos SSP */}
-                <div className="bg-transparent rounded-xl flex flex-col overflow-hidden z-10 pt-[10px]">
-                    <div className="text-white flex items-center h-[90px] pt-1">
-                        <div className="w-[110px] h-[70px] shrink-0"></div>
+                <div className="bg-transparent rounded-xl flex flex-col overflow-hidden z-10">
+                    <div className="text-white flex items-center h-[90px] pt-2">
+                        <div className="w-[100px] h-[70px] shrink-0"></div>
                         <div className="flex gap-4 items-center w-full pl-2">
-                            <span className="text-[70px] font-black leading-none drop-shadow-lg tracking-tighter" style={{ transform: 'scaleY(1.1)' }}>{totalAtendimentos.toString().padStart(2, '0')}</span>
-                            <span className="text-[12px] font-bold uppercase leading-[1.15] w-full drop-shadow-md tracking-tight">Atendimentos<br/>Relacionados<br/>A Incêndios em Vegetação</span>
+                            <span className="text-[60px] font-black leading-none drop-shadow-lg">{totalAtendimentos.toString().padStart(2, '0')}</span>
+                            <span className="text-[13px] font-bold uppercase leading-tight w-full drop-shadow-md">Atendimentos Relacionados<br/>A Incêndios em Vegetação</span>
                         </div>
                     </div>
                     <div className="text-white text-center py-1 font-bold text-sm uppercase opacity-0">Municípios Mais Atendidos</div>
-                    <div className="px-4 flex-1 flex flex-col justify-end pb-8 pt-4">
+                    <div className="px-4 flex-1 flex flex-col justify-end pb-4 pt-2">
                         {sspMuni.map(([mun, val]) => renderBar(mun, val, maxSspMuni, 'bg-[#76e5d7]'))}
                         {sspMuni.length === 0 && <div className="text-center text-gray-400 font-bold mt-10">Anexe a planilha SSP</div>}
                     </div>
+                    <div className="text-center font-bold text-[11px] pb-2 text-[#002b5e]">FONTE: CBMGO - TOP 5</div>
                 </div>
 
                 {/* Q2: Focos CENSIPAM */}
-                <div className="bg-transparent rounded-xl flex flex-col overflow-hidden z-10 pt-[10px]">
-                    <div className="text-white flex items-center h-[90px] pt-1">
+                <div className="bg-transparent rounded-xl flex flex-col overflow-hidden z-10">
+                    <div className="text-white flex items-center h-[90px] pt-2">
                         <div className="w-[120px] h-[70px] shrink-0"></div>
-                        <div className="flex gap-4 items-center w-full pl-6">
-                            <span className="text-[70px] font-black leading-none drop-shadow-lg tracking-tighter" style={{ transform: 'scaleY(1.1)' }}>{censipamDados.total.toString().padStart(2, '0')}</span>
-                            <span className="text-[13px] font-bold uppercase leading-[1.15] w-full drop-shadow-md tracking-tight">Eventos de Fogo<br/>Identificados por<br/>Satélites</span>
+                        <div className="flex gap-4 items-center w-full pl-2">
+                            <span className="text-[60px] font-black leading-none drop-shadow-lg">{censipamDados.total.toString().padStart(2, '0')}</span>
+                            <span className="text-[13px] font-bold uppercase leading-tight w-full drop-shadow-md">Eventos de Fogo<br/>Identificados por Satélites</span>
                         </div>
                     </div>
                     <div className="text-white text-center py-1 font-bold text-sm uppercase opacity-0">Municípios Mais Registrados</div>
-                    <div className="px-4 flex-1 flex flex-col justify-end pb-8 pt-4">
+                    <div className="px-4 flex-1 flex flex-col justify-end pb-4 pt-2">
                         {censipamDados.top.map(([mun, val]) => renderBar(mun, val, maxCenMuni, 'bg-[#76e5d7]', 'w-[90%]'))}
                         {censipamDados.top.length === 0 && <div className="text-center text-gray-400 font-bold mt-10">Sem focos na data</div>}
                     </div>
+                    <div className="text-center font-bold text-[11px] pb-2 text-[#002b5e]">FONTE: CENSIPAM</div>
                 </div>
 
                 {/* Q3: Naturezas */}
-                <div className="bg-transparent rounded-xl flex flex-col overflow-hidden z-10 pt-[10px]">
-                    <div className="text-white flex items-center justify-center h-[90px] pl-[110px] pr-4 pt-2">
-                        {/* Texto de Natureza já na imagem */}
+                <div className="bg-transparent rounded-xl flex flex-col overflow-hidden z-10">
+                    <div className="text-white flex items-center justify-center h-[90px] pl-[110px] pr-4 pt-1">
+                        <h3 className="text-[16px] font-bold uppercase leading-tight text-left w-full">Natureza das Ocorrências<br/>Atendidas</h3>
                     </div>
-                    <div className="px-4 flex-1 flex flex-col justify-center pb-8 pt-4">
+                    <div className="px-4 flex-1 flex flex-col justify-center pb-2 pt-2">
                         {sspNat.map(([nat, val]) => renderBar(nat, val, maxSspNat, 'bg-[#f47f20]'))}
                         {sspNat.length === 0 && <div className="text-center text-gray-400 font-bold mt-10">Anexe a planilha SSP</div>}
                     </div>
+                    <div className="text-center font-bold text-[11px] pb-1 text-[#002b5e]">FONTE: CBMGO</div>
                 </div>
 
                 {/* Q4: CIMEHGO */}
-                <div className="bg-transparent rounded-xl flex flex-col overflow-hidden z-10 pt-[10px]">
-                    <div className="text-white flex items-center justify-center h-[90px] pl-[110px] pr-4 pt-2">
-                        {/* Texto de Chuvas já na imagem */}
+                <div className="bg-transparent rounded-xl flex flex-col overflow-hidden z-10">
+                    <div className="text-white flex items-center justify-center h-[90px] pl-[110px] pr-4 pt-1">
+                        <h3 className="text-[16px] font-bold uppercase leading-tight text-left w-full">Dias sem Chuvas por<br/>Região do Estado</h3>
                     </div>
-                    <div className="px-4 flex-1 flex flex-col justify-center pb-8 pt-4">
+                    <div className="px-4 flex-1 flex flex-col justify-center pb-2 pt-2">
                         {['OESTE','NORTE','LESTE','SUL','CENTRAL','SUDOESTE'].map(reg => renderBar(reg, diasSeca[reg] || 0, maxDias, 'bg-[#3bbbf6]'))}
                     </div>
+                    <div className="text-center font-bold text-[11px] pb-1 text-[#002b5e]">FONTE: CIMEHGO ({displayDate})</div>
                 </div>
 
             </div>
