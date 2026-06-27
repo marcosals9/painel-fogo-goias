@@ -39,30 +39,29 @@ const getEventColorHex = (ageHours) => {
   return '#737373'; // Grey
 };
 
-// Ícone SVG Customizado para permitir cor dinâmica e marcador de UC
+// Ícone SVG Customizado de Chama (Foguinho) para permitir cor dinâmica e marcador de UC
 const createPinIcon = (isSelected, isUC, ageHours) => {
   const color = getEventColorHex(ageHours);
   
-  const scale = 0.75; 
-  const width = 25 * scale;
-  const height = 41 * scale;
+  const scale = 0.85; 
+  const width = 24 * scale;
+  const height = 24 * scale;
   
-  // Destaque visual: borda branca mais grossa se selecionado. Se for UC, coloca um ponto branco no meio.
-  const strokeColor = isSelected ? '#ffffff' : (isUC ? '#1f2937' : '#ffffff');
-  const strokeWidth = isSelected ? '2.5' : (isUC ? '2.0' : '1.5');
-  const innerDot = isUC ? `<circle cx="12" cy="12" r="5" fill="#ffffff" opacity="1.0" />` : '';
+  // Destaque visual
+  const strokeColor = isSelected ? '#ffffff' : '#ffffff';
+  const strokeWidth = isSelected ? '2.5' : '1.5';
   
-  const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 36" width="${width}" height="${height}" style="filter: drop-shadow(1px 2px 2px rgba(0,0,0,0.5));">
-    <path fill="${color}" stroke="${strokeColor}" stroke-width="${strokeWidth}" d="M12 0C5.373 0 0 5.373 0 12c0 7.333 12 24 12 24s12-16.667 12-24C24 5.373 18.627 0 12 0zm0 17.5c-3.038 0-5.5-2.462-5.5-5.5S8.962 6.5 12 6.5s5.5 2.462 5.5 5.5-2.462 5.5-5.5 5.5z"/>
-    ${innerDot}
+  // Ícone de chama (Flame) - Path estilo Lucide/Feather
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="${width}" height="${height}" fill="${color}" stroke="${strokeColor}" stroke-width="${strokeWidth}" stroke-linecap="round" stroke-linejoin="round" style="filter: drop-shadow(1px 2px 2px rgba(0,0,0,0.5));">
+    <path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"></path>
   </svg>`;
 
   return L.divIcon({
     html: svg,
-    className: 'bg-transparent border-0', // Remove fundo branco padrão do divIcon
+    className: 'bg-transparent border-0',
     iconSize: [width, height],
-    iconAnchor: [width / 2, height],
-    popupAnchor: [0, -(height - 5)]
+    iconAnchor: [width / 2, height / 2], // Ancoragem no centro do foguinho
+    popupAnchor: [0, -(height / 2)]
   });
 };
 
@@ -606,15 +605,6 @@ export default function Dashboard() {
                   }}
                 />
               )}
-
-              {/* Foguinhos Nativos do CENSIPAM (mv_evento_filtro em WMS) */}
-              <WMSTileLayer
-                url="https://panorama.sipam.gov.br/geoserver/painel_do_fogo/wms"
-                layers="painel_do_fogo:mv_evento_filtro"
-                format="image/png"
-                transparent={true}
-                opacity={0.6}
-              />
 
               {sortedEvents.map(event => (
                 <Marker 
