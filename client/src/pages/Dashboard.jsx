@@ -484,10 +484,10 @@ export default function Dashboard() {
               </Button>
             </h2>
             <div className="flex items-center gap-2 mt-1">
-              <img src="/cbmgo.png" alt="CBMGO" className="h-6 w-auto object-contain drop-shadow-sm" />
-              <span className="text-sm font-bold text-primary uppercase tracking-wide">
-                Corpo de Bombeiros Militar do Estado de Goiás
+              <span className="bg-primary/10 text-primary font-bold text-[10px] tracking-wider uppercase px-2 py-0.5 rounded border border-primary/20">
+                Operação Cerrado Vivo
               </span>
+              <span className="text-xs text-muted-foreground font-medium">Estado de Goiás</span>
             </div>
           </div>
         </div>

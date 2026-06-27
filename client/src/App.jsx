@@ -34,8 +34,15 @@ function App() {
               </div>
               <h1 className="text-xl font-bold tracking-tight">Sala de Situação CODEC</h1>
             </div>
-            <div className="text-sm font-semibold text-slate-200 hidden sm:block bg-slate-800 px-3 py-1.5 rounded-full border border-slate-700 shadow-inner tracking-wide">
-              {theme === 'theme-cerrado-vivo' ? '🔥 Operação Cerrado Vivo' : '🌧️ Operação Tempestade'}
+            <div className="text-sm font-semibold text-slate-200 hidden sm:flex items-center gap-3 tracking-wide">
+              {theme === 'theme-cerrado-vivo' ? (
+                <>
+                  <div className="w-10 h-10 flex items-center justify-center rounded-full bg-white shadow-sm p-1 ring-2 ring-slate-900 shrink-0">
+                    <img src="/cbmgo.png" alt="CBMGO" className="w-full h-full object-contain" />
+                  </div>
+
+                </>
+              ) : '🌧️ Operação Tempestade'}
             </div>
           </div>
         </header>
