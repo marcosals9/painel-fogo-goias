@@ -5,7 +5,7 @@ import { format } from 'date-fns';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Flame, Download, X, Upload, Calendar, ThermometerSun, CheckCircle2 } from 'lucide-react';
+import { Flame, Download, X, Upload, Calendar, ThermometerSun, CheckCircle2, FileSpreadsheet, Trees, Truck, Sun } from 'lucide-react';
 
 export default function InformativoMaker({ isOpen, onClose, fireEvents, date }) {
   const canvasRef = useRef(null);
