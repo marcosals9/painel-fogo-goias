@@ -29,8 +29,8 @@ function App() {
         <header className="border-b-2 border-primary bg-slate-900 sticky top-0 z-50 text-slate-100 shadow-md">
           <div className="container mx-auto px-4 h-16 flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="w-9 h-9 rounded-full bg-primary flex items-center justify-center shadow-sm ring-2 ring-slate-900">
-                <span className="text-primary-foreground font-bold text-sm">CD</span>
+              <div className="w-10 h-10 flex items-center justify-center">
+                <img src="/defesa-civil.png" alt="Defesa Civil" className="w-full h-full object-contain" />
               </div>
               <h1 className="text-xl font-bold tracking-tight">Sala de Situação CODEC</h1>
             </div>
