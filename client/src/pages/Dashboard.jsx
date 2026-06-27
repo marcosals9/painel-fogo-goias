@@ -731,9 +731,11 @@ export default function Dashboard() {
                       className={`cursor-pointer transition-colors ${selectedEvent === event.id ? 'bg-primary/20' : 'hover:bg-muted/50'}`}
                       onClick={() => setSelectedEvent(selectedEvent === event.id ? null : event.id)}
                     >
-                      <TableCell className="font-medium text-xs flex items-center gap-2 min-h-[40px]">
-                        <span className="w-2.5 h-2.5 rounded-full flex-shrink-0 shadow-sm border border-black/10" style={{ backgroundColor: getEventColorHex(event.ageHours) }} title={event.ageHours ? `Idade: ~${Math.round(event.ageHours)}h` : ''}></span>
-                        <span className="truncate">{event.municipio || 'N/A'}</span>
+                      <TableCell className="font-medium text-xs">
+                        <div className="flex items-center gap-2 min-h-[32px]">
+                          <span className="w-2.5 h-2.5 rounded-full flex-shrink-0 shadow-sm border border-black/10" style={{ backgroundColor: getEventColorHex(event.ageHours) }} title={event.ageHours ? `Idade: ~${Math.round(event.ageHours)}h` : ''}></span>
+                          <span className="whitespace-normal break-words leading-tight">{event.municipio || 'N/A'}</span>
+                        </div>
                       </TableCell>
                       <TableCell className="text-xs font-semibold">{event.tamanho_ha ? `${event.tamanho_ha} ha` : 'N/A'}</TableCell>
                       <TableCell className="text-xs text-orange-600 font-bold">{event.qtd_deteccoes || 0}</TableCell>
