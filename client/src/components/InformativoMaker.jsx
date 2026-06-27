@@ -111,14 +111,15 @@ export default function InformativoMaker({ isOpen, onClose, fireEvents, date }) 
   const displayDate = date.split('-').reverse().join('/');
 
   // Helpers de Renderização das Barras
-  const renderBar = (label, value, max, colorClass, widthClass = 'w-full') => (
-    <div key={label} className="flex flex-col mb-1 text-sm font-bold">
-      <div className="flex items-center">
-        <div className="w-[120px] text-right pr-2 text-[#002b5e] leading-none text-[11px] truncate">{label}</div>
-        <div className={`flex-1 flex items-center bg-gray-100 h-6 ${widthClass}`}>
-          <div className={`${colorClass} h-full flex items-center justify-end pr-2 text-black/80 font-extrabold`} style={{ width: max > 0 ? `${(value/max)*100}%` : '0%', minWidth: '24px' }}>
-             {value}
-          </div>
+  const renderBar = (label, value, max, colorClass) => (
+    <div key={label} className="flex items-center mb-1.5">
+      <div className="w-[130px] shrink-0 text-right pr-2 text-[#002b5e] font-bold text-[10px] leading-tight">{label}</div>
+      <div className="flex-1 flex items-center bg-gray-100 h-5">
+        <div
+          className={`${colorClass} h-full flex items-center justify-end pr-1.5 text-[10px] text-black/80 font-extrabold`}
+          style={{ width: max > 0 ? `${Math.max((value/max)*100, 8)}%` : '8%' }}
+        >
+          {value}
         </div>
       </div>
     </div>
@@ -198,81 +199,88 @@ export default function InformativoMaker({ isOpen, onClose, fireEvents, date }) 
             {/* Camada do Template do Canva (Enviado pelo usuário) */}
             <img src="/template.png" className="absolute inset-0 w-full h-full z-0 pointer-events-none object-cover" alt="Template Canva" onError={(e) => e.target.style.display = 'none'} />
 
-            {/* Header: template já tem logo e texto, só reservamos o espaço */}
-            <div className="bg-transparent h-[175px] z-10"></div>
+            {/* Header - Agora Transparente para mostrar o fundo da imagem */}
+            <div className="bg-transparent text-white flex justify-between h-[180px] p-6 relative z-10">
+                <div className="flex items-center gap-6 z-10 pl-[160px]">
+                    <div>
+                        <h1 className="text-[65px] font-black leading-[0.9] tracking-tighter shadow-sm" style={{ textShadow: '2px 2px 4px rgba(0,0,0,0.5)' }}>
+                            DEFESA<br/>
+                            <span className="text-white">CIVIL </span><span className="text-[#ff7f00]">GOIÁS</span>
+                        </h1>
+                        <p className="text-xl font-medium mt-1 tracking-wider text-gray-200">Proteger vidas é nossa missão!</p>
+                    </div>
+                </div>
+            </div>
 
-            {/* Fita Laranja Data - apenas data centralizada */}
-            <div className="mx-4 z-20">
-                <div className="bg-transparent flex items-center h-[68px]">
-                    <div className="w-[90px] shrink-0"></div>
-                    <div className="flex-1 flex flex-col items-center justify-center">
-                        <h2 className="text-[22px] font-black text-[#002b5e] leading-tight tracking-wide">INFORMATIVO - PERÍODO DE ESTIAGEM</h2>
-                        <h3 className="text-[16px] font-black text-[#002b5e] leading-tight">DADOS DO DIA {displayDate}</h3>
+            {/* Fita Laranja Data */}
+            <div className="mx-4 mt-[-15px] z-20">
+                <div className="bg-transparent rounded-2xl flex items-center h-[70px]">
+                    <div className="w-[100px] h-[70px] shrink-0"></div>
+                    <div className="flex-1 text-center flex flex-col justify-center h-full pt-2">
+                        <h2 className="text-[26px] font-black text-[#002b5e] leading-tight drop-shadow-sm">INFORMATIVO - PERÍODO DE ESTIAGEM</h2>
+                        <h3 className="text-xl font-black text-[#002b5e] leading-tight">DADOS DO DIA {displayDate}</h3>
                     </div>
                 </div>
             </div>
 
             {/* Grid 2x2 Quadrantes */}
-            <div className="grid grid-cols-2 gap-[14px] px-[14px] pb-[10px] flex-1 mt-[6px]">
-
+            <div className="grid grid-cols-2 gap-4 p-4 flex-1 mt-2">
+                
                 {/* Q1: Atendimentos SSP */}
-                <div className="bg-transparent flex flex-col overflow-hidden z-10">
-                    {/* Cabeçalho escuro: ícone + número + texto */}
-                    <div className="flex items-center h-[80px] pl-1 pr-2">
-                        <div className="w-[88px] shrink-0"></div>
-                        <span className="text-white text-[68px] font-black leading-none drop-shadow-lg mr-3">{totalAtendimentos.toString().padStart(2, '0')}</span>
-                        <span className="text-white text-[12px] font-black uppercase leading-[1.2] drop-shadow-md">Atendimentos<br/>Relacionados<br/>A Incêndios em<br/>Vegetação</span>
+                <div className="bg-transparent flex flex-col overflow-hidden z-10 pt-[10px]">
+                    <div className="text-white flex items-center h-[90px] pt-4">
+                        <div className="w-[100px] h-[70px] shrink-0"></div>
+                        <div className="flex gap-3 items-center w-full pl-1 pr-2">
+                            <span className="text-[58px] font-black leading-none drop-shadow-lg shrink-0">{totalAtendimentos.toString().padStart(2, '0')}</span>
+                            <span className="text-[11px] font-bold uppercase leading-tight drop-shadow-md">Atendimentos Relacionados<br/>A Incêndios em Vegetação</span>
+                        </div>
                     </div>
-                    {/* Linha azul "Municípios Mais Atendidos" já está no template */}
-                    <div className="h-[28px]"></div>
-                    {/* Barras */}
-                    <div className="px-3 flex-1 flex flex-col justify-center gap-[2px]">
+                    <div className="text-white text-center py-1 font-bold text-sm uppercase opacity-0 h-[20px]">Municípios Mais Atendidos</div>
+                    <div className="px-2 flex-1 flex flex-col justify-center pb-4 gap-0.5">
                         {sspMuni.slice(0,5).map(([mun, val]) => renderBar(mun, val, maxSspMuni, 'bg-[#76e5d7]'))}
                         {sspMuni.length === 0 && <div className="text-center text-gray-400 font-bold">Anexe a planilha SSP</div>}
                     </div>
-                    <div className="text-center font-bold text-[11px] pb-2 pt-1 text-[#002b5e]">FONTE: CBMGO - TOP 5</div>
+                    <div className="text-center font-bold text-[10px] pb-1 text-[#002b5e]">FONTE: CBMGO - TOP 5</div>
                 </div>
 
                 {/* Q2: Focos CENSIPAM */}
-                <div className="bg-transparent flex flex-col overflow-hidden z-10">
-                    <div className="flex items-center h-[80px] pl-1 pr-2">
-                        <div className="w-[88px] shrink-0"></div>
-                        <span className="text-white text-[68px] font-black leading-none drop-shadow-lg mr-3">{censipamDados.total.toString().padStart(2, '0')}</span>
-                        <span className="text-white text-[12px] font-black uppercase leading-[1.2] drop-shadow-md">Eventos<br/>de Fogo<br/>Identificados<br/>por Satélites</span>
+                <div className="bg-transparent flex flex-col overflow-hidden z-10 pt-[10px]">
+                    <div className="text-white flex items-center h-[90px] pt-4">
+                        <div className="w-[120px] h-[70px] shrink-0"></div>
+                        <div className="flex gap-3 items-center w-full pl-1 pr-2">
+                            <span className="text-[58px] font-black leading-none drop-shadow-lg shrink-0">{censipamDados.total.toString().padStart(2, '0')}</span>
+                            <span className="text-[11px] font-bold uppercase leading-tight drop-shadow-md">Eventos de Fogo<br/>Identificados por Satélites</span>
+                        </div>
                     </div>
-                    {/* Linha laranja "Municípios Mais Registrados" já está no template */}
-                    <div className="h-[28px]"></div>
-                    <div className="px-3 flex-1 flex flex-col justify-center gap-[2px]">
+                    <div className="text-white text-center py-1 font-bold text-sm uppercase opacity-0 h-[20px]">Municípios Mais Registrados</div>
+                    <div className="px-2 flex-1 flex flex-col justify-center pb-4 gap-0.5">
                         {censipamDados.top.slice(0,5).map(([mun, val]) => renderBar(mun, val, maxCenMuni, 'bg-[#76e5d7]'))}
                         {censipamDados.top.length === 0 && <div className="text-center text-gray-400 font-bold">Sem focos na data</div>}
                     </div>
-                    <div className="text-center font-bold text-[11px] pb-2 pt-1 text-[#002b5e]">FONTE: CENSIPAM</div>
+                    <div className="text-center font-bold text-[10px] pb-1 text-[#002b5e]">FONTE: CENSIPAM</div>
                 </div>
 
                 {/* Q3: Naturezas */}
-                <div className="bg-transparent flex flex-col overflow-hidden z-10">
-                    {/* Cabeçalho azul escuro com ícone + título */}
-                    <div className="flex items-center h-[85px] pl-1">
-                        <div className="w-[88px] shrink-0"></div>
-                        <h3 className="text-white text-[22px] font-black uppercase leading-tight">Natureza das<br/>Ocorrências<br/>Atendidas</h3>
+                <div className="bg-transparent flex flex-col overflow-hidden z-10 pt-[10px]">
+                    <div className="text-white flex items-center h-[90px] pt-2 pl-[110px] pr-3">
+                        <h3 className="text-[16px] font-bold uppercase leading-tight">Natureza das Ocorrências<br/>Atendidas</h3>
                     </div>
-                    <div className="px-3 flex-1 flex flex-col justify-center gap-[2px] pt-2">
+                    <div className="px-2 flex-1 flex flex-col justify-center pb-4 gap-0.5">
                         {sspNat.slice(0,5).map(([nat, val]) => renderBar(nat, val, maxSspNat, 'bg-[#f47f20]'))}
                         {sspNat.length === 0 && <div className="text-center text-gray-400 font-bold">Anexe a planilha SSP</div>}
                     </div>
-                    <div className="text-center font-bold text-[11px] pb-2 pt-1 text-[#002b5e]">FONTE : CBMGO</div>
+                    <div className="text-center font-bold text-[10px] pb-1 text-[#002b5e]">FONTE: CBMGO</div>
                 </div>
 
                 {/* Q4: CIMEHGO */}
-                <div className="bg-transparent flex flex-col overflow-hidden z-10">
-                    <div className="flex items-center h-[85px] pl-1">
-                        <div className="w-[88px] shrink-0"></div>
-                        <h3 className="text-white text-[22px] font-black uppercase leading-tight">Dias sem<br/>Chuvas por<br/>Região do Estado</h3>
+                <div className="bg-transparent flex flex-col overflow-hidden z-10 pt-[10px]">
+                    <div className="text-white flex items-center h-[90px] pt-2 pl-[110px] pr-3">
+                        <h3 className="text-[16px] font-bold uppercase leading-tight">Dias sem Chuvas por<br/>Região do Estado</h3>
                     </div>
-                    <div className="px-3 flex-1 flex flex-col justify-center gap-[2px] pt-2">
+                    <div className="px-2 flex-1 flex flex-col justify-center pb-4 gap-0.5">
                         {['OESTE','NORTE','LESTE','SUL','CENTRAL','SUDOESTE'].map(reg => renderBar(reg, diasSeca[reg] || 0, maxDias, 'bg-[#3bbbf6]'))}
                     </div>
-                    <div className="text-center font-bold text-[11px] pb-2 pt-1 text-[#002b5e]">FONTE: CIMEHGO ({displayDate})</div>
+                    <div className="text-center font-bold text-[10px] pb-1 text-[#002b5e]">FONTE: CIMEHGO ({displayDate})</div>
                 </div>
 
             </div>
