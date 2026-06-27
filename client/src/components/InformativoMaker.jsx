@@ -192,20 +192,19 @@ export default function InformativoMaker({ isOpen, onClose, fireEvents, date }) 
         {/* Container do Canvas A4/Poster - Aspect Ratio aproximado 800x1130 */}
         <div 
             ref={canvasRef} 
-            className="bg-white shadow-2xl shrink-0 relative flex flex-col font-sans"
+            className="bg-white shadow-2xl shrink-0 relative flex flex-col font-sans overflow-hidden"
             style={{ width: '800px', height: '1130px', transformOrigin: 'top center', transform: 'scale(0.85)' }}
         >
-            
+            {/* Camada do Template do Canva (Enviado pelo usuário) */}
+            <img src="/template.png" className="absolute inset-0 w-full h-full z-50 pointer-events-none object-contain" alt="Template Canva" onError={(e) => e.target.style.display = 'none'} />
+
             {/* Header */}
-            <div className="bg-[#0b162c] text-white flex justify-between h-[180px] p-6 relative overflow-hidden">
+            <div className="bg-[#0b162c] text-white flex justify-between h-[180px] p-6 relative">
                 {/* Linhas decorativas */}
                 <div className="absolute top-0 right-0 w-[500px] h-[500px] border-[3px] border-orange-500 rounded-full opacity-20 -translate-y-1/2 translate-x-1/4"></div>
                 <div className="absolute top-0 right-0 w-[400px] h-[400px] border-[3px] border-orange-500 rounded-full opacity-20 -translate-y-1/2 translate-x-1/4"></div>
                 
-                <div className="flex items-center gap-6 z-10">
-                    <div className="w-[120px] h-[120px] bg-white rounded-full flex items-center justify-center p-2 border-4 border-orange-500">
-                        <img src="/favicon.svg" alt="Logo" className="w-[80px] h-[80px] object-contain opacity-80" />
-                    </div>
+                <div className="flex items-center gap-6 z-10 pl-[140px]">
                     <div>
                         <h1 className="text-[65px] font-black leading-[0.9] tracking-tighter shadow-sm" style={{ textShadow: '2px 2px 4px rgba(0,0,0,0.5)' }}>
                             DEFESA<br/>
@@ -222,8 +221,8 @@ export default function InformativoMaker({ isOpen, onClose, fireEvents, date }) 
             {/* Fita Laranja Data */}
             <div className="mx-4 mt-[-15px] z-20">
                 <div className="border-[3px] border-orange-500 bg-white rounded-2xl flex items-center shadow-md">
-                    <div className="bg-orange-500 p-3 rounded-l-xl flex items-center justify-center">
-                        <Calendar className="w-10 h-10 text-white" />
+                    <div className="bg-orange-500 p-3 rounded-l-xl flex items-center justify-center w-[70px] h-[70px]">
+                        {/* Ícone vem do template overlay */}
                     </div>
                     <div className="flex-1 text-center py-2">
                         <h2 className="text-[26px] font-black text-[#002b5e] leading-tight">INFORMATIVO - PERÍODO DE ESTIAGEM</h2>
@@ -236,12 +235,12 @@ export default function InformativoMaker({ isOpen, onClose, fireEvents, date }) 
             <div className="grid grid-cols-2 gap-4 p-4 flex-1 mt-2">
                 
                 {/* Q1: Atendimentos SSP */}
-                <div className="border-[3px] border-[#002b5e] rounded-xl flex flex-col overflow-hidden bg-white">
+                <div className="border-[3px] border-[#002b5e] rounded-xl flex flex-col overflow-hidden bg-white z-10">
                     <div className="bg-[#002b5e] text-white flex items-center p-2 h-[100px]">
-                        <div className="bg-white rounded-full p-2 w-[70px] h-[70px] flex items-center justify-center border-4 border-green-600 shrink-0 mx-2">
-                            <Trees className="w-8 h-8 text-green-600" />
+                        <div className="w-[70px] h-[70px] shrink-0 mx-2">
+                            {/* Ícone da árvore vem do template */}
                         </div>
-                        <div className="flex gap-3 items-center w-full">
+                        <div className="flex gap-3 items-center w-full pl-2">
                             <span className="text-[60px] font-black leading-none">{totalAtendimentos.toString().padStart(2, '0')}</span>
                             <span className="text-sm font-bold uppercase leading-tight w-full">Atendimentos Relacionados<br/>A Incêndios em Vegetação</span>
                         </div>
@@ -255,12 +254,12 @@ export default function InformativoMaker({ isOpen, onClose, fireEvents, date }) 
                 </div>
 
                 {/* Q2: Focos CENSIPAM */}
-                <div className="border-[3px] border-[#002b5e] rounded-xl flex flex-col overflow-hidden bg-white">
+                <div className="border-[3px] border-[#002b5e] rounded-xl flex flex-col overflow-hidden bg-white z-10">
                     <div className="bg-[#002b5e] text-white flex items-center p-2 h-[100px]">
-                        <div className="bg-white rounded-full p-2 w-[70px] h-[70px] flex items-center justify-center border-4 border-orange-500 shrink-0 mx-2">
-                            <Flame className="w-10 h-10 text-orange-500" />
+                        <div className="w-[70px] h-[70px] shrink-0 mx-2">
+                            {/* Ícone de fogo vem do template */}
                         </div>
-                        <div className="flex gap-3 items-center w-full">
+                        <div className="flex gap-3 items-center w-full pl-2">
                             <span className="text-[60px] font-black leading-none">{censipamDados.total.toString().padStart(2, '0')}</span>
                             <span className="text-sm font-bold uppercase leading-tight w-full">Eventos de Fogo<br/>Identificados por Satélites</span>
                         </div>
@@ -274,9 +273,8 @@ export default function InformativoMaker({ isOpen, onClose, fireEvents, date }) 
                 </div>
 
                 {/* Q3: Naturezas */}
-                <div className="border-[3px] border-[#002b5e] rounded-xl flex flex-col overflow-hidden bg-white">
-                    <div className="bg-[#002b5e] text-white flex items-center justify-center gap-4 p-4 h-[110px]">
-                        <Truck className="w-12 h-12 text-white shrink-0 opacity-80" />
+                <div className="border-[3px] border-[#002b5e] rounded-xl flex flex-col overflow-hidden bg-white z-10">
+                    <div className="bg-[#002b5e] text-white flex items-center justify-center gap-4 p-4 h-[110px] pl-[70px]">
                         <h3 className="text-xl font-bold uppercase leading-tight text-center">Natureza das Ocorrências<br/>Atendidas</h3>
                     </div>
                     <div className="p-3 flex-1 flex flex-col justify-end pb-8 pt-4">
@@ -287,9 +285,8 @@ export default function InformativoMaker({ isOpen, onClose, fireEvents, date }) 
                 </div>
 
                 {/* Q4: CIMEHGO */}
-                <div className="border-[3px] border-[#002b5e] rounded-xl flex flex-col overflow-hidden bg-white">
-                    <div className="bg-[#002b5e] text-white flex items-center justify-center gap-4 p-4 h-[110px]">
-                        <Sun className="w-12 h-12 text-orange-400 shrink-0" />
+                <div className="border-[3px] border-[#002b5e] rounded-xl flex flex-col overflow-hidden bg-white z-10">
+                    <div className="bg-[#002b5e] text-white flex items-center justify-center gap-4 p-4 h-[110px] pl-[70px]">
                         <h3 className="text-xl font-bold uppercase leading-tight text-center">Dias sem Chuvas por<br/>Região do Estado</h3>
                     </div>
                     <div className="p-3 flex-1 flex flex-col justify-end pb-8 pt-4">
@@ -300,31 +297,9 @@ export default function InformativoMaker({ isOpen, onClose, fireEvents, date }) 
 
             </div>
 
-            {/* Footer */}
-            <div className="mt-2 h-[80px] bg-[#0b162c] text-white flex justify-between items-center px-6 relative overflow-hidden">
-                <div className="absolute top-0 left-0 w-[400px] h-[400px] border-[2px] border-orange-500 rounded-full opacity-10 -translate-y-3/4 -translate-x-1/4"></div>
-                
-                <div className="flex items-center gap-4 z-10">
-                    <div className="bg-white rounded-full w-14 h-14 flex items-center justify-center shadow-lg"><Flame className="w-8 h-8 text-orange-600"/></div>
-                    <div className="bg-white rounded-full w-14 h-14 flex items-center justify-center shadow-lg"><img src="/favicon.svg" alt="G" className="w-8 h-8 object-contain"/></div>
-                    <div>
-                        <h2 className="text-2xl font-black italic tracking-tight">EVITE QUEIMADAS!</h2>
-                        <h2 className="text-2xl font-black italic tracking-tight text-gray-300">DENUNCIE!</h2>
-                    </div>
-                </div>
-                
-                <div className="flex items-center gap-6 z-10 bg-white text-[#0b162c] h-full px-6 rounded-l-full py-2 mr-[-24px]">
-                    <div className="flex flex-col text-[10px] font-bold leading-tight uppercase">
-                       <span>Proteja o</span><span>Meio Ambiente</span>
-                    </div>
-                    <div className="flex flex-col text-[10px] font-bold leading-tight uppercase">
-                       <span>Preserve</span><span>Vidas</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                        <div className="bg-orange-500 text-white rounded-full w-10 h-10 flex items-center justify-center font-black text-lg">193</div>
-                        <div className="flex flex-col text-[10px] font-bold"><span>EMERGÊNCIA</span><span className="text-xl leading-none">193</span></div>
-                    </div>
-                </div>
+            {/* Footer do Template Original vai sobrepor o rodapé */}
+            <div className="mt-2 h-[120px] bg-transparent">
+                {/* O espaço em branco é preenchido pela imagem do template (z-50) */}
             </div>
 
         </div>
