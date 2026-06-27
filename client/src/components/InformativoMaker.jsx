@@ -11,6 +11,18 @@ export default function InformativoMaker({ isOpen, onClose, fireEvents, date }) 
   const canvasRef = useRef(null);
   const [downloading, setDownloading] = useState(false);
 
+  // Bloqueia o scroll do body quando o modal estiver aberto
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [isOpen]);
+
   // Estados dos Dados SSP
   const [sspFile, setSspFile] = useState(null);
   const [totalAtendimentos, setTotalAtendimentos] = useState(0);
