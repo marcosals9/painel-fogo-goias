@@ -19,6 +19,16 @@ router.get('/chats', async (req, res) => {
     }
 });
 
+// Rota para deslogar do WhatsApp
+router.post('/logout', async (req, res) => {
+    try {
+        await whatsappClient.logoutWhatsApp();
+        res.json({ success: true, message: 'WhatsApp desconectado com sucesso.' });
+    } catch (error) {
+        res.status(500).json({ error: 'Erro ao desconectar', details: error.message });
+    }
+});
+
 // Rota para disparar o boletim e salvar no banco de dados
 router.post('/send', async (req, res) => {
     let { titulo, texto, imagemBase64, destinatarios, destinatario } = req.body;

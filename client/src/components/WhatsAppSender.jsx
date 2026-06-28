@@ -3,7 +3,7 @@ import axios from 'axios';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Loader2, Send, QrCode, CheckCircle2, AlertTriangle, RefreshCw } from 'lucide-react';
+import { Loader2, Send, QrCode, CheckCircle2, AlertTriangle, RefreshCw, LogOut } from 'lucide-react';
 import { toPng } from 'html-to-image';
 
 export default function WhatsAppSender({ canvasRef, date }) {
@@ -25,6 +25,7 @@ export default function WhatsAppSender({ canvasRef, date }) {
 
   const [chats, setChats] = useState([]);
   const [loadingChats, setLoadingChats] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
 
   const fetchChats = async () => {
     setLoadingChats(true);
@@ -114,6 +115,22 @@ export default function WhatsAppSender({ canvasRef, date }) {
     }
   };
 
+  const handleLogoutWhatsApp = async () => {
+    if (!window.confirm("Deseja realmente desconectar o robô do WhatsApp? Você precisará ler o QR Code novamente.")) return;
+    try {
+      const token = localStorage.getItem('codec_token');
+      await axios.post(`${import.meta.env.PROD ? '' : 'http://localhost:3001'}/api/whatsapp/logout`, {}, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setStatus('DISCONNECTED');
+      setQrCode(null);
+    } catch (err) {
+      console.error('Erro ao deslogar:', err);
+    }
+  };
+
+  const filteredChats = chats.filter(c => c.name.toLowerCase().includes(searchQuery.toLowerCase()));
+
   return (
     <div className="space-y-4 border rounded-xl p-4 bg-white shadow-sm mt-4">
       <div className="flex items-center justify-between border-b pb-2">
@@ -122,7 +139,14 @@ export default function WhatsAppSender({ canvasRef, date }) {
         <div className="flex items-center gap-2 text-[10px] font-semibold uppercase">
           {loadingStatus ? <Loader2 className="w-3 h-3 animate-spin"/> : (
             <>
-              {status === 'CONNECTED' && <span className="text-green-600 flex items-center gap-1"><CheckCircle2 className="w-3 h-3"/> Conectado</span>}
+              {status === 'CONNECTED' && (
+                <>
+                  <span className="text-green-600 flex items-center gap-1"><CheckCircle2 className="w-3 h-3"/> Conectado</span>
+                  <button onClick={handleLogoutWhatsApp} className="ml-2 text-red-500 hover:text-red-700 p-1" title="Desconectar WhatsApp">
+                    <LogOut className="w-3.5 h-3.5" />
+                  </button>
+                </>
+              )}
               {status === 'QR_READY' && <span className="text-yellow-600 flex items-center gap-1"><QrCode className="w-3 h-3"/> Aguardando QR Code</span>}
               {status === 'DISCONNECTED' && <span className="text-red-600 flex items-center gap-1"><AlertTriangle className="w-3 h-3"/> Desconectado</span>}
             </>
@@ -141,11 +165,17 @@ export default function WhatsAppSender({ canvasRef, date }) {
         <div className="space-y-3">
           <div className="space-y-1">
             <Label className="text-xs">Contatos e Grupos</Label>
+            <Input 
+              placeholder="Buscar contato..." 
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="h-7 text-xs mb-1 bg-white"
+            />
             <div className="max-h-40 overflow-y-auto border rounded-md p-2 text-xs space-y-1 bg-muted/20">
               {loadingChats ? (
                 <div className="text-muted-foreground p-2">Carregando contatos...</div>
               ) : (
-                chats.map(c => (
+                filteredChats.map(c => (
                   <label key={c.id} className="flex items-center gap-2 cursor-pointer hover:bg-muted p-1.5 rounded transition-colors">
                     <input 
                       type="checkbox" 

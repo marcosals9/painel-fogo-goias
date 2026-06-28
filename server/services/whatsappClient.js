@@ -76,6 +76,28 @@ const sendBoletim = async (to, text, imageBase64) => {
 
 
 
+const logoutWhatsApp = async () => {
+    if (client && status === 'CONNECTED') {
+        try {
+            await client.logout();
+            console.log('Sessão do WhatsApp encerrada.');
+        } catch (error) {
+            console.error('Erro ao fazer logout do WhatsApp:', error);
+        }
+        
+        try {
+            await client.destroy();
+        } catch(e) {}
+    }
+    
+    status = 'DISCONNECTED';
+    currentQrBase64 = null;
+    
+    // Reinicia o cliente para gerar novo QR Code
+    initializeWhatsApp();
+    return true;
+};
+
 const getChats = async () => {
     if (status !== 'CONNECTED' || !client) {
         return [];
@@ -97,5 +119,6 @@ module.exports = {
     initializeWhatsApp,
     getStatus,
     sendBoletim,
-    getChats
+    getChats,
+    logoutWhatsApp
 };
