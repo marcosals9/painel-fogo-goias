@@ -34,6 +34,24 @@ export default function AdminArea() {
     fetchAdminData();
   }, [navigate]);
 
+  useEffect(() => {
+    // Interceptor global para capturar erros 401 e 403 (Sessão Expirada) em qualquer requisição
+    const interceptor = axios.interceptors.response.use(
+      (response) => response,
+      (error) => {
+        if (error.response && (error.response.status === 401 || error.response.status === 403)) {
+          alert('Sua sessão expirou por inatividade. Por favor, faça login novamente.');
+          localStorage.removeItem('codec_token');
+          navigate('/login');
+        }
+        return Promise.reject(error);
+      }
+    );
+
+    return () => {
+      axios.interceptors.response.eject(interceptor);
+    };
+  }, [navigate]);
 
 
   if (loading) return <div className="text-center py-10">Carregando painel...</div>;
