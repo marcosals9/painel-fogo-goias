@@ -354,7 +354,7 @@ export default function InformativoMaker({ isOpen, onClose, fireEvents, date }) 
                   <span className="text-[11px] font-bold uppercase leading-tight drop-shadow-md">Atendimentos Relacionados<br />a Incêndios em Vegetação</span>
                 </div>
               </div>
-              <div className="opacity-0 h-[22px]"></div>
+              <div className="opacity-0 h-[36px]"></div>
               <div className="px-2 flex-1 flex flex-col justify-center pb-4 gap-0.5">
                 {sspMuni.slice(0, 5).map(([mun, val]) => renderBar(mun, val, maxSspMuni, 'bg-[#76e5d7]'))}
                 {sspMuni.length === 0 && <div className="text-center text-gray-400 font-bold">Anexe a planilha SSP</div>}
@@ -371,7 +371,7 @@ export default function InformativoMaker({ isOpen, onClose, fireEvents, date }) 
                   <span className="text-[11px] font-bold uppercase leading-tight drop-shadow-md">Eventos de Fogo<br />Identificados por Satélites</span>
                 </div>
               </div>
-              <div className="opacity-0 h-[22px]"></div>
+              <div className="opacity-0 h-[36px]"></div>
               <div className="px-2 flex-1 flex flex-col justify-center pb-6 gap-0.5">
                 {censipamDados.top.slice(0, 5).map(([mun, val]) => renderBar(mun, val, maxCenMuni, 'bg-[#76e5d7]'))}
                 {censipamDados.top.length === 0 && <div className="text-center text-gray-400 font-bold">Sem focos na data</div>}
