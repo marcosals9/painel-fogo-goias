@@ -723,12 +723,12 @@ export default function Dashboard() {
           </CardContent>
         </Card>
 
-        <Card className="flex flex-col h-[600px] shadow-lg">
+        <Card className="flex flex-col h-[600px] border-t-4 border-t-primary shadow-lg">
           <CardHeader className="py-3 px-4 bg-slate-50 dark:bg-slate-800/40 border-b border-border flex flex-row justify-between items-center">
             <div className="flex flex-col gap-0.5">
-              <h3 className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground flex items-center gap-1.5">
-                <TableProperties className="w-3.5 h-3.5" /> DADOS DA TABELA
-              </h3>
+              <CardTitle className="text-lg flex items-center gap-2">
+                <Flame className="w-5 h-5 text-primary" /> Eventos de Fogo
+              </CardTitle>
               {!loading && (
                 <p className="text-xs text-muted-foreground mt-0.5">
                   <span className="font-semibold text-foreground">{sortedEvents.length}</span> eventos em Goiás
@@ -739,14 +739,14 @@ export default function Dashboard() {
               )}
             </div>
             <div className="flex gap-2">
-              <Button variant="outline" size="sm" className="h-8 w-8 p-0 bg-blue-50 text-blue-600 border-blue-200 hover:bg-blue-100 hover:text-blue-700 shadow-sm" onClick={() => setIsExplorerOpen(true)} title="Explorador de Dados KML (Detalhado)">
+              <Button variant="outline" size="sm" className="h-8 w-8 p-0 flex items-center justify-center bg-blue-50 text-blue-600 border-blue-200 hover:bg-blue-100 hover:text-blue-700 shadow-sm" onClick={() => setIsExplorerOpen(true)} title="Explorador de Dados KML (Detalhado)">
                 <Database className="w-4 h-4" />
               </Button>
               <Button
                 variant="outline"
                 size="sm"
                 onClick={exportToExcel}
-                className="h-8 w-8 p-0 bg-emerald-50 text-emerald-600 border-emerald-200 hover:bg-emerald-100 hover:text-emerald-700 shadow-sm"
+                className="h-8 w-8 p-0 flex items-center justify-center bg-emerald-50 text-emerald-600 border-emerald-200 hover:bg-emerald-100 hover:text-emerald-700 shadow-sm"
                 title="Exportar para Excel (.xlsx)"
               >
                 <Download className="w-4 h-4" />
