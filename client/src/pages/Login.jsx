@@ -72,8 +72,8 @@ export default function Login() {
             )}
           </CardContent>
           <CardFooter className="flex gap-3 pt-2">
-            <Button type="submit" size="sm" className="flex-1 bg-[#002b5e] hover:bg-[#001a38] text-white">Entrar</Button>
             <Button type="button" size="sm" className="flex-1 bg-[#ff7f00] hover:bg-[#cc6600] text-white" onClick={() => navigate('/')}>Cancelar</Button>
+            <Button type="submit" size="sm" className="flex-1 bg-[#002b5e] hover:bg-[#001a38] text-white">Entrar</Button>
           </CardFooter>
         </form>
       </Card>
