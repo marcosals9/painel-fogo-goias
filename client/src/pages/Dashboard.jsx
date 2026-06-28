@@ -10,7 +10,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { format, subDays, startOfDay, endOfDay } from 'date-fns';
-import { Download, Flame, Map as MapIcon, Loader2, ArrowUpDown, RefreshCw, MousePointerSquareDashed, LocateFixed, Timer, Trees, Smartphone, Database } from 'lucide-react';
+import { Download, Flame, Map as MapIcon, Loader2, ArrowUpDown, RefreshCw, MousePointerSquareDashed, LocateFixed, Timer, Trees, Smartphone, Database, TableProperties } from 'lucide-react';
 import InformativoMaker from '../components/InformativoMaker';
 import DataExplorer from '../components/DataExplorer';
 
@@ -489,9 +489,6 @@ export default function Dashboard() {
                 }}>
                   <Smartphone className="w-4 h-4" /> <span className="hidden sm:inline">Informativo WhatsApp</span><span className="sm:hidden">WhatsApp</span>
                 </Button>
-                <Button variant="outline" size="sm" className="flex-1 sm:flex-none h-8 gap-2 flex flex-row items-center bg-blue-50 text-blue-600 border-blue-200 hover:bg-blue-100 hover:text-blue-700 shadow-sm px-2 sm:px-3" onClick={() => setIsExplorerOpen(true)}>
-                  <Database className="w-4 h-4" /> Dados KML
-                </Button>
               </div>
             </h2>
             <div className="flex items-center gap-2 mt-2">
@@ -727,9 +724,11 @@ export default function Dashboard() {
         </Card>
 
         <Card className="flex flex-col h-[600px] shadow-lg">
-          <CardHeader className="py-3 px-4 bg-muted/30 flex flex-row justify-between items-center">
-            <div>
-              <CardTitle className="text-lg">Dados do Evento</CardTitle>
+          <CardHeader className="py-3 px-4 bg-slate-50 dark:bg-slate-800/40 border-b border-border flex flex-row justify-between items-center">
+            <div className="flex flex-col gap-0.5">
+              <h3 className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground flex items-center gap-1.5">
+                <TableProperties className="w-3.5 h-3.5" /> DADOS DA TABELA
+              </h3>
               {!loading && (
                 <p className="text-xs text-muted-foreground mt-0.5">
                   <span className="font-semibold text-foreground">{sortedEvents.length}</span> eventos em Goiás
@@ -739,15 +738,20 @@ export default function Dashboard() {
                 </p>
               )}
             </div>
-            <Button
-              variant="secondary"
-              size="sm"
-              onClick={exportToExcel}
-              className="flex flex-row items-center gap-2 h-8 px-3"
-              title="Baixar os dados visíveis na tabela em formato Excel (.xlsx)"
-            >
-              <Download className="w-4 h-4" /> Exportar
-            </Button>
+            <div className="flex gap-2">
+              <Button variant="outline" size="sm" className="h-8 w-8 p-0 bg-blue-50 text-blue-600 border-blue-200 hover:bg-blue-100 hover:text-blue-700 shadow-sm" onClick={() => setIsExplorerOpen(true)} title="Explorador de Dados KML (Detalhado)">
+                <Database className="w-4 h-4" />
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={exportToExcel}
+                className="h-8 w-8 p-0 bg-emerald-50 text-emerald-600 border-emerald-200 hover:bg-emerald-100 hover:text-emerald-700 shadow-sm"
+                title="Exportar para Excel (.xlsx)"
+              >
+                <Download className="w-4 h-4" />
+              </Button>
+            </div>
           </CardHeader>
           <CardContent className="flex-1 overflow-auto p-0">
             {loading ? (
