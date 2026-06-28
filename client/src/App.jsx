@@ -49,11 +49,10 @@ function App() {
                     <div>
                       <button 
                         onClick={() => setMenuOpen(!menuOpen)} 
-                        className="flex items-center gap-2 hover:opacity-80 transition-opacity bg-slate-800 py-1.5 px-3 rounded-full border border-slate-700 focus:outline-none"
+                        className="flex items-center justify-center hover:opacity-80 transition-opacity bg-slate-800 w-10 h-10 rounded-full border border-slate-700 focus:outline-none"
+                        title="Menu do Administrador"
                       >
-                        <User className="w-4 h-4 text-orange-400" />
-                        <span className="hidden sm:inline">Admin</span>
-                        <ChevronDown className="w-4 h-4 text-slate-400" />
+                        <User className="w-5 h-5 text-orange-400" />
                       </button>
                       
                       {menuOpen && (
@@ -71,9 +70,8 @@ function App() {
                       )}
                     </div>
                   ) : (
-                    <Link to="/login" className="flex items-center gap-2 hover:opacity-80 transition-opacity bg-slate-800 py-1.5 px-4 rounded-full border border-slate-700">
-                      <Lock className="w-4 h-4 text-orange-400" />
-                      <span>Área Restrita</span>
+                    <Link to="/login" className="flex items-center justify-center hover:opacity-80 transition-opacity bg-slate-800 w-10 h-10 rounded-full border border-slate-700" title="Área Restrita">
+                      <Lock className="w-5 h-5 text-orange-400" />
                     </Link>
                   )}
                 </div>
