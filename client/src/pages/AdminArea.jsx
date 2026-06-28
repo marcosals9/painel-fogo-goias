@@ -19,7 +19,7 @@ export default function AdminArea() {
       }
 
       try {
-        const response = await axios.get(`${import.meta.env.VITE_API_URL || 'http://localhost:3001'}/api/admin/dashboard`, {
+        const response = await axios.get(`${import.meta.env.PROD ? '' : 'http://localhost:3001'}/api/admin/dashboard`, {
           headers: { Authorization: `Bearer ${token}` }
         });
         setUser(response.data.user);
