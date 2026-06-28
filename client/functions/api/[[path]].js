@@ -1,15 +1,21 @@
 export async function onRequest(context) {
   const url = new URL(context.request.url);
-  const backendUrl = context.env.BACKEND_URL;
+  let backendUrl = context.env.BACKEND_URL;
   
   if (!backendUrl) {
     return new Response("Erro: BACKEND_URL não configurado", { status: 500 });
   }
 
-  const targetUrl = new URL(url.pathname + url.search, backendUrl);
+  const backendUrlObj = new URL(backendUrl);
+  // Se for um endereço IP (ex: 34.121.71.100), o Cloudflare Worker bloqueia com erro 1003 (Direct IP Access).
+  // Para contornar, adicionamos .nip.io (serviço gratuito de DNS curinga) para transformar o IP em um domínio.
+  if (/^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$/.test(backendUrlObj.hostname)) {
+    backendUrlObj.hostname = backendUrlObj.hostname + '.nip.io';
+  }
+
+  const targetUrl = new URL(url.pathname + url.search, backendUrlObj.toString());
   
   // Criar cabeçalhos totalmente novos apenas com o essencial
-  // Isso impede que o Cloudflare Worker tente rotear a requisição de volta para si mesmo
   const newHeaders = new Headers();
   
   const contentType = context.request.headers.get('Content-Type');
