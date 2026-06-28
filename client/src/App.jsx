@@ -1,14 +1,15 @@
-import { BrowserRouter as Router, Routes, Route, Navigate, Link } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate, Link, useLocation } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { Lock, User, LogOut, ChevronDown } from 'lucide-react';
 import Dashboard from './pages/Dashboard';
 import Login from './pages/Login';
 import AdminArea from './pages/AdminArea';
 
-function App() {
+function AppContent() {
   const [theme, setTheme] = useState('theme-cerrado-vivo');
   const [menuOpen, setMenuOpen] = useState(false);
   const isLoggedIn = !!localStorage.getItem('codec_token');
+  const location = useLocation();
 
   const handleLogout = () => {
     localStorage.removeItem('codec_token');
@@ -32,8 +33,7 @@ function App() {
   }, [theme]);
 
   return (
-    <Router>
-      <div className="min-h-screen bg-background text-foreground flex flex-col">
+    <div className="min-h-screen bg-background text-foreground flex flex-col">
         <header className="border-b-2 border-primary bg-slate-900 sticky top-0 z-50 text-slate-100 shadow-md">
           <div className="container mx-auto px-4 h-16 flex items-center justify-between relative">
             <Link to="/" className="flex items-center gap-3 min-w-0 hover:opacity-80 transition-opacity">
@@ -59,9 +59,15 @@ function App() {
                         <>
                           <div className="fixed inset-0 z-40" onClick={() => setMenuOpen(false)}></div>
                           <div className="absolute right-0 mt-2 w-48 bg-white text-slate-800 rounded-md shadow-lg overflow-hidden border z-50">
-                            <Link to="/admin" className="block px-4 py-3 text-sm font-medium hover:bg-slate-100 border-b" onClick={() => setMenuOpen(false)}>
-                              Painel Administrativo
-                            </Link>
+                            {location.pathname === '/admin' ? (
+                              <Link to="/" className="block px-4 py-3 text-sm font-medium hover:bg-slate-100 border-b" onClick={() => setMenuOpen(false)}>
+                                Voltar para o Mapa
+                              </Link>
+                            ) : (
+                              <Link to="/admin" className="block px-4 py-3 text-sm font-medium hover:bg-slate-100 border-b" onClick={() => setMenuOpen(false)}>
+                                Painel Administrativo
+                              </Link>
+                            )}
                             <button onClick={handleLogout} className="w-full text-left px-4 py-3 text-sm font-medium text-red-600 hover:bg-red-50 flex items-center gap-2">
                               <LogOut className="w-4 h-4" /> Sair
                             </button>
@@ -89,6 +95,13 @@ function App() {
           </Routes>
         </main>
       </div>
+  );
+}
+
+function App() {
+  return (
+    <Router>
+      <AppContent />
     </Router>
   );
 }
