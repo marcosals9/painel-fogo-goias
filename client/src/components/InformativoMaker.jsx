@@ -151,6 +151,20 @@ export default function InformativoMaker({ isOpen, onClose, fireEvents, date }) 
 
   const downloadImage = async () => {
     if (!canvasRef.current) return;
+    
+    // Validar dados incompletos
+    const isSspIncompleto = totalAtendimentos === 0;
+    const isCimehgoIncompleto = Object.values(diasSeca).every(v => v === 0);
+    
+    if (isSspIncompleto || isCimehgoIncompleto) {
+      const alertas = [];
+      if (isSspIncompleto) alertas.push("- Planilha de Ocorrências (SSP) não foi anexada.");
+      if (isCimehgoIncompleto) alertas.push("- Dias sem chuva (CIMEHGO) não foram preenchidos (todos estão zerados).");
+      
+      const confirmar = window.confirm(`Atenção! O boletim possui dados incompletos:\n\n${alertas.join('\n')}\n\nDeseja gerar a imagem assim mesmo?`);
+      if (!confirmar) return;
+    }
+
     setDownloading(true);
     try {
       const dataUrl = await toPng(canvasRef.current, { cacheBust: true, pixelRatio: 2 });
@@ -199,13 +213,13 @@ export default function InformativoMaker({ isOpen, onClose, fireEvents, date }) 
             <p className="text-xs text-muted-foreground">Preencha os dados manuais</p>
           </div>
           <div className="flex gap-1">
-            <Button variant="outline" size="icon" className="md:hidden text-muted-foreground" onClick={() => setShowPreviewMobile(true)} title="Ver Preview da Imagem">
+            <Button variant="outline" size="icon" className="md:hidden text-muted-foreground flex items-center justify-center" onClick={() => setShowPreviewMobile(true)} title="Ver Preview da Imagem">
               <Eye className="w-4 h-4" />
             </Button>
-            <Button variant="outline" size="icon" className="text-primary hover:text-primary" onClick={downloadImage} disabled={downloading} title="Baixar Imagem Manualmente">
+            <Button variant="outline" size="icon" className="text-primary hover:text-primary flex items-center justify-center" onClick={downloadImage} disabled={downloading} title="Baixar Imagem Manualmente">
               {downloading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Download className="w-4 h-4" />}
             </Button>
-            <Button variant="ghost" size="icon" onClick={onClose}><X className="w-5 h-5" /></Button>
+            <Button variant="ghost" size="icon" className="flex items-center justify-center text-muted-foreground" onClick={onClose}><X className="w-5 h-5" /></Button>
           </div>
         </div>
 
@@ -280,20 +294,22 @@ export default function InformativoMaker({ isOpen, onClose, fireEvents, date }) 
       </div>
 
       {/* Preview (Direita) */}
-      <div className={`flex-1 bg-black/5 overflow-y-auto flex-col items-center py-8 relative ${showPreviewMobile ? 'flex' : 'hidden md:flex'}`}>
+      <div className={`flex-1 w-full bg-black/5 overflow-auto flex-col items-center py-8 relative ${showPreviewMobile ? 'flex' : 'hidden md:flex'}`}>
         
         {/* Mobile Voltar Botão */}
-        <div className="md:hidden absolute top-4 left-4 z-[1000]">
-          <Button variant="secondary" onClick={() => setShowPreviewMobile(false)} className="bg-white shadow-md">
-            <ArrowLeft className="w-4 h-4 mr-2" /> Formulário
+        <div className="md:hidden sticky top-0 left-4 z-[1000] mb-8 ml-4 self-start">
+          <Button variant="secondary" onClick={() => setShowPreviewMobile(false)} className="bg-white shadow-md flex items-center justify-center gap-2 whitespace-nowrap h-10 px-4">
+            <ArrowLeft className="w-4 h-4" /> Formulário
           </Button>
         </div>
 
-        {/* Wrapper para os efeitos visuais (sombra e escala) sem afetar a imagem exportada */}
-        <div 
-          className="shadow-2xl shrink-0 mt-8 md:mt-0"
-          style={{ width: '800px', height: '1130px', transformOrigin: 'top center', transform: 'scale(0.85)' }}
-        >
+        {/* Wrapper do tamanho exato da escala para centralizar perfeitamente */}
+        <div className="w-[360px] h-[508px] md:w-[680px] md:h-[960px] shrink-0 mt-2 md:mt-0 mx-auto">
+          {/* Wrapper para os efeitos visuais (sombra e escala) sem afetar a imagem exportada */}
+          <div 
+            className="shadow-2xl origin-top-left scale-[0.45] md:scale-[0.85]"
+            style={{ width: '800px', height: '1130px' }}
+          >
           {/* Container do Canvas A4/Poster (Este é o que será exportado) */}
           <div
             ref={canvasRef}
@@ -394,10 +410,9 @@ export default function InformativoMaker({ isOpen, onClose, fireEvents, date }) 
           </div>
 
           </div>
-
         </div>
-
       </div>
+    </div>
     </div>
   );
 }

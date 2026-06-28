@@ -473,7 +473,7 @@ export default function Dashboard() {
 
   return (
     <>
-      <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
+      <div className="space-y-6 animate-in fade-in duration-500">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
           <div className="flex items-start gap-2.5 w-full md:w-auto">
             <Flame className="w-9 h-9 text-primary mt-0.5 drop-shadow-sm shrink-0" />
@@ -531,11 +531,11 @@ export default function Dashboard() {
                   className="h-9 flex-1 sm:flex-none sm:w-auto min-w-[140px] bg-card shadow-sm cursor-pointer"
                 />
                 <Button
-                  variant="default"
+                  variant="outline"
                   size="icon"
                   onClick={() => fetchFireData(date, timezone)}
                   disabled={loading}
-                  className="h-9 w-9 shadow-sm flex items-center justify-center p-0 shrink-0"
+                  className="h-9 w-9 border-blue-200 bg-blue-50 text-blue-600 hover:bg-blue-100 hover:text-blue-700 shadow-sm flex items-center justify-center p-0 shrink-0"
                   title="Sincronizar/Buscar dados atualizados no satélite do CENSIPAM"
                 >
                   {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <RefreshCw className="w-4 h-4" />}
@@ -593,6 +593,7 @@ export default function Dashboard() {
                 zoomSnap={0.1}
                 zoomDelta={0.5}
                 scrollWheelZoom={true}
+                keyboard={false}
                 className="w-full h-full z-0"
               >
                 <TileLayer
