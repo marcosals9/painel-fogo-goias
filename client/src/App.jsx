@@ -40,7 +40,9 @@ function AppContent() {
               <div className="w-11 h-11 sm:w-12 sm:h-12 flex items-center justify-center rounded-full overflow-hidden bg-white shadow-sm p-0.5 shrink-0">
                 <img src="/defesa-civil.png" alt="Defesa Civil" className="w-full h-full object-contain" />
               </div>
-              <h1 className="text-base sm:text-lg font-medium text-primary tracking-wide truncate">Sala de Situação CODEC</h1>
+              <h1 className="text-sm sm:text-base font-medium text-primary tracking-wide truncate">
+                Sala de Situação <span className="font-bold text-white ml-1">CODEC</span>
+              </h1>
             </Link>
             <div className="text-sm font-semibold text-slate-200 flex items-center gap-3 tracking-wide shrink-0">
               {theme === 'theme-cerrado-vivo' ? (
