@@ -30,7 +30,7 @@ export default function WhatsAppSender({ canvasRef, date }) {
     setLoadingChats(true);
     try {
       const token = localStorage.getItem('codec_token');
-      const res = await axios.get('http://localhost:3001/api/whatsapp/chats', {
+      const res = await axios.get(`${import.meta.env.VITE_API_URL || 'http://localhost:3001'}/api/whatsapp/chats`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       if (res.data.success) {
@@ -46,7 +46,7 @@ export default function WhatsAppSender({ canvasRef, date }) {
   const fetchStatus = async () => {
     try {
       const token = localStorage.getItem('codec_token');
-      const res = await axios.get('http://localhost:3001/api/whatsapp/status', {
+      const res = await axios.get(`${import.meta.env.VITE_API_URL || 'http://localhost:3001'}/api/whatsapp/status`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setStatus(res.data.status);
@@ -97,7 +97,7 @@ export default function WhatsAppSender({ canvasRef, date }) {
         imagemBase64: imageBase64
       };
 
-      const res = await axios.post('http://localhost:3001/api/whatsapp/send', payload, {
+      const res = await axios.post(`${import.meta.env.VITE_API_URL || 'http://localhost:3001'}/api/whatsapp/send`, payload, {
         headers: { Authorization: `Bearer ${token}` }
       });
 
