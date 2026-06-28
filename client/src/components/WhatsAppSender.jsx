@@ -208,7 +208,9 @@ export default function WhatsAppSender({ canvasRef, date }) {
       {status === 'DISCONNECTED' && (
         <div className="text-center p-4">
           <p className="text-xs text-muted-foreground mb-2">O robô do WhatsApp está desconectado.</p>
-          <Button variant="outline" size="sm" onClick={fetchStatus}><RefreshCw className="w-3 h-3 mr-2"/> Tentar Novamente</Button>
+          <Button variant="outline" size="sm" className="flex items-center justify-center gap-1.5" onClick={fetchStatus}>
+            <RefreshCw className="w-3 h-3" /> Tentar Novamente
+          </Button>
         </div>
       )}
     </div>
