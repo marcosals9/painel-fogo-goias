@@ -475,355 +475,355 @@ export default function Dashboard() {
     <>
       <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-        <div className="flex items-start gap-2.5 w-full md:w-auto">
-          <Flame className="w-9 h-9 text-primary mt-0.5 drop-shadow-sm shrink-0" />
-          <div className="flex flex-col w-full">
-            <h2 className="text-2xl sm:text-3xl font-black tracking-tight flex flex-col sm:flex-row sm:items-center gap-2">
-              Monitoramento de Focos
-              <div className="flex gap-2 mt-2 sm:mt-0 sm:ml-4">
-                <Button variant="outline" size="sm" className="flex-1 sm:flex-none h-8 gap-2 flex flex-row items-center bg-orange-50 text-orange-600 border-orange-200 hover:bg-orange-100 hover:text-orange-700 shadow-sm px-2 sm:px-3" onClick={() => {
-                  if (!localStorage.getItem('codec_token')) {
-                    navigate('/login');
-                  } else {
-                    setIsMakerOpen(true);
-                  }
-                }}>
-                  <Smartphone className="w-4 h-4" /> <span className="hidden sm:inline">Informativo WhatsApp</span><span className="sm:hidden">WhatsApp</span>
+          <div className="flex items-start gap-2.5 w-full md:w-auto">
+            <Flame className="w-9 h-9 text-primary mt-0.5 drop-shadow-sm shrink-0" />
+            <div className="flex flex-col w-full">
+              <h2 className="text-2xl sm:text-3xl font-black tracking-tight flex flex-col sm:flex-row sm:items-center gap-2">
+                Monitoramento de Focos
+                <div className="flex gap-2 mt-2 sm:mt-0 sm:ml-4">
+                  <Button variant="outline" size="sm" className="flex-1 sm:flex-none h-8 gap-2 flex flex-row items-center bg-orange-50 text-orange-600 border-orange-200 hover:bg-orange-100 hover:text-orange-700 shadow-sm px-2 sm:px-3" onClick={() => {
+                    if (!localStorage.getItem('codec_token')) {
+                      navigate('/login');
+                    } else {
+                      setIsMakerOpen(true);
+                    }
+                  }}>
+                    <Smartphone className="w-4 h-4" /> <span className="hidden sm:inline">Informativo WhatsApp</span><span className="sm:hidden">WhatsApp</span>
+                  </Button>
+                </div>
+              </h2>
+              <div className="flex items-center gap-2 mt-2">
+                <span className="bg-primary/10 text-primary font-bold text-[10px] tracking-wider uppercase px-2 py-0.5 rounded border border-primary/20 shrink-0">
+                  Operação Cerrado Vivo
+                </span>
+                <span className="text-xs text-muted-foreground font-medium truncate">Corpo de Bombeiros Militar do Estado de Goiás</span>
+              </div>
+            </div>
+          </div>
+
+          <div className="flex flex-col items-end gap-1.5 w-full md:w-auto">
+            <div className="flex items-center gap-2 flex-wrap justify-end w-full sm:w-auto">
+              <div className="relative flex items-center bg-card border rounded-md shadow-sm pr-2 hover:border-primary/50 transition-colors">
+                <Timer className="w-4 h-4 ml-3 text-muted-foreground absolute pointer-events-none" />
+                <select
+                  value={refreshInterval}
+                  onChange={(e) => setRefreshInterval(Number(e.target.value))}
+                  className="h-9 pl-9 pr-3 text-sm bg-transparent border-none focus:outline-none focus:ring-0 cursor-pointer text-muted-foreground appearance-none"
+                  title="Atualização Automática"
+                >
+                  <option value={0}>Auto Refresh: OFF</option>
+                  <option value={5}>A cada 5 min</option>
+                  <option value={15}>A cada 15 min</option>
+                  <option value={30}>A cada 30 min</option>
+                </select>
+              </div>
+              <div className="relative flex items-center bg-card border rounded-md shadow-sm hover:border-primary/50 transition-colors flex-1 sm:flex-none min-w-[100px]">
+                <select
+                  value={timezone}
+                  onChange={(e) => setTimezone(e.target.value)}
+                  className="h-9 px-3 text-sm bg-transparent border-none focus:outline-none focus:ring-0 cursor-pointer text-muted-foreground font-medium appearance-none w-full"
+                  title="Fuso Horário"
+                >
+                  <option value="BRT">BRT (-3)</option>
+                  <option value="UTC">UTC (0)</option>
+                </select>
+              </div>
+
+              <div className="flex items-center gap-2 w-full sm:w-auto">
+                <Input
+                  type="date"
+                  value={date}
+                  onChange={(e) => setDate(e.target.value)}
+                  className="h-9 flex-1 sm:flex-none sm:w-auto min-w-[140px] bg-card shadow-sm cursor-pointer"
+                />
+                <Button
+                  variant="default"
+                  size="icon"
+                  onClick={() => fetchFireData(date, timezone)}
+                  disabled={loading}
+                  className="h-9 w-9 shadow-sm flex items-center justify-center p-0 shrink-0"
+                  title="Sincronizar/Buscar dados atualizados no satélite do CENSIPAM"
+                >
+                  {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <RefreshCw className="w-4 h-4" />}
                 </Button>
               </div>
-            </h2>
-            <div className="flex items-center gap-2 mt-2">
-              <span className="bg-primary/10 text-primary font-bold text-[10px] tracking-wider uppercase px-2 py-0.5 rounded border border-primary/20 shrink-0">
-                Operação Cerrado Vivo
-              </span>
-              <span className="text-xs text-muted-foreground font-medium truncate">Corpo de Bombeiros Militar do Estado de Goiás</span>
             </div>
+            <p className="text-[11px] text-muted-foreground font-medium bg-muted/60 px-2 py-0.5 rounded border border-border/50 text-center w-full md:w-auto">
+              Período: {date.split('-').reverse().join('/')} das 00:00 às 23:59 ({timezone === 'BRT' ? 'Horário de Brasília' : 'UTC Global'})
+            </p>
           </div>
         </div>
 
-        <div className="flex flex-col items-end gap-1.5 w-full md:w-auto">
-          <div className="flex items-center gap-2 flex-wrap justify-end w-full sm:w-auto">
-            <div className="relative flex items-center bg-card border rounded-md shadow-sm pr-2 hover:border-primary/50 transition-colors">
-              <Timer className="w-4 h-4 ml-3 text-muted-foreground absolute pointer-events-none" />
-              <select
-                value={refreshInterval}
-                onChange={(e) => setRefreshInterval(Number(e.target.value))}
-                className="h-9 pl-9 pr-3 text-sm bg-transparent border-none focus:outline-none focus:ring-0 cursor-pointer text-muted-foreground appearance-none"
-                title="Atualização Automática"
-              >
-                <option value={0}>Auto Refresh: OFF</option>
-                <option value={5}>A cada 5 min</option>
-                <option value={15}>A cada 15 min</option>
-                <option value={30}>A cada 30 min</option>
-              </select>
-            </div>
-            <div className="relative flex items-center bg-card border rounded-md shadow-sm hover:border-primary/50 transition-colors flex-1 sm:flex-none min-w-[100px]">
-              <select
-                value={timezone}
-                onChange={(e) => setTimezone(e.target.value)}
-                className="h-9 px-3 text-sm bg-transparent border-none focus:outline-none focus:ring-0 cursor-pointer text-muted-foreground font-medium appearance-none w-full"
-                title="Fuso Horário"
-              >
-                <option value="BRT">BRT (-3)</option>
-                <option value="UTC">UTC (0)</option>
-              </select>
-            </div>
-
-            <div className="flex items-center gap-2 w-full sm:w-auto">
-              <Input
-                type="date"
-                value={date}
-                onChange={(e) => setDate(e.target.value)}
-                className="h-9 flex-1 sm:flex-none sm:w-auto min-w-[140px] bg-card shadow-sm cursor-pointer"
-              />
-              <Button
-                variant="default"
-                size="icon"
-                onClick={() => fetchFireData(date, timezone)}
-                disabled={loading}
-                className="h-9 w-9 shadow-sm flex items-center justify-center p-0 shrink-0"
-                title="Sincronizar/Buscar dados atualizados no satélite do CENSIPAM"
-              >
-                {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <RefreshCw className="w-4 h-4" />}
-              </Button>
-            </div>
-          </div>
-          <p className="text-[11px] text-muted-foreground font-medium bg-muted/60 px-2 py-0.5 rounded border border-border/50 text-center w-full md:w-auto">
-            Período: {date.split('-').reverse().join('/')} das 00:00 às 23:59 ({timezone === 'BRT' ? 'Horário de Brasília' : 'UTC Global'})
-          </p>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <Card className="shadow-sm border-l-4 border-l-primary">
+            <CardContent className="p-4 flex flex-col justify-center">
+              <p className="text-sm text-muted-foreground font-medium truncate" title="Total no Estado">Focos Totais (Estado)</p>
+              <p className="text-3xl font-bold text-foreground">{loading ? '...' : totalStateEvents}</p>
+            </CardContent>
+          </Card>
+          <Card className="shadow-sm border-l-4 border-l-orange-500">
+            <CardContent className="p-4 flex flex-col justify-center">
+              <p className="text-sm text-muted-foreground font-medium truncate" title={locationLabel}>{locationLabel}</p>
+              <p className="text-3xl font-bold text-foreground">{loading ? '...' : totalFocos}</p>
+            </CardContent>
+          </Card>
+          <Card className="shadow-sm border-l-4 border-l-red-600">
+            <CardContent className="p-4 flex flex-col justify-center">
+              <p className="text-sm text-muted-foreground font-medium truncate" title="Área Estimada (ha)">Área Estimada (ha)</p>
+              <div className="flex items-baseline gap-2">
+                <p className="text-3xl font-bold text-foreground">{loading ? '...' : areaTotal}</p>
+                {!loading && <p className="text-xs text-muted-foreground font-medium">({areaTotalKm2} km²)</p>}
+              </div>
+            </CardContent>
+          </Card>
+          <Card className="shadow-sm border-l-4 border-l-amber-500">
+            <CardContent className="p-4 flex flex-col justify-center">
+              <p className="text-sm text-muted-foreground font-medium truncate" title="Municípios Atingidos">Municípios Atingidos</p>
+              <p className="text-3xl font-bold text-foreground">{loading ? '...' : cidadesAfetadas}</p>
+            </CardContent>
+          </Card>
         </div>
-      </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <Card className="shadow-sm border-l-4 border-l-primary">
-          <CardContent className="p-4 flex flex-col justify-center">
-            <p className="text-sm text-muted-foreground font-medium truncate" title="Total no Estado">Focos Totais (Estado)</p>
-            <p className="text-3xl font-bold text-foreground">{loading ? '...' : totalStateEvents}</p>
-          </CardContent>
-        </Card>
-        <Card className="shadow-sm border-l-4 border-l-orange-500">
-          <CardContent className="p-4 flex flex-col justify-center">
-            <p className="text-sm text-muted-foreground font-medium truncate" title={locationLabel}>{locationLabel}</p>
-            <p className="text-3xl font-bold text-foreground">{loading ? '...' : totalFocos}</p>
-          </CardContent>
-        </Card>
-        <Card className="shadow-sm border-l-4 border-l-red-600">
-          <CardContent className="p-4 flex flex-col justify-center">
-            <p className="text-sm text-muted-foreground font-medium truncate" title="Área Estimada (ha)">Área Estimada (ha)</p>
-            <div className="flex items-baseline gap-2">
-              <p className="text-3xl font-bold text-foreground">{loading ? '...' : areaTotal}</p>
-              {!loading && <p className="text-xs text-muted-foreground font-medium">({areaTotalKm2} km²)</p>}
-            </div>
-          </CardContent>
-        </Card>
-        <Card className="shadow-sm border-l-4 border-l-amber-500">
-          <CardContent className="p-4 flex flex-col justify-center">
-            <p className="text-sm text-muted-foreground font-medium truncate" title="Municípios Atingidos">Municípios Atingidos</p>
-            <p className="text-3xl font-bold text-foreground">{loading ? '...' : cidadesAfetadas}</p>
-          </CardContent>
-        </Card>
-      </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <Card className="lg:col-span-2 overflow-hidden flex flex-col h-[600px] border-t-4 border-t-primary shadow-lg">
-          <CardHeader className="py-3 px-4 bg-muted/30">
-            <CardTitle className="text-lg flex justify-between items-center">
-              Visualização Geográfica
-              <span className="text-xs font-normal bg-primary/10 text-primary px-2 py-1 rounded">Fonte: CENSIPAM WMS</span>
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="p-0 flex-1 relative">
-            <MapContainer
-              bounds={GOIAS_BOUNDS}
-              boundsOptions={{ padding: [10, 10] }}
-              zoomSnap={0.1}
-              zoomDelta={0.5}
-              scrollWheelZoom={true}
-              className="w-full h-full z-0"
-            >
-              <TileLayer
-                attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-              />
-
-              {/* Vetores Interativos de UCs do CENSIPAM (Lazy Loaded) */}
-              {showUCs && ucGeoJSON && (
-                <GeoJSON
-                  data={ucGeoJSON}
-                  style={(feature) => {
-                    const level = (feature.properties.esfera || feature.properties.administra || '').toLowerCase();
-                    let fillColor = '#22c55e'; // green-500 default
-                    let color = '#15803d'; // green-700 default border
-
-                    if (level.includes('federal')) {
-                      fillColor = '#14532d'; // green-900 (Federal - Mais escuro/intenso)
-                      color = '#052e16'; // green-950
-                    } else if (level.includes('estadual')) {
-                      fillColor = '#22c55e'; // green-500 (Estadual - Médio)
-                      color = '#15803d'; // green-700
-                    } else if (level.includes('municipal')) {
-                      fillColor = '#86efac'; // green-300 (Municipal - Mais claro)
-                      color = '#22c55e'; // green-500
-                    }
-
-                    return {
-                      color: color,
-                      weight: 1,
-                      fillOpacity: 0.35,
-                      fillColor: fillColor
-                    };
-                  }}
-                  onEachFeature={(feature, layer) => {
-                    const nome = feature.properties.nome || feature.properties.nome_uc || 'Unidade de Conservação';
-                    const tipo = feature.properties.esfera || feature.properties.administra || '';
-                    layer.bindPopup(`<strong>${nome}</strong><br/><span class="text-xs opacity-80">${tipo}</span>`);
-                  }}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <Card className="lg:col-span-2 overflow-hidden flex flex-col h-[600px] border-t-4 border-t-primary shadow-lg">
+            <CardHeader className="py-3 px-4 bg-muted/30">
+              <CardTitle className="text-lg flex justify-between items-center">
+                Visualização Geográfica
+                <span className="text-xs font-normal bg-primary/10 text-primary px-2 py-1 rounded">Fonte: CENSIPAM WMS</span>
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="p-0 flex-1 relative">
+              <MapContainer
+                bounds={GOIAS_BOUNDS}
+                boundsOptions={{ padding: [10, 10] }}
+                zoomSnap={0.1}
+                zoomDelta={0.5}
+                scrollWheelZoom={true}
+                className="w-full h-full z-0"
+              >
+                <TileLayer
+                  attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                  url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                 />
-              )}
-              <WMSTileLayer
-                url="https://panorama.sipam.gov.br/geoserver/painel_do_fogo/wms"
-                layers="painel_do_fogo:focos_ativos"
-                format="image/png"
-                transparent={true}
-                zIndex={10}
-              />
-              <WMSTileLayer
-                url="https://panorama.sipam.gov.br/geoserver/painel_do_fogo/wms"
-                layers="painel_do_fogo:mv_frente_deteccao"
-                format="image/png"
-                transparent={true}
-                opacity={0.8}
-              />
 
-              {sortedEvents.map(event => (
-                <Marker
-                  key={event.id}
-                  position={[event.lat, event.lng]}
-                  icon={createPinIcon(selectedEvent === event.id, event.uc, event.ageHours)}
-                >
-                  <Popup>
-                    <div className="text-sm font-sans space-y-1">
-                      <p className="font-bold text-base border-b pb-1 mb-1">{event.municipio}</p>
-                      <p className="text-[11px] text-muted-foreground m-0 leading-tight"><span className="font-semibold">Lat:</span> {Number(event.lat).toFixed(6)}</p>
-                      <p className="text-[11px] text-muted-foreground mb-1 leading-tight"><span className="font-semibold">Lon:</span> {Number(event.lng).toFixed(6)}</p>
-                      <p><span className="font-semibold">Tamanho:</span> {event.tamanho_ha ? `${event.tamanho_ha} ha` : 'N/A'}</p>
-                      <p><span className="font-semibold">Detecções:</span> {event.qtd_deteccoes}</p>
-                      <p><span className="font-semibold">Duração:</span> {event.duracao_h ? `${event.duracao_h} h` : 'N/A'}</p>
-                      {event.ucText && event.ucText !== 'N/A' && (
-                        <p className="pt-1 mt-1 border-t border-muted/30 text-amber-600"><span className="font-bold">UC:</span> {event.ucText}</p>
-                      )}
+                {/* Vetores Interativos de UCs do CENSIPAM (Lazy Loaded) */}
+                {showUCs && ucGeoJSON && (
+                  <GeoJSON
+                    data={ucGeoJSON}
+                    style={(feature) => {
+                      const level = (feature.properties.esfera || feature.properties.administra || '').toLowerCase();
+                      let fillColor = '#22c55e'; // green-500 default
+                      let color = '#15803d'; // green-700 default border
+
+                      if (level.includes('federal')) {
+                        fillColor = '#14532d'; // green-900 (Federal - Mais escuro/intenso)
+                        color = '#052e16'; // green-950
+                      } else if (level.includes('estadual')) {
+                        fillColor = '#22c55e'; // green-500 (Estadual - Médio)
+                        color = '#15803d'; // green-700
+                      } else if (level.includes('municipal')) {
+                        fillColor = '#86efac'; // green-300 (Municipal - Mais claro)
+                        color = '#22c55e'; // green-500
+                      }
+
+                      return {
+                        color: color,
+                        weight: 1,
+                        fillOpacity: 0.35,
+                        fillColor: fillColor
+                      };
+                    }}
+                    onEachFeature={(feature, layer) => {
+                      const nome = feature.properties.nome || feature.properties.nome_uc || 'Unidade de Conservação';
+                      const tipo = feature.properties.esfera || feature.properties.administra || '';
+                      layer.bindPopup(`<strong>${nome}</strong><br/><span class="text-xs opacity-80">${tipo}</span>`);
+                    }}
+                  />
+                )}
+                <WMSTileLayer
+                  url="https://panorama.sipam.gov.br/geoserver/painel_do_fogo/wms"
+                  layers="painel_do_fogo:focos_ativos"
+                  format="image/png"
+                  transparent={true}
+                  zIndex={10}
+                />
+                <WMSTileLayer
+                  url="https://panorama.sipam.gov.br/geoserver/painel_do_fogo/wms"
+                  layers="painel_do_fogo:mv_frente_deteccao"
+                  format="image/png"
+                  transparent={true}
+                  opacity={0.8}
+                />
+
+                {sortedEvents.map(event => (
+                  <Marker
+                    key={event.id}
+                    position={[event.lat, event.lng]}
+                    icon={createPinIcon(selectedEvent === event.id, event.uc, event.ageHours)}
+                  >
+                    <Popup>
+                      <div className="text-sm font-sans space-y-1">
+                        <p className="font-bold text-base border-b pb-1 mb-1">{event.municipio}</p>
+                        <p className="text-[11px] text-muted-foreground m-0 leading-tight"><span className="font-semibold">Lat:</span> {Number(event.lat).toFixed(6)}</p>
+                        <p className="text-[11px] text-muted-foreground mb-1 leading-tight"><span className="font-semibold">Lon:</span> {Number(event.lng).toFixed(6)}</p>
+                        <p><span className="font-semibold">Tamanho:</span> {event.tamanho_ha ? `${event.tamanho_ha} ha` : 'N/A'}</p>
+                        <p><span className="font-semibold">Detecções:</span> {event.qtd_deteccoes}</p>
+                        <p><span className="font-semibold">Duração:</span> {event.duracao_h ? `${event.duracao_h} h` : 'N/A'}</p>
+                        {event.ucText && event.ucText !== 'N/A' && (
+                          <p className="pt-1 mt-1 border-t border-muted/30 text-amber-600"><span className="font-bold">UC:</span> {event.ucText}</p>
+                        )}
+                      </div>
+                    </Popup>
+                  </Marker>
+                ))}
+
+                {goiasGeoJSON && (
+                  <GeoJSON
+                    data={goiasGeoJSON}
+                    style={{
+                      color: '#3b82f6',
+                      weight: 1.5,
+                      fillOpacity: 0.05,
+                      fillColor: '#3b82f6'
+                    }}
+                  />
+                )}
+
+                <MapController selectedEvent={selectedEvent} sortedEvents={sortedEvents} goiasCenter={goiasCenter} showUCs={showUCs} setShowUCs={setShowUCs} loadingUCs={loadingUCs} />
+
+                {/* Legenda de Detecção de Fogo */}
+                <div className="absolute bottom-4 right-4 z-[400] flex flex-col items-end">
+                  <Button
+                    variant="secondary"
+                    size="sm"
+                    className="mb-2 shadow-md md:hidden bg-card/95 hover:bg-card border-border border"
+                    onClick={() => setIsLegendOpen(!isLegendOpen)}
+                  >
+                    ℹ️ Legenda
+                  </Button>
+
+                  <div className={`${isLegendOpen ? 'block' : 'hidden'} md:block bg-card/95 backdrop-blur-sm p-3 rounded-md shadow-md border border-border text-xs w-[240px] transition-all`}>
+                    <div className="flex justify-between items-center mb-3 border-b pb-1">
+                      <h4 className="font-bold">Frente de Fogo - 24h</h4>
+                      <button className="md:hidden text-muted-foreground" onClick={() => setIsLegendOpen(false)}>✕</button>
                     </div>
-                  </Popup>
-                </Marker>
-              ))}
-
-              {goiasGeoJSON && (
-                <GeoJSON
-                  data={goiasGeoJSON}
-                  style={{
-                    color: '#3b82f6',
-                    weight: 1.5,
-                    fillOpacity: 0.05,
-                    fillColor: '#3b82f6'
-                  }}
-                />
-              )}
-
-              <MapController selectedEvent={selectedEvent} sortedEvents={sortedEvents} goiasCenter={goiasCenter} showUCs={showUCs} setShowUCs={setShowUCs} loadingUCs={loadingUCs} />
-
-              {/* Legenda de Detecção de Fogo */}
-              <div className="absolute bottom-4 right-4 z-[400] flex flex-col items-end">
-                <Button 
-                  variant="secondary" 
-                  size="sm" 
-                  className="mb-2 shadow-md md:hidden bg-card/95 hover:bg-card border-border border"
-                  onClick={() => setIsLegendOpen(!isLegendOpen)}
-                >
-                  ℹ️ Legenda
-                </Button>
-                
-                <div className={`${isLegendOpen ? 'block' : 'hidden'} md:block bg-card/95 backdrop-blur-sm p-3 rounded-md shadow-md border border-border text-xs w-[240px] transition-all`}>
-                  <div className="flex justify-between items-center mb-3 border-b pb-1">
-                    <h4 className="font-bold">Frente de Fogo - 24h</h4>
-                    <button className="md:hidden text-muted-foreground" onClick={() => setIsLegendOpen(false)}>✕</button>
-                  </div>
-                  <div className="space-y-1.5">
-                    <div className="flex items-center gap-2"><span className="w-3 h-3 rounded bg-[#8B0000] border border-black/20 shrink-0"></span> Detecção em até 3 Horas</div>
-                    <div className="flex items-center gap-2"><span className="w-3 h-3 rounded bg-[#DC2626] border border-black/20 shrink-0"></span> Detecção entre 3 e 6 horas</div>
-                    <div className="flex items-center gap-2"><span className="w-3 h-3 rounded bg-[#F97316] border border-black/20 shrink-0"></span> Detecção entre 6 e 12 horas</div>
-                    <div className="flex items-center gap-2"><span className="w-3 h-3 rounded bg-[#F59E0B] border border-black/20 shrink-0"></span> Detecção entre 12 e 24 horas</div>
-                    <div className="flex items-center gap-2"><span className="w-3 h-3 rounded bg-[#737373] border border-black/20 shrink-0"></span> Detecção a mais de 24 horas</div>
-                  </div>
-                  <div className="mt-3 pt-2 border-t text-[10px] text-muted-foreground italic flex items-center gap-2">
-                    <div className="w-3 h-3 rounded-full border-[1.5px] border-gray-800 flex items-center justify-center shrink-0"><div className="w-1.5 h-1.5 bg-white rounded-full"></div></div>
-                    Focos em Unidade de Conservação
+                    <div className="space-y-1.5">
+                      <div className="flex items-center gap-2"><span className="w-3 h-3 rounded bg-[#8B0000] border border-black/20 shrink-0"></span> Detecção em até 3 Horas</div>
+                      <div className="flex items-center gap-2"><span className="w-3 h-3 rounded bg-[#DC2626] border border-black/20 shrink-0"></span> Detecção entre 3 e 6 horas</div>
+                      <div className="flex items-center gap-2"><span className="w-3 h-3 rounded bg-[#F97316] border border-black/20 shrink-0"></span> Detecção entre 6 e 12 horas</div>
+                      <div className="flex items-center gap-2"><span className="w-3 h-3 rounded bg-[#F59E0B] border border-black/20 shrink-0"></span> Detecção entre 12 e 24 horas</div>
+                      <div className="flex items-center gap-2"><span className="w-3 h-3 rounded bg-[#737373] border border-black/20 shrink-0"></span> Detecção a mais de 24 horas</div>
+                    </div>
+                    <div className="mt-3 pt-2 border-t text-[10px] text-muted-foreground italic flex items-center gap-2">
+                      <div className="w-3 h-3 rounded-full border-[1.5px] border-gray-800 flex items-center justify-center shrink-0"><div className="w-1.5 h-1.5 bg-white rounded-full"></div></div>
+                      Focos em Unidade de Conservação
+                    </div>
                   </div>
                 </div>
-              </div>
-            </MapContainer>
-          </CardContent>
-        </Card>
+              </MapContainer>
+            </CardContent>
+          </Card>
 
-        <Card className="flex flex-col h-[600px] border-t-4 border-t-primary shadow-lg">
-          <CardHeader className="py-3 px-4 bg-slate-50 dark:bg-slate-800/40 border-b border-border flex flex-row justify-between items-center">
-            <div className="flex flex-col gap-0.5">
-              <CardTitle className="text-lg flex items-center gap-2">
-                <Flame className="w-5 h-5 text-primary" /> Eventos de Fogo
-              </CardTitle>
-              {!loading && (
-                <p className="text-xs text-muted-foreground mt-0.5">
-                  <span className="font-semibold text-foreground">{sortedEvents.length}</span> eventos em Goiás
-                  {fireEvents.length > sortedEvents.length && (
-                    <> · <span className="text-muted-foreground">{fireEvents.length} no total</span></>
-                  )}
-                </p>
-              )}
-            </div>
-            <div className="flex gap-2">
-              <Button variant="outline" size="sm" className="h-8 w-8 p-0 flex items-center justify-center bg-blue-50 text-blue-600 border-blue-200 hover:bg-blue-100 hover:text-blue-700 shadow-sm" onClick={() => setIsExplorerOpen(true)} title="Explorador de Dados KML (Detalhado)">
-                <Database className="w-4 h-4" />
-              </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={exportToExcel}
-                className="h-8 w-8 p-0 flex items-center justify-center bg-emerald-50 text-emerald-600 border-emerald-200 hover:bg-emerald-100 hover:text-emerald-700 shadow-sm"
-                title="Exportar para Excel (.xlsx)"
-              >
-                <Download className="w-4 h-4" />
-              </Button>
-            </div>
-          </CardHeader>
-          <CardContent className="flex-1 overflow-auto p-0">
-            {loading ? (
-              <div className="flex justify-center items-center h-full">
-                <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
+          <Card className="flex flex-col h-[600px] border-t-4 border-t-primary shadow-lg">
+            <CardHeader className="py-3 px-4 bg-slate-50 dark:bg-slate-800/40 border-b border-border flex flex-row justify-between items-center">
+              <div className="flex flex-col gap-0.5">
+                <CardTitle className="text-lg flex items-center gap-2">
+                  <Flame className="w-5 h-5 text-primary" /> Eventos de Fogo
+                </CardTitle>
+                {!loading && (
+                  <p className="text-xs text-muted-foreground mt-0.5">
+                    <span className="font-semibold text-foreground">{sortedEvents.length}</span> eventos em Goiás
+                    {fireEvents.length > sortedEvents.length && (
+                      <> · <span className="text-muted-foreground">{fireEvents.length} no total</span></>
+                    )}
+                  </p>
+                )}
               </div>
-            ) : (
-              <Table>
-                <TableHeader className="bg-card sticky top-0 z-10 shadow-sm">
-                  <TableRow>
-                    <TableHead className="cursor-pointer hover:bg-muted text-xs" onClick={() => requestSort('municipio')}>
-                      <div className="flex items-center">Município <ArrowUpDown className="w-3 h-3 ml-1" /></div>
-                    </TableHead>
-                    <TableHead className="cursor-pointer hover:bg-muted/50 text-xs" onClick={() => requestSort('tamanho_ha')}>
-                      Tamanho (ha) {sortConfig.key === 'tamanho_ha' && <ArrowUpDown className="inline w-3 h-3 ml-1" />}
-                    </TableHead>
-                    <TableHead
-                      className="cursor-pointer hover:bg-muted/50 text-xs"
-                      onClick={() => requestSort('qtd_deteccoes')}
-                      title="Quantidade de registros/pixels de calor detectados por satélite neste foco. Valores altos indicam incêndios de maior gravidade, intensidade ou extensão."
-                    >
-                      Detecções {sortConfig.key === 'qtd_deteccoes' && <ArrowUpDown className="inline w-3 h-3 ml-1" />}
-                    </TableHead>
-                    <TableHead className="cursor-pointer hover:bg-muted/50 text-xs" onClick={() => requestSort('duracao_h')}>
-                      <div className="flex items-center">Duração <ArrowUpDown className="w-3 h-3 ml-1" /></div>
-                    </TableHead>
-                    <TableHead className="cursor-pointer hover:bg-muted text-xs" onClick={() => requestSort('uc')}>
-                      <div className="flex items-center">Unid. de Conservação <ArrowUpDown className="w-3 h-3 ml-1" /></div>
-                    </TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {sortedEvents.length > 0 ? sortedEvents.map((event, index) => (
-                    <TableRow
-                      key={event.id || index}
-                      className={`cursor-pointer transition-colors ${selectedEvent === event.id ? 'bg-primary/20' : 'hover:bg-muted/50'}`}
-                      onClick={() => setSelectedEvent(selectedEvent === event.id ? null : event.id)}
-                    >
-                      <TableCell className="font-medium text-xs">
-                        <div className="flex items-center gap-2 min-h-[32px]">
-                          <span className="w-2.5 h-2.5 rounded-full flex-shrink-0 shadow-sm border border-black/10" style={{ backgroundColor: getEventColorHex(event.ageHours) }} title={event.ageHours ? `Idade: ~${Math.round(event.ageHours)}h` : ''}></span>
-                          <span className="whitespace-normal break-words leading-tight">{event.municipio || 'N/A'}</span>
-                        </div>
-                      </TableCell>
-                      <TableCell className="text-xs font-semibold">{event.tamanho_ha ? `${event.tamanho_ha} ha` : 'N/A'}</TableCell>
-                      <TableCell className="text-xs text-orange-600 font-bold">{event.qtd_deteccoes || 0}</TableCell>
-                      <TableCell className="text-xs">{event.duracao_h ? `${event.duracao_h} h` : 'N/A'}</TableCell>
-                      <TableCell className="font-medium text-[10px] leading-tight py-2" title={event.ucText !== 'N/A' ? event.ucText : ''}>
-                        {event.ucText !== 'N/A' ? <span className="font-bold text-gray-900 capitalize">{event.ucText.toLowerCase()}</span> : 'Não'}
-                      </TableCell>
-                    </TableRow>
-                  )) : (
+              <div className="flex gap-2">
+                <Button variant="outline" size="sm" className="h-8 w-8 p-0 flex items-center justify-center bg-blue-50 text-blue-600 border-blue-200 hover:bg-blue-100 hover:text-blue-700 shadow-sm" onClick={() => setIsExplorerOpen(true)} title="Explorador de Dados KML (Detalhado)">
+                  <Database className="w-4 h-4" />
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={exportToExcel}
+                  className="h-8 w-8 p-0 flex items-center justify-center bg-emerald-50 text-emerald-600 border-emerald-200 hover:bg-emerald-100 hover:text-emerald-700 shadow-sm"
+                  title="Exportar para Excel (.xlsx)"
+                >
+                  <Download className="w-4 h-4" />
+                </Button>
+              </div>
+            </CardHeader>
+            <CardContent className="flex-1 overflow-auto p-0">
+              {loading ? (
+                <div className="flex justify-center items-center h-full">
+                  <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
+                </div>
+              ) : (
+                <Table>
+                  <TableHeader className="bg-card sticky top-0 z-10 shadow-sm">
                     <TableRow>
-                      <TableCell colSpan={4} className="text-center py-10 text-muted-foreground">
-                        Nenhum evento registrado nesta data.
-                      </TableCell>
+                      <TableHead className="cursor-pointer hover:bg-muted text-xs" onClick={() => requestSort('municipio')}>
+                        <div className="flex items-center">Município <ArrowUpDown className="w-3 h-3 ml-1" /></div>
+                      </TableHead>
+                      <TableHead className="cursor-pointer hover:bg-muted/50 text-xs" onClick={() => requestSort('tamanho_ha')}>
+                        Tamanho (ha) {sortConfig.key === 'tamanho_ha' && <ArrowUpDown className="inline w-3 h-3 ml-1" />}
+                      </TableHead>
+                      <TableHead
+                        className="cursor-pointer hover:bg-muted/50 text-xs"
+                        onClick={() => requestSort('qtd_deteccoes')}
+                        title="Quantidade de registros/pixels de calor detectados por satélite neste foco. Valores altos indicam incêndios de maior gravidade, intensidade ou extensão."
+                      >
+                        Detecções {sortConfig.key === 'qtd_deteccoes' && <ArrowUpDown className="inline w-3 h-3 ml-1" />}
+                      </TableHead>
+                      <TableHead className="cursor-pointer hover:bg-muted/50 text-xs" onClick={() => requestSort('duracao_h')}>
+                        <div className="flex items-center">Duração <ArrowUpDown className="w-3 h-3 ml-1" /></div>
+                      </TableHead>
+                      <TableHead className="cursor-pointer hover:bg-muted text-xs" onClick={() => requestSort('uc')}>
+                        <div className="flex items-center">Unid. de Conservação <ArrowUpDown className="w-3 h-3 ml-1" /></div>
+                      </TableHead>
                     </TableRow>
-                  )}
-                </TableBody>
-              </Table>
-            )}
-          </CardContent>
-        </Card>
-      </div>
+                  </TableHeader>
+                  <TableBody>
+                    {sortedEvents.length > 0 ? sortedEvents.map((event, index) => (
+                      <TableRow
+                        key={event.id || index}
+                        className={`cursor-pointer transition-colors ${selectedEvent === event.id ? 'bg-primary/20' : 'hover:bg-muted/50'}`}
+                        onClick={() => setSelectedEvent(selectedEvent === event.id ? null : event.id)}
+                      >
+                        <TableCell className="font-medium text-xs">
+                          <div className="flex items-center gap-2 min-h-[32px]">
+                            <span className="w-2.5 h-2.5 rounded-full flex-shrink-0 shadow-sm border border-black/10" style={{ backgroundColor: getEventColorHex(event.ageHours) }} title={event.ageHours ? `Idade: ~${Math.round(event.ageHours)}h` : ''}></span>
+                            <span className="whitespace-normal break-words leading-tight">{event.municipio || 'N/A'}</span>
+                          </div>
+                        </TableCell>
+                        <TableCell className="text-xs font-semibold">{event.tamanho_ha ? `${event.tamanho_ha} ha` : 'N/A'}</TableCell>
+                        <TableCell className="text-xs text-orange-600 font-bold">{event.qtd_deteccoes || 0}</TableCell>
+                        <TableCell className="text-xs">{event.duracao_h ? `${event.duracao_h} h` : 'N/A'}</TableCell>
+                        <TableCell className="font-medium text-[10px] leading-tight py-2" title={event.ucText !== 'N/A' ? event.ucText : ''}>
+                          {event.ucText !== 'N/A' ? <span className="font-bold text-gray-900 capitalize">{event.ucText.toLowerCase()}</span> : 'Não'}
+                        </TableCell>
+                      </TableRow>
+                    )) : (
+                      <TableRow>
+                        <TableCell colSpan={4} className="text-center py-10 text-muted-foreground">
+                          Nenhum evento registrado nesta data.
+                        </TableCell>
+                      </TableRow>
+                    )}
+                  </TableBody>
+                </Table>
+              )}
+            </CardContent>
+          </Card>
+        </div>
 
-      {/* Footer */}
-      <footer className="mt-8 pt-4 pb-2 border-t border-muted-foreground/20 text-center">
-        <p className="text-xs text-muted-foreground font-medium">
-          &copy; {new Date().getFullYear()} Painel Fogo Goiás. Todos os direitos reservados. | Versão 1.0.0
-        </p>
-      </footer>
+        {/* Footer */}
+        <footer className="mt-8 pt-4 pb-2 border-t border-muted-foreground/20 text-center">
+          <p className="text-xs text-muted-foreground font-medium">
+            &copy; {new Date().getFullYear()} Painel Fogo Goiás. Todos os direitos reservados. | Versão 1.0.0
+          </p>
+        </footer>
 
       </div>
 
