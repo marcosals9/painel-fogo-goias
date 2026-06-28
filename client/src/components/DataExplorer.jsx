@@ -6,7 +6,6 @@ import { Input } from '@/components/ui/input';
 export default function DataExplorer({ isOpen, onClose, fireEvents, date }) {
   const [search, setSearch]           = useState('');
   const [filterUF, setFilterUF]       = useState('TODOS');
-  const [filterGoias, setFilterGoias] = useState('TODOS'); // TODOS | GOIAS | OUTROS
   const [sortKey, setSortKey]         = useState('municipio');
   const [sortDir, setSortDir]         = useState('asc');
 
@@ -32,9 +31,13 @@ export default function DataExplorer({ isOpen, onClose, fireEvents, date }) {
   const filtered = useMemo(() => {
     let data = fireEvents || [];
 
-    if (filterGoias === 'GOIAS')  data = data.filter(e => e.isGoias !== false);
-    if (filterGoias === 'OUTROS') data = data.filter(e => e.isGoias === false);
-    if (filterUF !== 'TODOS')     data = data.filter(e => e.uf === filterUF);
+    if (filterUF === 'GOIAS') {
+      data = data.filter(e => e.isGoias !== false);
+    } else if (filterUF === 'OUTROS') {
+      data = data.filter(e => e.isGoias === false);
+    } else if (filterUF !== 'TODOS') {
+      data = data.filter(e => e.uf === filterUF);
+    }
 
     if (search.trim()) {
       const q = search.trim().toLowerCase();
@@ -56,7 +59,7 @@ export default function DataExplorer({ isOpen, onClose, fireEvents, date }) {
     });
 
     return data;
-  }, [fireEvents, search, filterUF, filterGoias, sortKey, sortDir]);
+  }, [fireEvents, search, filterUF, sortKey, sortDir]);
 
   const toggleSort = (key) => {
     if (sortKey === key) setSortDir(d => d === 'asc' ? 'desc' : 'asc');
@@ -134,10 +137,7 @@ export default function DataExplorer({ isOpen, onClose, fireEvents, date }) {
             </div>
           </div>
           <div className="flex items-center gap-2">
-            <Button variant="outline" size="sm" className="flex flex-row items-center gap-1.5 h-8" onClick={exportCSV}>
-              <Download className="w-3.5 h-3.5" /> Exportar CSV
-            </Button>
-            <Button variant="ghost" size="icon" className="flex flex-row items-center justify-center h-8 w-8" onClick={onClose}>
+            <Button variant="outline" size="icon" className="flex flex-row items-center justify-center h-8 w-8 hover:bg-red-50 hover:text-red-600 hover:border-red-200 transition-colors" onClick={onClose} title="Fechar (ESC)">
               <X className="w-4 h-4" />
             </Button>
           </div>
@@ -158,35 +158,42 @@ export default function DataExplorer({ isOpen, onClose, fireEvents, date }) {
             />
           </div>
 
-          {/* Filtro Goiás */}
-          <select
-            value={filterGoias}
-            onChange={e => setFilterGoias(e.target.value)}
-            className="h-8 rounded-md border border-input bg-background px-2 text-sm focus:outline-none focus:ring-1 focus:ring-ring"
-          >
-            <option value="TODOS">🌎 Todos os Estados</option>
-            <option value="GOIAS">✅ Apenas Goiás</option>
-            <option value="OUTROS">❌ Fora de Goiás</option>
-          </select>
-
-          {/* Filtro UF */}
+          {/* Filtro Unificado UF/Região */}
           <select
             value={filterUF}
             onChange={e => setFilterUF(e.target.value)}
             className="h-8 rounded-md border border-input bg-background px-2 text-sm focus:outline-none focus:ring-1 focus:ring-ring"
           >
-            {ufs.map(uf => (
-              <option key={uf} value={uf}>{uf === 'TODOS' ? 'Todas as UFs' : uf}</option>
-            ))}
+            <option value="TODOS">🌎 Todos os Estados</option>
+            <option value="GOIAS">✅ Apenas Goiás</option>
+            <option value="OUTROS">❌ Fora de Goiás</option>
+            <optgroup label="Por UF Específica">
+              {ufs.filter(u => u !== 'TODOS').map(uf => (
+                <option key={uf} value={uf}>{uf}</option>
+              ))}
+            </optgroup>
           </select>
 
           {/* Reset */}
-          {(search || filterUF !== 'TODOS' || filterGoias !== 'TODOS') && (
+          {(search || filterUF !== 'TODOS') && (
             <Button variant="ghost" size="sm" className="h-8 text-xs text-muted-foreground"
-              onClick={() => { setSearch(''); setFilterUF('TODOS'); setFilterGoias('TODOS'); }}>
+              onClick={() => { setSearch(''); setFilterUF('TODOS'); }}>
               Limpar filtros
             </Button>
           )}
+
+          <div className="flex-1 min-w-[20px]" />
+
+          {/* Exportar */}
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={exportCSV}
+            className="h-8 w-8 p-0 flex items-center justify-center bg-emerald-50 text-emerald-600 border-emerald-200 hover:bg-emerald-100 hover:text-emerald-700 shadow-sm shrink-0"
+            title="Exportar dados filtrados para Excel (.csv)"
+          >
+            <Download className="w-4 h-4" />
+          </Button>
         </div>
 
         {/* Tabela */}
