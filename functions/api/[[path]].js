@@ -3,15 +3,34 @@ export async function onRequest(context) {
   const backendUrl = context.env.BACKEND_URL;
   
   if (!backendUrl) {
-    return new Response("Erro: BACKEND_URL não configurado nas variáveis de ambiente da Cloudflare.", { status: 500 });
+    return new Response("Erro: BACKEND_URL não configurado", { status: 500 });
   }
 
-  // Constrói a URL final do backend (ex: http://34.121.71.100:80/api/auth/login)
   const targetUrl = new URL(url.pathname + url.search, backendUrl);
   
-  // Cria uma nova requisição baseada na original, mas apontando para o IP real
-  const request = new Request(targetUrl, context.request);
-  
-  // Envia para o backend e retorna a resposta para o frontend
-  return fetch(request);
+  // Precisamos limpar os cabeçalhos de rastreamento do Cloudflare
+  // porque se enviarmos eles de volta para fora, o Cloudflare bloqueia com erro 403 Forbidden!
+  const newHeaders = new Headers(context.request.headers);
+  newHeaders.delete('host');
+  newHeaders.delete('cf-connecting-ip');
+  newHeaders.delete('cf-ray');
+  newHeaders.delete('cf-visitor');
+  newHeaders.delete('cf-ipcountry');
+  newHeaders.delete('x-forwarded-proto');
+  newHeaders.delete('x-forwarded-for');
+
+  const init = {
+    method: context.request.method,
+    headers: newHeaders,
+  };
+
+  if (context.request.method !== 'GET' && context.request.method !== 'HEAD') {
+    init.body = context.request.body;
+  }
+
+  try {
+    return await fetch(targetUrl.toString(), init);
+  } catch (err) {
+    return new Response("Erro de proxy: " + err.message, { status: 502 });
+  }
 }
