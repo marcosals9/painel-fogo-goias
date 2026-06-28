@@ -40,8 +40,8 @@ function AppContent() {
               <div className="w-11 h-11 sm:w-12 sm:h-12 flex items-center justify-center rounded-full overflow-hidden shrink-0">
                 <img src="/defesa-civil.png" alt="Defesa Civil" className="w-full h-full object-contain" />
               </div>
-              <h1 className="text-sm sm:text-base font-medium text-primary tracking-wide truncate">
-                Sala de Situação <span className="font-bold text-white ml-1">CODEC</span>
+              <h1 className="text-sm sm:text-base font-medium text-primary tracking-wide truncate flex items-baseline">
+                Sala de Situação <span className="text-lg sm:text-xl font-bold text-white ml-1.5 tracking-tight">CODEC</span>
               </h1>
             </Link>
             <div className="text-sm font-semibold text-slate-200 flex items-center gap-3 tracking-wide shrink-0">
