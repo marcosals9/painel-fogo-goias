@@ -37,7 +37,7 @@ function AppContent() {
         <header className="border-b-2 border-primary bg-slate-900 sticky top-0 z-50 text-slate-100 shadow-md">
           <div className="container mx-auto px-4 h-16 flex items-center justify-between relative">
             <Link to="/" className="flex items-center gap-3 min-w-0 hover:opacity-80 transition-opacity">
-              <div className="w-11 h-11 sm:w-12 sm:h-12 flex items-center justify-center rounded-full overflow-hidden bg-white shadow-sm p-0.5 shrink-0">
+              <div className="w-11 h-11 sm:w-12 sm:h-12 flex items-center justify-center rounded-full overflow-hidden shrink-0">
                 <img src="/defesa-civil.png" alt="Defesa Civil" className="w-full h-full object-contain" />
               </div>
               <h1 className="text-sm sm:text-base font-medium text-primary tracking-wide truncate">
