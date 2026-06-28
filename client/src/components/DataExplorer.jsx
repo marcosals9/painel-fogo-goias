@@ -5,7 +5,7 @@ import { Input } from '@/components/ui/input';
 
 export default function DataExplorer({ isOpen, onClose, fireEvents, date }) {
   const [search, setSearch]           = useState('');
-  const [filterUF, setFilterUF]       = useState('TODOS');
+  const [filterUF, setFilterUF]       = useState('GOIAS');
   const [sortKey, setSortKey]         = useState('municipio');
   const [sortDir, setSortDir]         = useState('asc');
 
@@ -13,6 +13,8 @@ export default function DataExplorer({ isOpen, onClose, fireEvents, date }) {
   React.useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = 'hidden';
+      setFilterUF('GOIAS');
+      setSearch('');
     } else {
       document.body.style.overflow = '';
     }
