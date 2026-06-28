@@ -129,6 +129,7 @@ export default function Dashboard() {
   const [loadingUCs, setLoadingUCs] = useState(false);
   const [ucGeoJSON, setUcGeoJSON] = useState(null);
   const [goiasGeoJSON, setGoiasGeoJSON] = useState(null);
+  const [isLegendOpen, setIsLegendOpen] = useState(false);
 
   const [sortConfig, setSortConfig] = useState({ key: 'tamanho_ha', direction: 'desc' });
 
@@ -472,36 +473,38 @@ export default function Dashboard() {
 
   return (
     <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-        <div className="flex items-start gap-2.5">
-          <Flame className="w-9 h-9 text-primary mt-0.5 drop-shadow-sm" />
-          <div className="flex flex-col">
-            <h2 className="text-3xl font-black tracking-tight flex items-center gap-2">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+        <div className="flex items-start gap-2.5 w-full md:w-auto">
+          <Flame className="w-9 h-9 text-primary mt-0.5 drop-shadow-sm shrink-0" />
+          <div className="flex flex-col w-full">
+            <h2 className="text-2xl sm:text-3xl font-black tracking-tight flex flex-col sm:flex-row sm:items-center gap-2">
               Monitoramento de Focos
-              <Button variant="outline" size="sm" className="ml-4 h-8 gap-2 flex flex-row items-center bg-orange-50 text-orange-600 border-orange-200 hover:bg-orange-100 hover:text-orange-700 shadow-sm" onClick={() => {
-                if (!localStorage.getItem('codec_token')) {
-                  navigate('/login');
-                } else {
-                  setIsMakerOpen(true);
-                }
-              }}>
-                <Smartphone className="w-4 h-4" /> Informativo WhatsApp
-              </Button>
-              <Button variant="outline" size="sm" className="h-8 gap-2 flex flex-row items-center bg-blue-50 text-blue-600 border-blue-200 hover:bg-blue-100 hover:text-blue-700 shadow-sm" onClick={() => setIsExplorerOpen(true)}>
-                <Database className="w-4 h-4" /> Dados KML
-              </Button>
+              <div className="flex gap-2 mt-2 sm:mt-0 sm:ml-4">
+                <Button variant="outline" size="sm" className="flex-1 sm:flex-none h-8 gap-2 flex flex-row items-center bg-orange-50 text-orange-600 border-orange-200 hover:bg-orange-100 hover:text-orange-700 shadow-sm px-2 sm:px-3" onClick={() => {
+                  if (!localStorage.getItem('codec_token')) {
+                    navigate('/login');
+                  } else {
+                    setIsMakerOpen(true);
+                  }
+                }}>
+                  <Smartphone className="w-4 h-4" /> <span className="hidden sm:inline">Informativo WhatsApp</span><span className="sm:hidden">WhatsApp</span>
+                </Button>
+                <Button variant="outline" size="sm" className="flex-1 sm:flex-none h-8 gap-2 flex flex-row items-center bg-blue-50 text-blue-600 border-blue-200 hover:bg-blue-100 hover:text-blue-700 shadow-sm px-2 sm:px-3" onClick={() => setIsExplorerOpen(true)}>
+                  <Database className="w-4 h-4" /> Dados KML
+                </Button>
+              </div>
             </h2>
-            <div className="flex items-center gap-2 mt-1">
-              <span className="bg-primary/10 text-primary font-bold text-[10px] tracking-wider uppercase px-2 py-0.5 rounded border border-primary/20">
+            <div className="flex items-center gap-2 mt-2">
+              <span className="bg-primary/10 text-primary font-bold text-[10px] tracking-wider uppercase px-2 py-0.5 rounded border border-primary/20 shrink-0">
                 Operação Cerrado Vivo
               </span>
-              <span className="text-xs text-muted-foreground font-medium">Corpo de Bombeiros Militar do Estado de Goiás</span>
+              <span className="text-xs text-muted-foreground font-medium truncate">Corpo de Bombeiros Militar do Estado de Goiás</span>
             </div>
           </div>
         </div>
 
-        <div className="flex flex-col items-end gap-1.5">
-          <div className="flex items-center gap-3 flex-wrap justify-end">
+        <div className="flex flex-col items-end gap-1.5 w-full md:w-auto">
+          <div className="flex items-center gap-2 flex-wrap justify-end w-full sm:w-auto">
             <div className="relative flex items-center bg-card border rounded-md shadow-sm pr-2 hover:border-primary/50 transition-colors">
               <Timer className="w-4 h-4 ml-3 text-muted-foreground absolute pointer-events-none" />
               <select
@@ -516,11 +519,11 @@ export default function Dashboard() {
                 <option value={30}>A cada 30 min</option>
               </select>
             </div>
-            <div className="relative flex items-center bg-card border rounded-md shadow-sm hover:border-primary/50 transition-colors">
+            <div className="relative flex items-center bg-card border rounded-md shadow-sm hover:border-primary/50 transition-colors flex-1 sm:flex-none min-w-[100px]">
               <select
                 value={timezone}
                 onChange={(e) => setTimezone(e.target.value)}
-                className="h-9 px-3 text-sm bg-transparent border-none focus:outline-none focus:ring-0 cursor-pointer text-muted-foreground font-medium appearance-none"
+                className="h-9 px-3 text-sm bg-transparent border-none focus:outline-none focus:ring-0 cursor-pointer text-muted-foreground font-medium appearance-none w-full"
                 title="Fuso Horário"
               >
                 <option value="BRT">BRT (-3)</option>
@@ -528,24 +531,26 @@ export default function Dashboard() {
               </select>
             </div>
 
-            <Input
-              type="date"
-              value={date}
-              onChange={(e) => setDate(e.target.value)}
-              className="h-9 w-auto min-w-[140px] bg-card shadow-sm cursor-pointer"
-            />
-            <Button
-              variant="default"
-              size="icon"
-              onClick={() => fetchFireData(date, timezone)}
-              disabled={loading}
-              className="h-9 w-9 shadow-sm flex items-center justify-center p-0"
-              title="Sincronizar/Buscar dados atualizados no satélite do CENSIPAM"
-            >
-              {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <RefreshCw className="w-4 h-4" />}
-            </Button>
+            <div className="flex items-center gap-2 w-full sm:w-auto">
+              <Input
+                type="date"
+                value={date}
+                onChange={(e) => setDate(e.target.value)}
+                className="h-9 flex-1 sm:flex-none sm:w-auto min-w-[140px] bg-card shadow-sm cursor-pointer"
+              />
+              <Button
+                variant="default"
+                size="icon"
+                onClick={() => fetchFireData(date, timezone)}
+                disabled={loading}
+                className="h-9 w-9 shadow-sm flex items-center justify-center p-0 shrink-0"
+                title="Sincronizar/Buscar dados atualizados no satélite do CENSIPAM"
+              >
+                {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <RefreshCw className="w-4 h-4" />}
+              </Button>
+            </div>
           </div>
-          <p className="text-[11px] text-muted-foreground font-medium bg-muted/60 px-2 py-0.5 rounded border border-border/50">
+          <p className="text-[11px] text-muted-foreground font-medium bg-muted/60 px-2 py-0.5 rounded border border-border/50 text-center w-full md:w-auto">
             Período: {date.split('-').reverse().join('/')} das 00:00 às 23:59 ({timezone === 'BRT' ? 'Horário de Brasília' : 'UTC Global'})
           </p>
         </div>
@@ -689,18 +694,32 @@ export default function Dashboard() {
               <MapController selectedEvent={selectedEvent} sortedEvents={sortedEvents} goiasCenter={goiasCenter} showUCs={showUCs} setShowUCs={setShowUCs} loadingUCs={loadingUCs} />
 
               {/* Legenda de Detecção de Fogo */}
-              <div className="absolute bottom-4 right-4 z-[400] bg-card/95 backdrop-blur-sm p-3 rounded-md shadow-md border border-border text-xs w-[240px]">
-                <h4 className="font-bold mb-3 border-b pb-1">Frente de Fogo - 24h</h4>
-                <div className="space-y-1.5">
-                  <div className="flex items-center gap-2"><span className="w-3 h-3 rounded bg-[#8B0000] border border-black/20"></span> Detecção em até 3 Horas</div>
-                  <div className="flex items-center gap-2"><span className="w-3 h-3 rounded bg-[#DC2626] border border-black/20"></span> Detecção entre 3 e 6 horas</div>
-                  <div className="flex items-center gap-2"><span className="w-3 h-3 rounded bg-[#F97316] border border-black/20"></span> Detecção entre 6 e 12 horas</div>
-                  <div className="flex items-center gap-2"><span className="w-3 h-3 rounded bg-[#F59E0B] border border-black/20"></span> Detecção entre 12 e 24 horas</div>
-                  <div className="flex items-center gap-2"><span className="w-3 h-3 rounded bg-[#737373] border border-black/20"></span> Detecção a mais de 24 horas</div>
-                </div>
-                <div className="mt-3 pt-2 border-t text-[10px] text-muted-foreground italic flex items-center gap-2">
-                  <div className="w-3 h-3 rounded-full border-[1.5px] border-gray-800 flex items-center justify-center"><div className="w-1.5 h-1.5 bg-white rounded-full"></div></div>
-                  Focos em Unidade de Conservação
+              <div className="absolute bottom-4 right-4 z-[400] flex flex-col items-end">
+                <Button 
+                  variant="secondary" 
+                  size="sm" 
+                  className="mb-2 shadow-md md:hidden bg-card/95 hover:bg-card border-border border"
+                  onClick={() => setIsLegendOpen(!isLegendOpen)}
+                >
+                  ℹ️ Legenda
+                </Button>
+                
+                <div className={`${isLegendOpen ? 'block' : 'hidden'} md:block bg-card/95 backdrop-blur-sm p-3 rounded-md shadow-md border border-border text-xs w-[240px] transition-all`}>
+                  <div className="flex justify-between items-center mb-3 border-b pb-1">
+                    <h4 className="font-bold">Frente de Fogo - 24h</h4>
+                    <button className="md:hidden text-muted-foreground" onClick={() => setIsLegendOpen(false)}>✕</button>
+                  </div>
+                  <div className="space-y-1.5">
+                    <div className="flex items-center gap-2"><span className="w-3 h-3 rounded bg-[#8B0000] border border-black/20 shrink-0"></span> Detecção em até 3 Horas</div>
+                    <div className="flex items-center gap-2"><span className="w-3 h-3 rounded bg-[#DC2626] border border-black/20 shrink-0"></span> Detecção entre 3 e 6 horas</div>
+                    <div className="flex items-center gap-2"><span className="w-3 h-3 rounded bg-[#F97316] border border-black/20 shrink-0"></span> Detecção entre 6 e 12 horas</div>
+                    <div className="flex items-center gap-2"><span className="w-3 h-3 rounded bg-[#F59E0B] border border-black/20 shrink-0"></span> Detecção entre 12 e 24 horas</div>
+                    <div className="flex items-center gap-2"><span className="w-3 h-3 rounded bg-[#737373] border border-black/20 shrink-0"></span> Detecção a mais de 24 horas</div>
+                  </div>
+                  <div className="mt-3 pt-2 border-t text-[10px] text-muted-foreground italic flex items-center gap-2">
+                    <div className="w-3 h-3 rounded-full border-[1.5px] border-gray-800 flex items-center justify-center shrink-0"><div className="w-1.5 h-1.5 bg-white rounded-full"></div></div>
+                    Focos em Unidade de Conservação
+                  </div>
                 </div>
               </div>
             </MapContainer>

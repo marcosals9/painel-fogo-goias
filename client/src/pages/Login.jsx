@@ -31,7 +31,7 @@ export default function Login() {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-[80vh]">
+    <div className="flex items-center justify-center min-h-[80vh] px-4">
       <Card className="w-full max-w-md shadow-xl border-t-4 border-t-primary">
         <CardHeader className="space-y-1 items-center">
           <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mb-2">
@@ -71,8 +71,9 @@ export default function Login() {
               </div>
             )}
           </CardContent>
-          <CardFooter>
+          <CardFooter className="flex flex-col gap-2">
             <Button type="submit" className="w-full">Entrar</Button>
+            <Button type="button" variant="outline" className="w-full" onClick={() => navigate('/')}>Cancelar e Voltar</Button>
           </CardFooter>
         </form>
       </Card>

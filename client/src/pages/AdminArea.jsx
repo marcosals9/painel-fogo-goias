@@ -34,29 +34,15 @@ export default function AdminArea() {
     fetchAdminData();
   }, [navigate]);
 
-  const handleLogout = () => {
-    localStorage.removeItem('codec_token');
-    navigate('/login');
-  };
+
 
   if (loading) return <div className="text-center py-10">Carregando painel...</div>;
 
   return (
     <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
-      <div className="flex justify-between items-center">
-        <div>
-          <h2 className="text-3xl font-bold tracking-tight">Painel Administrativo</h2>
-          <p className="text-muted-foreground">Gerenciamento da Sala de Situação</p>
-        </div>
-        <div className="flex gap-2">
-          <Button variant="default" onClick={() => navigate('/')} className="gap-2">
-            Voltar para o Mapa
-          </Button>
-          <Button variant="outline" onClick={handleLogout} className="gap-2">
-            <LogOut className="w-4 h-4" />
-            Sair
-          </Button>
-        </div>
+      <div className="mb-8">
+        <h2 className="text-2xl sm:text-3xl font-bold tracking-tight">Painel Administrativo</h2>
+        <p className="text-muted-foreground text-sm sm:text-base">Gerenciamento da Sala de Situação</p>
       </div>
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">

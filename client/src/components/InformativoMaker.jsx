@@ -5,12 +5,13 @@ import { format } from 'date-fns';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Download, X, Upload, FileSpreadsheet, CheckCircle2, Flame, ThermometerSun, Loader2, Calendar, Trees, Truck, Sun } from 'lucide-react';
+import { Download, X, Upload, FileSpreadsheet, CheckCircle2, Flame, ThermometerSun, Loader2, Calendar, Trees, Truck, Sun, Eye, EyeOff, ArrowLeft } from 'lucide-react';
 import WhatsAppSender from './WhatsAppSender';
 
 export default function InformativoMaker({ isOpen, onClose, fireEvents, date }) {
   const canvasRef = useRef(null);
   const [downloading, setDownloading] = useState(false);
+  const [showPreviewMobile, setShowPreviewMobile] = useState(false);
 
   // Bloqueia o scroll do body quando o modal estiver aberto
   React.useEffect(() => {
@@ -188,16 +189,19 @@ export default function InformativoMaker({ isOpen, onClose, fireEvents, date }) 
   const maxDias = Math.max(...Object.values(diasSeca), 14);
 
   return (
-    <div className="fixed inset-0 z-[999] bg-background/95 backdrop-blur-sm flex overflow-hidden">
+    <div className="fixed inset-0 z-[999] bg-background/95 backdrop-blur-sm flex flex-col md:flex-row overflow-hidden">
 
       {/* Controles (Esquerda) */}
-      <div className="w-[400px] bg-card border-r shadow-xl flex flex-col h-full">
+      <div className={`w-full md:w-[400px] bg-card border-r shadow-xl flex-col h-full ${showPreviewMobile ? 'hidden md:flex' : 'flex'}`}>
         <div className="p-4 border-b flex justify-between items-center bg-muted/30">
           <div>
             <h2 className="text-lg font-bold">Gerador de Informativo</h2>
             <p className="text-xs text-muted-foreground">Preencha os dados manuais</p>
           </div>
           <div className="flex gap-1">
+            <Button variant="outline" size="icon" className="md:hidden text-muted-foreground" onClick={() => setShowPreviewMobile(true)} title="Ver Preview da Imagem">
+              <Eye className="w-4 h-4" />
+            </Button>
             <Button variant="outline" size="icon" className="text-primary hover:text-primary" onClick={downloadImage} disabled={downloading} title="Baixar Imagem Manualmente">
               {downloading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Download className="w-4 h-4" />}
             </Button>
@@ -276,11 +280,18 @@ export default function InformativoMaker({ isOpen, onClose, fireEvents, date }) 
       </div>
 
       {/* Preview (Direita) */}
-      <div className="flex-1 bg-black/5 overflow-y-auto flex justify-center py-8">
+      <div className={`flex-1 bg-black/5 overflow-y-auto flex-col items-center py-8 relative ${showPreviewMobile ? 'flex' : 'hidden md:flex'}`}>
+        
+        {/* Mobile Voltar Botão */}
+        <div className="md:hidden absolute top-4 left-4 z-[1000]">
+          <Button variant="secondary" onClick={() => setShowPreviewMobile(false)} className="bg-white shadow-md">
+            <ArrowLeft className="w-4 h-4 mr-2" /> Formulário
+          </Button>
+        </div>
 
         {/* Wrapper para os efeitos visuais (sombra e escala) sem afetar a imagem exportada */}
         <div 
-          className="shadow-2xl shrink-0"
+          className="shadow-2xl shrink-0 mt-8 md:mt-0"
           style={{ width: '800px', height: '1130px', transformOrigin: 'top center', transform: 'scale(0.85)' }}
         >
           {/* Container do Canvas A4/Poster (Este é o que será exportado) */}

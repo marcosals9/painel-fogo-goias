@@ -1,11 +1,19 @@
 import { BrowserRouter as Router, Routes, Route, Navigate, Link } from 'react-router-dom';
 import { useEffect, useState } from 'react';
+import { Lock, User, LogOut, ChevronDown } from 'lucide-react';
 import Dashboard from './pages/Dashboard';
 import Login from './pages/Login';
 import AdminArea from './pages/AdminArea';
 
 function App() {
   const [theme, setTheme] = useState('theme-cerrado-vivo');
+  const [menuOpen, setMenuOpen] = useState(false);
+  const isLoggedIn = !!localStorage.getItem('codec_token');
+
+  const handleLogout = () => {
+    localStorage.removeItem('codec_token');
+    window.location.href = '/login';
+  };
 
   useEffect(() => {
     // Determinar a operação baseada no mês atual (0-11)
@@ -27,24 +35,49 @@ function App() {
     <Router>
       <div className="min-h-screen bg-background text-foreground flex flex-col">
         <header className="border-b-2 border-primary bg-slate-900 sticky top-0 z-50 text-slate-100 shadow-md">
-          <div className="container mx-auto px-4 h-16 flex items-center justify-between">
-            <div className="flex items-center gap-3">
+          <div className="container mx-auto px-4 h-16 flex items-center justify-between relative">
+            <Link to="/" className="flex items-center gap-3 min-w-0 hover:opacity-80 transition-opacity">
               <div className="w-10 h-10 flex items-center justify-center rounded-full overflow-hidden bg-white shadow-sm p-1 ring-2 ring-slate-900 shrink-0">
                 <img src="/defesa-civil.png" alt="Defesa Civil" className="w-full h-full object-contain" />
               </div>
-              <h1 className="text-xl font-bold tracking-tight">Sala de Situação CODEC</h1>
-            </div>
-            <div className="text-sm font-semibold text-slate-200 hidden sm:flex items-center gap-3 tracking-wide">
+              <h1 className="text-lg sm:text-xl font-bold tracking-tight truncate">Sala de Situação CODEC</h1>
+            </Link>
+            <div className="text-sm font-semibold text-slate-200 flex items-center gap-3 tracking-wide shrink-0">
               {theme === 'theme-cerrado-vivo' ? (
-                <>
-                  <Link to={localStorage.getItem('codec_token') ? '/admin' : '/login'} className="flex items-center gap-2 hover:opacity-80 transition-opacity">
-                    <span className="hidden md:inline">{localStorage.getItem('codec_token') ? 'Painel Admin' : 'Área Restrita'}</span>
-                    <div className="w-10 h-10 flex items-center justify-center rounded-full bg-white shadow-sm p-1 ring-2 ring-slate-900 shrink-0 cursor-pointer">
-                      <img src="/cbmgo.png" alt="CBMGO" className="w-full h-full object-contain" />
+                <div className="relative">
+                  {isLoggedIn ? (
+                    <div>
+                      <button 
+                        onClick={() => setMenuOpen(!menuOpen)} 
+                        className="flex items-center gap-2 hover:opacity-80 transition-opacity bg-slate-800 py-1.5 px-3 rounded-full border border-slate-700 focus:outline-none"
+                      >
+                        <User className="w-4 h-4 text-orange-400" />
+                        <span className="hidden sm:inline">Admin</span>
+                        <ChevronDown className="w-4 h-4 text-slate-400" />
+                      </button>
+                      
+                      {menuOpen && (
+                        <>
+                          <div className="fixed inset-0 z-40" onClick={() => setMenuOpen(false)}></div>
+                          <div className="absolute right-0 mt-2 w-48 bg-white text-slate-800 rounded-md shadow-lg overflow-hidden border z-50">
+                            <Link to="/admin" className="block px-4 py-3 text-sm font-medium hover:bg-slate-100 border-b" onClick={() => setMenuOpen(false)}>
+                              Painel Administrativo
+                            </Link>
+                            <button onClick={handleLogout} className="w-full text-left px-4 py-3 text-sm font-medium text-red-600 hover:bg-red-50 flex items-center gap-2">
+                              <LogOut className="w-4 h-4" /> Sair
+                            </button>
+                          </div>
+                        </>
+                      )}
                     </div>
-                  </Link>
-                </>
-              ) : '🌧️ Operação Tempestade'}
+                  ) : (
+                    <Link to="/login" className="flex items-center gap-2 hover:opacity-80 transition-opacity bg-slate-800 py-1.5 px-4 rounded-full border border-slate-700">
+                      <Lock className="w-4 h-4 text-orange-400" />
+                      <span>Área Restrita</span>
+                    </Link>
+                  )}
+                </div>
+              ) : '🌧️ Tempestade'}
             </div>
           </div>
         </header>
