@@ -783,7 +783,7 @@ export default function Dashboard() {
                     {sortedEvents.length > 0 ? sortedEvents.map((event, index) => (
                       <React.Fragment key={event.id || index}>
                         <TableRow
-                          className={`cursor-pointer transition-colors ${selectedEvent === event.id ? 'bg-primary/20' : 'hover:bg-muted/50'}`}
+                          className={`cursor-pointer transition-colors ${selectedEvent === event.id ? 'bg-slate-200 dark:bg-slate-800' : 'hover:bg-muted/50'}`}
                           onClick={() => setSelectedEvent(selectedEvent === event.id ? null : event.id)}
                         >
                           <TableCell className="font-medium text-xs">

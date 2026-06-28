@@ -226,7 +226,7 @@ export default function DataExplorer({ isOpen, onClose, fireEvents, date }) {
               ) : filtered.map((e, i) => (
                 <React.Fragment key={e.id ?? i}>
                   <tr 
-                    className={`cursor-pointer hover:bg-muted/80 transition-colors ${e.isGoias !== false ? '' : 'opacity-60'} ${expandedRowId === (e.id ?? i) ? 'bg-muted/80' : ''}`}
+                    className={`cursor-pointer transition-colors ${e.isGoias !== false ? '' : 'opacity-60'} ${expandedRowId === (e.id ?? i) ? 'bg-slate-200 dark:bg-slate-800' : 'hover:bg-muted/50'}`}
                     onClick={() => setExpandedRowId(expandedRowId === (e.id ?? i) ? null : (e.id ?? i))}
                   >
                     <td className={tdCls + " font-medium max-w-[160px] break-words"}>{e.municipio || 'N/A'}</td>
