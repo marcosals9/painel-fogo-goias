@@ -47,9 +47,14 @@ export default function InformativoMaker({ isOpen, onClose, fireEvents, date }) 
   // Mantém a data no formato YYYY-MM-DD para o input type="date"
   const [cimehgoDate, setCimehgoDate] = useState(date);
 
-  // Atualiza a data do CIMEHGO caso a data do painel mude e o modal seja reaberto
+  // Atualiza a data do CIMEHGO e limpa os dados de upload ao mudar a data
   React.useEffect(() => {
     setCimehgoDate(date);
+    // Limpar os dados carregados via upload ao alterar a data
+    setSspFile(null);
+    setSspMuni([]);
+    setSspNat([]);
+    setTotalAtendimentos(0);
   }, [date]);
 
   // Cálculo CENSIPAM (Focos de Calor)
