@@ -203,7 +203,7 @@ export default function InformativoMaker({ isOpen, onClose, fireEvents, date }) 
   const maxDias = Math.max(...Object.values(diasSeca), 14);
 
   return (
-    <div className="fixed inset-0 z-[999] bg-background/95 backdrop-blur-sm flex flex-col md:flex-row overflow-hidden">
+    <div className="fixed inset-0 z-[999] bg-background/95 backdrop-blur-sm flex flex-col md:flex-row overflow-hidden animate-in slide-in-from-right duration-300">
 
       {/* Controles (Esquerda) */}
       <div className={`w-full md:w-[400px] bg-card border-r shadow-xl flex-col h-full ${showPreviewMobile ? 'hidden md:flex' : 'flex'}`}>
