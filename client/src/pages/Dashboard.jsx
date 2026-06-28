@@ -472,8 +472,9 @@ export default function Dashboard() {
   };
 
   return (
-    <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+    <>
+      <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div className="flex items-start gap-2.5 w-full md:w-auto">
           <Flame className="w-9 h-9 text-primary mt-0.5 drop-shadow-sm shrink-0" />
           <div className="flex flex-col w-full">
@@ -824,8 +825,10 @@ export default function Dashboard() {
         </p>
       </footer>
 
+      </div>
+
       <InformativoMaker isOpen={isMakerOpen} onClose={() => setIsMakerOpen(false)} fireEvents={sortedEvents} date={date} />
       <DataExplorer isOpen={isExplorerOpen} onClose={() => setIsExplorerOpen(false)} fireEvents={fireEvents} date={date} />
-    </div>
+    </>
   );
 }
