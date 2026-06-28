@@ -8,16 +8,18 @@ export async function onRequest(context) {
 
   const targetUrl = new URL(url.pathname + url.search, backendUrl);
   
-  // Precisamos limpar os cabeçalhos de rastreamento do Cloudflare
-  // porque se enviarmos eles de volta para fora, o Cloudflare bloqueia com erro 403 Forbidden!
-  const newHeaders = new Headers(context.request.headers);
-  newHeaders.delete('host');
-  newHeaders.delete('cf-connecting-ip');
-  newHeaders.delete('cf-ray');
-  newHeaders.delete('cf-visitor');
-  newHeaders.delete('cf-ipcountry');
-  newHeaders.delete('x-forwarded-proto');
-  newHeaders.delete('x-forwarded-for');
+  // Criar cabeçalhos totalmente novos apenas com o essencial
+  // Isso impede que o Cloudflare Worker tente rotear a requisição de volta para si mesmo
+  const newHeaders = new Headers();
+  
+  const contentType = context.request.headers.get('Content-Type');
+  if (contentType) newHeaders.set('Content-Type', contentType);
+  
+  const auth = context.request.headers.get('Authorization');
+  if (auth) newHeaders.set('Authorization', auth);
+  
+  const accept = context.request.headers.get('Accept');
+  if (accept) newHeaders.set('Accept', accept);
 
   const init = {
     method: context.request.method,
