@@ -51,6 +51,10 @@ const authenticateToken = (req, res, next) => {
 // Rotas do WhatsApp (Protegidas)
 app.use('/api/whatsapp', authenticateToken, whatsappRoutes);
 
+// Rotas de Focos de Calor / Eventos de Fogo
+const focosRoutes = require('./routes/focos');
+app.use('/api/focos', focosRoutes);
+
 // Rota protegida de exemplo (Admin Dashboard)
 app.get('/api/admin/dashboard', authenticateToken, (req, res) => {
     res.json({ message: 'Bem-vindo à Área Restrita do CODEC', user: req.user });

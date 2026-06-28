@@ -45,6 +45,22 @@ db.serialize(() => {
         )
     `);
 
+    // Tabela de cache de eventos de fogo (CENSIPAM)
+    db.run(`
+        CREATE TABLE IF NOT EXISTS eventos_fogo (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            id_evento INTEGER UNIQUE NOT NULL,
+            geojson TEXT NOT NULL,
+            municipio TEXT,
+            uf TEXT,
+            dt_maxima DATETIME,
+            dt_minima DATETIME,
+            tamanho_km2 REAL,
+            data_referencia DATE NOT NULL,
+            criado_em DATETIME DEFAULT CURRENT_TIMESTAMP
+        )
+    `);
+
     // Inserir usuário mock (admin / admin) se não existir
     db.get("SELECT count(*) as count FROM users WHERE username = 'admin'", (err, row) => {
         if (row && row.count === 0) {

@@ -57,7 +57,7 @@ export default function InformativoMaker({ isOpen, onClose, fireEvents, date }) 
     setTotalAtendimentos(0);
   }, [date]);
 
-  // Cálculo CENSIPAM (Focos de Calor)
+  // Cálculo CENSIPAM (Eventos de Fogo)
   const censipamDados = useMemo(() => {
     const counts = {};
     let total = 0;
@@ -259,8 +259,8 @@ export default function InformativoMaker({ isOpen, onClose, fireEvents, date }) 
           </div>
 
           <div className="space-y-3">
-            <h3 className="font-semibold text-sm flex items-center gap-2"><Flame className="w-4 h-4" /> 2. Focos de Calor (CENSIPAM)</h3>
-            <p className="text-xs text-muted-foreground bg-muted p-2 rounded border">Dados coletados automaticamente do mapa (Total: {censipamDados.total} focos na data {displayDate}). Nenhuma ação necessária.</p>
+            <h3 className="font-semibold text-sm flex items-center gap-2"><Flame className="w-4 h-4" /> 2. Eventos de Fogo (CENSIPAM)</h3>
+            <p className="text-xs text-muted-foreground bg-muted p-2 rounded border">Dados coletados automaticamente do mapa (Total: {censipamDados.total} eventos na data {displayDate}). Nenhuma ação necessária.</p>
           </div>
 
           <div className="space-y-3">
@@ -379,7 +379,7 @@ export default function InformativoMaker({ isOpen, onClose, fireEvents, date }) 
               <div className="opacity-0 h-[36px]"></div>
               <div className="px-2 flex-1 flex flex-col justify-center pb-6 gap-0.5">
                 {censipamDados.top.slice(0, 5).map(([mun, val]) => renderBar(mun, val, maxCenMuni, 'bg-[#76e5d7]'))}
-                {censipamDados.top.length === 0 && <div className="text-center text-gray-400 font-bold">Sem focos na data</div>}
+                {censipamDados.top.length === 0 && <div className="text-center text-gray-400 font-bold">Sem eventos na data</div>}
               </div>
               <div className="text-center font-bold text-[10px] pb-2 text-[#002b5e]">FONTE: CENSIPAM</div>
             </div>

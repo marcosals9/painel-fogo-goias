@@ -201,9 +201,10 @@ export default function Dashboard() {
     setSortConfig({ key, direction });
   };
 
-  const { totalStateEvents, locationLabel, totalFocos, areaTotal, areaTotalKm2, cidadesAfetadas } = useMemo(() => {
+  const { totalStateEvents, ucStateEvents, locationLabel, totalFocos, ucFocos, areaTotal, areaTotalKm2, ucAreaTotal, ucAreaTotalKm2, cidadesAfetadas } = useMemo(() => {
     let eventsToCount = sortedEvents;
     const totalState = sortedEvents.length;
+    const ucState = sortedEvents.filter(e => e.uc).length;
     let label = "Focos Ativos";
 
     if (selectedEvent) {
@@ -217,16 +218,25 @@ export default function Dashboard() {
     }
 
     const focos = eventsToCount.length;
+    const ucFocosCount = eventsToCount.filter(e => e.uc).length;
     const area = eventsToCount.reduce((acc, curr) => acc + (curr.tamanho_ha || 0), 0);
     const areaKm2 = area / 100; // 1 km² = 100 ha
-    const cidades = new Set(eventsToCount.map(e => e.municipio).filter(m => m !== 'N/A' && m !== 'Desconhecido' && m !== 'Buscando...')).size;
+    
+    const ucArea = eventsToCount.filter(e => e.uc).reduce((acc, curr) => acc + (curr.tamanho_ha || 0), 0);
+    const ucAreaKm2 = ucArea / 100;
+
+    const cidades = new Set(eventsToCount.map(e => e.municipio).filter(m => m !== 'N/A' && m !== 'Não Mapeado' && m !== 'Desconhecido' && m !== 'Buscando...')).size;
 
     return {
       totalStateEvents: totalState,
+      ucStateEvents: ucState,
       locationLabel: label,
       totalFocos: focos,
+      ucFocos: ucFocosCount,
       areaTotal: area.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
       areaTotalKm2: areaKm2.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
+      ucAreaTotal: ucArea.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
+      ucAreaTotalKm2: ucAreaKm2.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
       cidadesAfetadas: cidades
     };
   }, [sortedEvents, selectedEvent]);
@@ -237,99 +247,64 @@ export default function Dashboard() {
   const fetchFireData = async (selectedDate, tz) => {
     setLoading(true);
     try {
-      const wfsUrl = `https://panorama.sipam.gov.br/geoserver/painel_do_fogo/wfs`;
-
-      let startFilter, endFilter;
-      if (tz === 'UTC') {
-        startFilter = `${selectedDate}T00:00:00Z`;
-        endFilter = `${selectedDate}T23:59:59Z`;
-      } else {
-        // BRT (UTC-3)
-        startFilter = `${selectedDate}T03:00:00Z`;
-        const d = new Date(selectedDate);
-        d.setUTCDate(d.getUTCDate() + 1);
-        const nextDateStr = d.toISOString().split('T')[0];
-        endFilter = `${nextDateStr}T02:59:59Z`;
+      const baseUrl = import.meta.env.PROD ? '' : 'http://localhost:3001';
+      
+      // 1. Sincroniza com o CENSIPAM através do nosso backend (faz o POST para /api/focos/sync)
+      // Pode falhar caso o censipam esteja fora, mas não vai travar a leitura do banco
+      try {
+          await axios.post(`${baseUrl}/api/focos/sync`, { date: selectedDate, tz });
+      } catch (e) {
+          console.warn("Sincronização com CENSIPAM falhou, usando cache local:", e);
       }
 
-      const response = await axios.get(wfsUrl, {
-        params: {
-          service: 'WFS',
-          version: '1.0.0',
-          request: 'GetFeature',
-          typeName: 'painel_do_fogo:mv_evento_filtro',
-          outputFormat: 'application/vnd.google-earth.kml+xml',
-          maxFeatures: 300,
-          CQL_FILTER: `BBOX(geom,-53.25,-19.49,-45.90,-12.39) AND dt_maxima >= '${startFilter}' AND dt_minima <= '${endFilter}'`
-        }
-      });
-
-      if (response.data && response.data.includes('<kml')) {
-        const parser = new DOMParser();
-        const xmlDoc = parser.parseFromString(response.data, "text/xml");
-        const placemarks = xmlDoc.getElementsByTagName("Placemark");
-
-        const features = [];
-        for (let i = 0; i < placemarks.length; i++) {
-          const placemark = placemarks[i];
-          const simpleData = placemark.getElementsByTagName("SimpleData");
-          const props = {};
-          for (let j = 0; j < simpleData.length; j++) {
-            const name = simpleData[j].getAttribute("name");
-            let value = simpleData[j].textContent;
-
-            if (value && value.includes('[Ljava.lang.')) {
-              value = null;
-            } else {
-              if (value && value.startsWith('{') && value.endsWith('}')) {
-                value = value.slice(1, -1);
-              }
-              if (value === 'NULL') value = null;
-            }
-            props[name] = value;
-          }
-
-          const coordNode = placemark.getElementsByTagName("coordinates")[0];
-          let lat = 0, lng = 0;
-          if (coordNode) {
-            const coordsStr = coordNode.textContent.trim().split(' ');
-            if (coordsStr.length > 0) {
-              const firstCoord = coordsStr[0].split(',');
-              if (firstCoord.length >= 2) {
-                lng = parseFloat(firstCoord[0]);
-                lat = parseFloat(firstCoord[1]);
-              }
-            }
-          }
-          features.push({ properties: props, lat, lng });
-        }
+      // 2. Lê os dados do nosso backend
+      const response = await axios.get(`${baseUrl}/api/focos`, { params: { date: selectedDate } });
+      
+      if (response.data && response.data.features) {
+        const features = response.data.features;
 
         const mappedEvents = features.map(f => {
           const prop = f.properties;
           const uf = prop.sigla_uf || 'N/A';
-          const mun = prop.nome_municipio || 'N/A';
+          const mun = prop.nome_municipio || prop.municipio || 'N/A';
 
-          // Calcula a idade do foco de calor
+          // Calcula a idade do evento de fogo
           let ageHours = null;
           if (prop.dt_maxima) {
             const dt = new Date(prop.dt_maxima);
             const todayStr = new Date().toISOString().split('T')[0];
-            const referenceTime = date === todayStr ? Date.now() : new Date(endFilter).getTime();
+            
+            // Para manter a mesma lógica de tempo de referência de antes
+            let endFilter;
+            if (tz === 'UTC') {
+                endFilter = `${selectedDate}T23:59:59Z`;
+            } else {
+                const d = new Date(selectedDate);
+                d.setUTCDate(d.getUTCDate() + 1);
+                endFilter = `${d.toISOString().split('T')[0]}T02:59:59Z`;
+            }
+            
+            const referenceTime = selectedDate === todayStr ? Date.now() : new Date(endFilter).getTime();
             if (!isNaN(dt.getTime())) {
               ageHours = (referenceTime - dt.getTime()) / (1000 * 60 * 60);
             }
           }
 
+          // Conversão Crítica: API do CENSIPAM retorna km². 
+          // O painel mostra em hectares, então multiplicamos por 100. (1 km² = 100 ha)
+          const tamanhoKm2 = prop.area_total_evento || 0;
+          const tamanhoHa = tamanhoKm2 * 100;
+
           return {
             municipio: mun,
             uf: uf,
-            tamanho_ha: prop.area_total_evento ? parseFloat(parseFloat(prop.area_total_evento).toFixed(2)) : null,
+            tamanho_ha: tamanhoHa ? parseFloat(tamanhoHa.toFixed(2)) : null,
             duracao_h: prop.persistencia_dias ? parseInt(prop.persistencia_dias) * 24 : null,
             qtd_deteccoes: prop.qtd_deteccoes ? parseInt(prop.qtd_deteccoes, 10) : 0,
             uc: !!prop.nome_unidade_conservacao,
             ucText: prop.nome_unidade_conservacao || 'N/A',
-            lat: f.lat,
-            lng: f.lng,
+            lat: prop.lat,
+            lng: prop.lng,
             dt_minima: prop.dt_minima,
             dt_maxima: prop.dt_maxima,
             ageHours: ageHours,
@@ -340,10 +315,11 @@ export default function Dashboard() {
 
         setFireEvents(mappedEvents);
       } else {
-        throw new Error("Formato inválido retornado pelo GeoServer");
+        setFireEvents([]);
       }
     } catch (error) {
-      console.error("Erro ao buscar dados de fogo:", error);
+      console.error("Erro ao buscar dados de fogo do backend:", error);
+      setFireEvents([]);
     } finally {
       setLoading(false);
     }
@@ -400,29 +376,31 @@ export default function Dashboard() {
         }
       }
 
-      // 3. Geocodificação Reversa para Municípios N/A
+      // 3. Geocodificação Reversa Super Rápida (BigDataCloud) para Municípios N/A
       for (let i = 0; i < newEvents.length; i++) {
         const ev = newEvents[i];
-        // Só busca município se o evento realmente pertencer a Goiás
-        if (ev.isGoias && (ev.municipio === 'N/A' || !ev.municipio)) {
+        if (ev.isGoias && (ev.municipio === 'N/A' || ev.municipio === 'Não Mapeado' || !ev.municipio)) {
           try {
             ev.municipio = 'Buscando...';
             setFireEvents([...newEvents]);
             hasChanges = true;
 
-            await new Promise(r => setTimeout(r, 1200));
-            const res = await axios.get(`https://nominatim.openstreetmap.org/reverse?lat=${ev.lat}&lon=${ev.lng}&format=json`, {
-              headers: { 'Accept-Language': 'pt-BR' }
-            });
-            if (res.data && res.data.address) {
-              const city = res.data.address.city || res.data.address.town || res.data.address.municipality || res.data.address.village;
+            // Sem delay, API gratuita para cliente sem rate limit severo
+            const res = await axios.get(`https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${ev.lat}&longitude=${ev.lng}&localityLanguage=pt`);
+            
+            if (res.data) {
+              const city = res.data.city || res.data.locality;
               if (city) {
                 ev.municipio = city;
+                // Salva silenciosamente no banco de dados para não precisar buscar na próxima vez!
+                axios.put(`/api/focos/${ev.id}`, { municipio: city }).catch(console.error);
               } else {
                 ev.municipio = 'Desconhecido';
+                axios.put(`/api/focos/${ev.id}`, { municipio: 'Desconhecido' }).catch(console.error);
               }
             } else {
               ev.municipio = 'Desconhecido';
+              axios.put(`/api/focos/${ev.id}`, { municipio: 'Desconhecido' }).catch(console.error);
             }
           } catch (e) {
             console.error("Erro na Geocodificação Reversa", e);
@@ -552,22 +530,35 @@ export default function Dashboard() {
           <Card className="shadow-sm border-l-4 border-l-primary">
             <CardContent className="p-4 flex flex-col justify-center">
               <p className="text-sm text-muted-foreground font-medium truncate" title="Total no Estado">Focos Totais (Estado)</p>
-              <p className="text-3xl font-bold text-foreground">{loading ? '...' : totalStateEvents}</p>
+              <div className="flex items-baseline gap-2">
+                <p className="text-3xl font-bold text-foreground">{loading ? '...' : totalStateEvents}</p>
+                <p className="text-[11px] sm:text-xs font-bold text-emerald-700">
+                  ({loading ? '...' : ucStateEvents} em UCs)
+                </p>
+              </div>
             </CardContent>
           </Card>
           <Card className="shadow-sm border-l-4 border-l-orange-500">
             <CardContent className="p-4 flex flex-col justify-center">
               <p className="text-sm text-muted-foreground font-medium truncate" title={locationLabel}>{locationLabel}</p>
-              <p className="text-3xl font-bold text-foreground">{loading ? '...' : totalFocos}</p>
+              <div className="flex items-baseline gap-2">
+                <p className="text-3xl font-bold text-foreground">{loading ? '...' : totalFocos}</p>
+                <p className="text-[11px] sm:text-xs font-bold text-emerald-700">
+                  ({loading ? '...' : ucFocos} em UCs)
+                </p>
+              </div>
             </CardContent>
           </Card>
           <Card className="shadow-sm border-l-4 border-l-red-600">
             <CardContent className="p-4 flex flex-col justify-center">
               <p className="text-sm text-muted-foreground font-medium truncate" title="Área Estimada (ha)">Área Estimada (ha)</p>
               <div className="flex items-baseline gap-2">
-                <p className="text-3xl font-bold text-foreground">{loading ? '...' : areaTotal}</p>
+                <strong className="text-xl sm:text-2xl font-black tabular-nums">{loading ? '...' : areaTotal}</strong>
                 {!loading && <p className="text-xs text-muted-foreground font-medium">({areaTotalKm2} km²)</p>}
               </div>
+              <p className="text-[10px] sm:text-xs text-muted-foreground mt-1">
+                UCs: {loading ? '...' : `${ucAreaTotal} ha (${ucAreaTotalKm2} km²)`}
+              </p>
             </CardContent>
           </Card>
           <Card className="shadow-sm border-l-4 border-l-amber-500">
@@ -792,11 +783,11 @@ export default function Dashboard() {
                               <span className="whitespace-normal break-words leading-tight">{event.municipio || 'N/A'}</span>
                             </div>
                           </TableCell>
-                          <TableCell className="text-xs font-semibold">{event.tamanho_ha ? `${event.tamanho_ha} ha` : 'N/A'}</TableCell>
+                          <TableCell className="text-xs font-semibold">{event.tamanho_ha ? event.tamanho_ha : 'N/A'}</TableCell>
                           <TableCell className="text-xs text-orange-600 font-bold">{event.qtd_deteccoes || 0}</TableCell>
                           <TableCell className="text-xs">{event.duracao_h ? `${event.duracao_h} h` : 'N/A'}</TableCell>
                           <TableCell className="font-medium text-[10px] leading-tight py-2" title={event.ucText !== 'N/A' ? event.ucText : ''}>
-                            {event.ucText !== 'N/A' ? <span className="font-bold text-gray-900 capitalize">{event.ucText.toLowerCase()}</span> : 'Não'}
+                            {event.ucText !== 'N/A' ? <span className="font-bold text-emerald-700 capitalize">{event.ucText.toLowerCase()}</span> : 'Não'}
                           </TableCell>
                         </TableRow>
                         {selectedEvent === event.id && (
@@ -805,7 +796,7 @@ export default function Dashboard() {
                               <div className="p-4 sm:p-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 text-xs bg-gradient-to-br from-white to-slate-50 shadow-inner">
                                 <div className="space-y-1"><strong className="text-muted-foreground uppercase text-[10px] tracking-wider flex items-center gap-1"><MapIcon className="w-3 h-3"/> Localização</strong><p className="font-semibold text-sm">{event.municipio} - {event.uf || 'GO'}</p></div>
                                 <div className="space-y-1"><strong className="text-muted-foreground uppercase text-[10px] tracking-wider flex items-center gap-1"><LocateFixed className="w-3 h-3"/> Coordenadas</strong><p className="font-medium font-mono text-xs">{event.lat?.toFixed(5)}, {event.lng?.toFixed(5)}</p></div>
-                                <div className="space-y-1"><strong className="text-muted-foreground uppercase text-[10px] tracking-wider flex items-center gap-1"><Trees className="w-3 h-3"/> Unidade de Conservação</strong><p className="font-semibold">{event.ucText !== 'N/A' ? event.ucText : 'Nenhuma área protegida atingida'}</p></div>
+                                <div className="space-y-1"><strong className="text-muted-foreground uppercase text-[10px] tracking-wider flex items-center gap-1"><Trees className="w-3 h-3 text-emerald-700"/> Unidade de Conservação</strong><p className={event.ucText !== 'N/A' ? 'font-bold text-emerald-700' : 'font-semibold'}>{event.ucText !== 'N/A' ? event.ucText : 'Nenhuma área protegida atingida'}</p></div>
                                 <div className="space-y-1"><strong className="text-muted-foreground uppercase text-[10px] tracking-wider flex items-center gap-1"><Flame className="w-3 h-3 text-orange-500"/> Área Estimada</strong><p className="font-semibold text-sm">{event.tamanho_ha ? `${event.tamanho_ha} hectares` : 'N/A'}</p></div>
                                 <div className="space-y-1"><strong className="text-muted-foreground uppercase text-[10px] tracking-wider">Qtd. Detecções (Pixels)</strong><p className="font-semibold">{event.qtd_deteccoes || 0} registros de satélite</p></div>
                                 <div className="space-y-1"><strong className="text-muted-foreground uppercase text-[10px] tracking-wider flex items-center gap-1"><Timer className="w-3 h-3"/> Duração Total</strong><p className="font-semibold">{event.duracao_h ? `${event.duracao_h} horas` : 'N/A'}</p></div>
