@@ -8,6 +8,7 @@ export default function DataExplorer({ isOpen, onClose, fireEvents, date }) {
   const [filterUF, setFilterUF]       = useState('GOIAS');
   const [sortKey, setSortKey]         = useState('municipio');
   const [sortDir, setSortDir]         = useState('asc');
+  const [expandedRowId, setExpandedRowId] = useState(null);
 
   // Bloqueia o scroll do body quando o drawer estiver aberto
   React.useEffect(() => {
@@ -15,6 +16,7 @@ export default function DataExplorer({ isOpen, onClose, fireEvents, date }) {
       document.body.style.overflow = 'hidden';
       setFilterUF('GOIAS');
       setSearch('');
+      setExpandedRowId(null);
     } else {
       document.body.style.overflow = '';
     }
@@ -222,36 +224,58 @@ export default function DataExplorer({ isOpen, onClose, fireEvents, date }) {
                   </td>
                 </tr>
               ) : filtered.map((e, i) => (
-                <tr key={e.id ?? i} className={`hover:bg-muted/50 transition-colors ${e.isGoias !== false ? '' : 'opacity-60'}`}>
-                  <td className={tdCls + " font-medium max-w-[160px] break-words"}>{e.municipio || 'N/A'}</td>
-                  <td className={tdCls}>
-                    <span className="font-bold px-1.5 py-0.5 rounded text-xs bg-muted">{e.uf || 'N/A'}</span>
-                  </td>
-                  <td className={tdCls + " text-center"}>
-                    {e.isGoias !== false
-                      ? <span className="text-green-600 font-bold text-xs">✓ Sim</span>
-                      : <span className="text-red-500 font-bold text-xs">✗ Não</span>
-                    }
-                  </td>
-                  <td className={tdCls + " text-right"}>{e.tamanho_ha != null ? e.tamanho_ha.toLocaleString('pt-BR') : '—'}</td>
-                  <td className={tdCls + " text-center"}>{e.qtd_deteccoes ?? '—'}</td>
-                  <td className={tdCls + " text-center"}>{e.duracao_h != null ? e.duracao_h : '—'}</td>
-                  <td className={tdCls}>
-                    {e.uc
-                      ? <span className="text-[10px] bg-green-100 text-green-800 dark:bg-green-900/40 dark:text-green-300 px-1.5 py-0.5 rounded font-medium">{e.ucText}</span>
-                      : <span className="text-muted-foreground text-[11px]">Não</span>
-                    }
-                  </td>
-                  <td className={tdCls + " whitespace-nowrap text-[11px]"}>
-                    <div className="flex flex-col">
-                      <span className="text-muted-foreground">Início: {e.dt_minima ? new Date(e.dt_minima).toLocaleString('pt-BR', { dateStyle: 'short', timeStyle: 'short' }) : '—'}</span>
-                      <span className="font-semibold text-foreground">Fim: {e.dt_maxima ? new Date(e.dt_maxima).toLocaleString('pt-BR', { dateStyle: 'short', timeStyle: 'short' }) : '—'}</span>
-                    </div>
-                  </td>
-                  <td className={tdCls + " text-[10px] text-muted-foreground whitespace-nowrap font-mono"}>
-                    {e.lat?.toFixed(4)}, {e.lng?.toFixed(4)}
-                  </td>
-                </tr>
+                <React.Fragment key={e.id ?? i}>
+                  <tr 
+                    className={`cursor-pointer hover:bg-muted/80 transition-colors ${e.isGoias !== false ? '' : 'opacity-60'} ${expandedRowId === (e.id ?? i) ? 'bg-muted/80' : ''}`}
+                    onClick={() => setExpandedRowId(expandedRowId === (e.id ?? i) ? null : (e.id ?? i))}
+                  >
+                    <td className={tdCls + " font-medium max-w-[160px] break-words"}>{e.municipio || 'N/A'}</td>
+                    <td className={tdCls}>
+                      <span className="font-bold px-1.5 py-0.5 rounded text-xs bg-muted">{e.uf || 'N/A'}</span>
+                    </td>
+                    <td className={tdCls + " text-center"}>
+                      {e.isGoias !== false
+                        ? <span className="text-green-600 font-bold text-xs">✓ Sim</span>
+                        : <span className="text-red-500 font-bold text-xs">✗ Não</span>
+                      }
+                    </td>
+                    <td className={tdCls + " text-right"}>{e.tamanho_ha != null ? e.tamanho_ha.toLocaleString('pt-BR') : '—'}</td>
+                    <td className={tdCls + " text-center"}>{e.qtd_deteccoes ?? '—'}</td>
+                    <td className={tdCls + " text-center"}>{e.duracao_h != null ? e.duracao_h : '—'}</td>
+                    <td className={tdCls}>
+                      {e.uc
+                        ? <span className="text-[10px] bg-green-100 text-green-800 dark:bg-green-900/40 dark:text-green-300 px-1.5 py-0.5 rounded font-medium">{e.ucText}</span>
+                        : <span className="text-muted-foreground text-[11px]">Não</span>
+                      }
+                    </td>
+                    <td className={tdCls + " whitespace-nowrap text-[11px]"}>
+                      <div className="flex flex-col">
+                        <span className="text-muted-foreground">Início: {e.dt_minima ? new Date(e.dt_minima).toLocaleString('pt-BR', { dateStyle: 'short', timeStyle: 'short' }) : '—'}</span>
+                        <span className="font-semibold text-foreground">Fim: {e.dt_maxima ? new Date(e.dt_maxima).toLocaleString('pt-BR', { dateStyle: 'short', timeStyle: 'short' }) : '—'}</span>
+                      </div>
+                    </td>
+                    <td className={tdCls + " text-right font-mono text-[10px] text-muted-foreground whitespace-nowrap"}>
+                      {e.lat != null ? e.lat.toFixed(4) : ''}, {e.lng != null ? e.lng.toFixed(4) : ''}
+                    </td>
+                  </tr>
+                  {expandedRowId === (e.id ?? i) && (
+                    <tr className="bg-muted/10">
+                      <td colSpan={9} className="p-0 border-b-2 border-primary/20">
+                        <div className="p-4 sm:p-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 text-xs bg-gradient-to-br from-white to-slate-50 shadow-inner">
+                          <div className="space-y-1"><strong className="text-muted-foreground uppercase text-[10px] tracking-wider flex items-center gap-1"><Database className="w-3 h-3"/> ID do Evento</strong><p className="font-mono text-xs">{e.id || 'N/A'}</p></div>
+                          <div className="space-y-1"><strong className="text-muted-foreground uppercase text-[10px] tracking-wider">Município / Estado</strong><p className="font-semibold text-sm">{e.municipio} - {e.uf}</p></div>
+                          <div className="space-y-1"><strong className="text-muted-foreground uppercase text-[10px] tracking-wider">Pertence a Goiás?</strong><p className="font-semibold">{e.isGoias !== false ? 'Sim' : 'Não'}</p></div>
+                          <div className="space-y-1"><strong className="text-muted-foreground uppercase text-[10px] tracking-wider">Unidade de Conservação</strong><p className="font-semibold">{e.ucText !== 'N/A' ? e.ucText : 'Nenhuma área protegida atingida'}</p></div>
+                          <div className="space-y-1"><strong className="text-muted-foreground uppercase text-[10px] tracking-wider">Área Estimada (hectares)</strong><p className="font-semibold text-sm">{e.tamanho_ha != null ? e.tamanho_ha : 'N/A'}</p></div>
+                          <div className="space-y-1"><strong className="text-muted-foreground uppercase text-[10px] tracking-wider">Qtd. Detecções (Pixels)</strong><p className="font-semibold">{e.qtd_deteccoes || 0}</p></div>
+                          <div className="space-y-1"><strong className="text-muted-foreground uppercase text-[10px] tracking-wider">Duração Total (horas)</strong><p className="font-semibold">{e.duracao_h != null ? e.duracao_h : 'N/A'}</p></div>
+                          <div className="space-y-1"><strong className="text-muted-foreground uppercase text-[10px] tracking-wider">Coordenadas (Lat, Lng)</strong><p className="font-medium font-mono text-xs">{e.lat}, {e.lng}</p></div>
+                          <div className="space-y-1 md:col-span-2"><strong className="text-muted-foreground uppercase text-[10px] tracking-wider">Bioma</strong><p className="font-medium">{e.bioma || 'Cerrado'}</p></div>
+                        </div>
+                      </td>
+                    </tr>
+                  )}
+                </React.Fragment>
               ))}
             </tbody>
           </table>

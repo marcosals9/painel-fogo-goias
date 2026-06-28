@@ -493,7 +493,7 @@ export default function Dashboard() {
           <div className="flex flex-col items-end gap-1.5 w-full md:w-auto">
             <div className="flex items-center gap-2 flex-wrap justify-end w-full sm:w-auto">
               {!!localStorage.getItem('codec_token') && (
-                <Button variant="outline" size="sm" className="flex-1 sm:flex-none h-9 gap-2 flex flex-row items-center bg-orange-50 text-orange-600 border-orange-200 hover:bg-orange-100 hover:text-orange-700 shadow-sm px-2 sm:px-3" onClick={() => setIsMakerOpen(true)}>
+                <Button variant="outline" size="sm" className="flex-1 sm:flex-none h-9 gap-2 flex flex-row items-center bg-orange-50 text-orange-600 border-orange-200 hover:bg-orange-100 hover:text-orange-700 shadow-sm px-2 sm:px-3" onClick={() => setIsMakerOpen(true)} title="Gerar Card Informativo WhatsApp">
                   <Smartphone className="w-4 h-4" /> <span className="hidden md:inline">Informativo WhatsApp</span><span className="md:hidden">WhatsApp</span>
                 </Button>
               )}
@@ -781,24 +781,42 @@ export default function Dashboard() {
                   </TableHeader>
                   <TableBody>
                     {sortedEvents.length > 0 ? sortedEvents.map((event, index) => (
-                      <TableRow
-                        key={event.id || index}
-                        className={`cursor-pointer transition-colors ${selectedEvent === event.id ? 'bg-primary/20' : 'hover:bg-muted/50'}`}
-                        onClick={() => setSelectedEvent(selectedEvent === event.id ? null : event.id)}
-                      >
-                        <TableCell className="font-medium text-xs">
-                          <div className="flex items-center gap-2 min-h-[32px]">
-                            <span className="w-2.5 h-2.5 rounded-full flex-shrink-0 shadow-sm border border-black/10" style={{ backgroundColor: getEventColorHex(event.ageHours) }} title={event.ageHours ? `Idade: ~${Math.round(event.ageHours)}h` : ''}></span>
-                            <span className="whitespace-normal break-words leading-tight">{event.municipio || 'N/A'}</span>
-                          </div>
-                        </TableCell>
-                        <TableCell className="text-xs font-semibold">{event.tamanho_ha ? `${event.tamanho_ha} ha` : 'N/A'}</TableCell>
-                        <TableCell className="text-xs text-orange-600 font-bold">{event.qtd_deteccoes || 0}</TableCell>
-                        <TableCell className="text-xs">{event.duracao_h ? `${event.duracao_h} h` : 'N/A'}</TableCell>
-                        <TableCell className="font-medium text-[10px] leading-tight py-2" title={event.ucText !== 'N/A' ? event.ucText : ''}>
-                          {event.ucText !== 'N/A' ? <span className="font-bold text-gray-900 capitalize">{event.ucText.toLowerCase()}</span> : 'Não'}
-                        </TableCell>
-                      </TableRow>
+                      <React.Fragment key={event.id || index}>
+                        <TableRow
+                          className={`cursor-pointer transition-colors ${selectedEvent === event.id ? 'bg-primary/20' : 'hover:bg-muted/50'}`}
+                          onClick={() => setSelectedEvent(selectedEvent === event.id ? null : event.id)}
+                        >
+                          <TableCell className="font-medium text-xs">
+                            <div className="flex items-center gap-2 min-h-[32px]">
+                              <span className="w-2.5 h-2.5 rounded-full flex-shrink-0 shadow-sm border border-black/10" style={{ backgroundColor: getEventColorHex(event.ageHours) }} title={event.ageHours ? `Idade: ~${Math.round(event.ageHours)}h` : ''}></span>
+                              <span className="whitespace-normal break-words leading-tight">{event.municipio || 'N/A'}</span>
+                            </div>
+                          </TableCell>
+                          <TableCell className="text-xs font-semibold">{event.tamanho_ha ? `${event.tamanho_ha} ha` : 'N/A'}</TableCell>
+                          <TableCell className="text-xs text-orange-600 font-bold">{event.qtd_deteccoes || 0}</TableCell>
+                          <TableCell className="text-xs">{event.duracao_h ? `${event.duracao_h} h` : 'N/A'}</TableCell>
+                          <TableCell className="font-medium text-[10px] leading-tight py-2" title={event.ucText !== 'N/A' ? event.ucText : ''}>
+                            {event.ucText !== 'N/A' ? <span className="font-bold text-gray-900 capitalize">{event.ucText.toLowerCase()}</span> : 'Não'}
+                          </TableCell>
+                        </TableRow>
+                        {selectedEvent === event.id && (
+                          <TableRow className="bg-primary/5 hover:bg-primary/5">
+                            <TableCell colSpan={5} className="p-0 border-b-2 border-primary/20">
+                              <div className="p-4 sm:p-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 text-xs bg-gradient-to-br from-white to-slate-50 shadow-inner">
+                                <div className="space-y-1"><strong className="text-muted-foreground uppercase text-[10px] tracking-wider flex items-center gap-1"><MapIcon className="w-3 h-3"/> Localização</strong><p className="font-semibold text-sm">{event.municipio} - {event.uf || 'GO'}</p></div>
+                                <div className="space-y-1"><strong className="text-muted-foreground uppercase text-[10px] tracking-wider flex items-center gap-1"><LocateFixed className="w-3 h-3"/> Coordenadas</strong><p className="font-medium font-mono text-xs">{event.lat?.toFixed(5)}, {event.lng?.toFixed(5)}</p></div>
+                                <div className="space-y-1"><strong className="text-muted-foreground uppercase text-[10px] tracking-wider flex items-center gap-1"><Trees className="w-3 h-3"/> Unidade de Conservação</strong><p className="font-semibold">{event.ucText !== 'N/A' ? event.ucText : 'Nenhuma área protegida atingida'}</p></div>
+                                <div className="space-y-1"><strong className="text-muted-foreground uppercase text-[10px] tracking-wider flex items-center gap-1"><Flame className="w-3 h-3 text-orange-500"/> Área Estimada</strong><p className="font-semibold text-sm">{event.tamanho_ha ? `${event.tamanho_ha} hectares` : 'N/A'}</p></div>
+                                <div className="space-y-1"><strong className="text-muted-foreground uppercase text-[10px] tracking-wider">Qtd. Detecções (Pixels)</strong><p className="font-semibold">{event.qtd_deteccoes || 0} registros de satélite</p></div>
+                                <div className="space-y-1"><strong className="text-muted-foreground uppercase text-[10px] tracking-wider flex items-center gap-1"><Timer className="w-3 h-3"/> Duração Total</strong><p className="font-semibold">{event.duracao_h ? `${event.duracao_h} horas` : 'N/A'}</p></div>
+                                <div className="space-y-1"><strong className="text-muted-foreground uppercase text-[10px] tracking-wider">Início (Primeira Detecção)</strong><p className="font-medium text-slate-700">{event.dt_minima ? new Date(event.dt_minima).toLocaleString('pt-BR') : '—'}</p></div>
+                                <div className="space-y-1"><strong className="text-muted-foreground uppercase text-[10px] tracking-wider">Fim (Última Detecção)</strong><p className="font-medium text-slate-700">{event.dt_maxima ? new Date(event.dt_maxima).toLocaleString('pt-BR') : '—'}</p></div>
+                                <div className="space-y-1"><strong className="text-muted-foreground uppercase text-[10px] tracking-wider">Bioma</strong><p className="font-medium">{event.bioma || 'Cerrado'}</p></div>
+                              </div>
+                            </TableCell>
+                          </TableRow>
+                        )}
+                      </React.Fragment>
                     )) : (
                       <TableRow>
                         <TableCell colSpan={4} className="text-center py-10 text-muted-foreground">
