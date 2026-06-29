@@ -26,10 +26,13 @@ RUN apt-get update && apt-get install -y \
     libgbm-dev \
     --no-install-recommends
 
-# Instalar Node.js
-RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
-    && apt-get install -y nodejs \
+# Instalar Node.js nativo do Ubuntu e NPM
+RUN apt-get update && apt-get install -y \
+    ca-certificates \
+    nodejs \
+    npm \
     && rm -rf /var/lib/apt/lists/*
+
 
 WORKDIR /app
 
