@@ -105,7 +105,7 @@ router.post('/sync', async (req, res) => {
             db.run(`DELETE FROM eventos_fogo WHERE data_referencia = ?`, [date]);
 
             const stmt = db.prepare(`
-                INSERT INTO eventos_fogo (id_evento, geojson, municipio, uf, dt_maxima, dt_minima, tamanho_km2, data_referencia)
+                INSERT OR REPLACE INTO eventos_fogo (id_evento, geojson, municipio, uf, dt_maxima, dt_minima, tamanho_km2, data_referencia)
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?)
             `);
 
