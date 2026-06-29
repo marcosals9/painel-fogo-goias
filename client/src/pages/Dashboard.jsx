@@ -766,8 +766,8 @@ export default function Dashboard() {
                       <TableHead className="cursor-pointer hover:bg-muted/50 text-xs" onClick={() => requestSort('duracao_h')}>
                         <div className="flex items-center gap-1 whitespace-nowrap">Duração <ArrowUpDown className="w-3 h-3" /></div>
                       </TableHead>
-                      <TableHead className="cursor-pointer hover:bg-muted text-xs" onClick={() => requestSort('uc')}>
-                        <div className="flex items-center gap-1 whitespace-nowrap">Unid. de Conservação <ArrowUpDown className="w-3 h-3" /></div>
+                      <TableHead className="cursor-pointer hover:bg-muted text-xs" title="Unidade de Conservação" onClick={() => requestSort('uc')}>
+                        <div className="flex items-center gap-1 whitespace-nowrap">UC <ArrowUpDown className="w-3 h-3" /></div>
                       </TableHead>
                     </TableRow>
                   </TableHeader>
