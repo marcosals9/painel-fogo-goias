@@ -33,6 +33,15 @@ const GOIAS_BOUNDS = [
   [-12.3950, -45.9060]
 ];
 
+const toCapitalCase = (str) => {
+  if (!str || str === 'N/A') return str;
+  const lowers = ['de', 'da', 'do', 'das', 'dos', 'e', 'em'];
+  return str.toLowerCase().split(' ').map((word, i) => {
+    if (i > 0 && lowers.includes(word)) return word;
+    return word.charAt(0).toUpperCase() + word.slice(1);
+  }).join(' ');
+};
+
 const getEventColorHex = (ageHours) => {
   if (ageHours === null || ageHours === undefined) return '#737373'; // Default Cinza
   if (ageHours <= 3) return '#8B0000'; // Dark Red
@@ -302,7 +311,7 @@ export default function Dashboard() {
             duracao_h: prop.persistencia_dias ? parseInt(prop.persistencia_dias) * 24 : null,
             qtd_deteccoes: prop.qtd_deteccoes ? parseInt(prop.qtd_deteccoes, 10) : 0,
             uc: !!prop.nome_unidade_conservacao,
-            ucText: prop.nome_unidade_conservacao || 'N/A',
+            ucText: toCapitalCase(prop.nome_unidade_conservacao || 'N/A'),
             lat: prop.lat,
             lng: prop.lng,
             dt_minima: prop.dt_minima,
@@ -365,7 +374,7 @@ export default function Dashboard() {
             for (const feature of ucGeoJSON.features) {
               if (feature.geometry && (feature.geometry.type === 'Polygon' || feature.geometry.type === 'MultiPolygon')) {
                 if (turf.booleanPointInPolygon(pt, feature)) {
-                  ev.ucText = feature.properties.nome || feature.properties.nome_uc || 'Unidade de Conservação';
+                  ev.ucText = toCapitalCase(feature.properties.nome || feature.properties.nome_uc || 'Unidade de Conservação');
                   ev.uc = true;
                   hasChanges = true;
                   break;
@@ -788,7 +797,7 @@ export default function Dashboard() {
                           <TableCell className="text-xs text-orange-600 font-bold">{event.qtd_deteccoes || 0}</TableCell>
                           <TableCell className="text-xs">{event.duracao_h ? `${event.duracao_h} h` : 'N/A'}</TableCell>
                           <TableCell className="font-medium text-[10px] leading-tight py-2" title={event.ucText !== 'N/A' ? event.ucText : ''}>
-                            {event.ucText !== 'N/A' ? <span className="font-bold text-emerald-700 capitalize">{event.ucText.toLowerCase()}</span> : 'Não'}
+                            {event.ucText !== 'N/A' ? <span className="font-bold text-emerald-700">{event.ucText}</span> : 'Não'}
                           </TableCell>
                         </TableRow>
                         {selectedEvent === event.id && (
