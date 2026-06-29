@@ -1,13 +1,17 @@
 import { BrowserRouter as Router, Routes, Route, Navigate, Link, useLocation } from 'react-router-dom';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
+import axios from 'axios';
 import { Lock, User, LogOut, ChevronDown } from 'lucide-react';
 import Dashboard from './pages/Dashboard';
 import Login from './pages/Login';
 import AdminArea from './pages/AdminArea';
+import { useAutoLogout } from './hooks/useAutoLogout';
+import TimeoutModal from './components/TimeoutModal';
 
 function AppContent() {
   const [theme, setTheme] = useState('theme-cerrado-vivo');
   const [menuOpen, setMenuOpen] = useState(false);
+  const [showTimeoutModal, setShowTimeoutModal] = useState(false);
   const isLoggedIn = !!localStorage.getItem('codec_token');
   const location = useLocation();
 
@@ -15,6 +19,35 @@ function AppContent() {
     localStorage.removeItem('codec_token');
     window.location.href = '/login';
   };
+
+  const handleSessionTimeout = useCallback(() => {
+    localStorage.removeItem('codec_token');
+    setShowTimeoutModal(true);
+  }, []);
+
+  const closeTimeoutModal = () => {
+    setShowTimeoutModal(false);
+    window.location.href = '/login';
+  };
+
+  useAutoLogout(isLoggedIn, 30, handleSessionTimeout);
+
+  useEffect(() => {
+    // Interceptor global para capturar erros 401 e 403 (Sessão Expirada) em qualquer requisição
+    const interceptor = axios.interceptors.response.use(
+      (response) => response,
+      (error) => {
+        if (error.response && (error.response.status === 401 || error.response.status === 403)) {
+          handleSessionTimeout();
+        }
+        return Promise.reject(error);
+      }
+    );
+
+    return () => {
+      axios.interceptors.response.eject(interceptor);
+    };
+  }, [handleSessionTimeout]);
 
   useEffect(() => {
     // Determinar a operação baseada no mês atual (0-11)
@@ -96,6 +129,8 @@ function AppContent() {
           <Route path="*" element={<Navigate to="/" />} />
         </Routes>
       </main>
+
+      <TimeoutModal isOpen={showTimeoutModal} onClose={closeTimeoutModal} />
     </div>
   );
 }

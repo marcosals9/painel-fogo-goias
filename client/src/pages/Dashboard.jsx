@@ -754,14 +754,14 @@ export default function Dashboard() {
                         <div className="flex items-center">Município <ArrowUpDown className="w-3 h-3 ml-1" /></div>
                       </TableHead>
                       <TableHead className="cursor-pointer hover:bg-muted/50 text-xs" onClick={() => requestSort('tamanho_ha')}>
-                        Tamanho (ha) {sortConfig.key === 'tamanho_ha' && <ArrowUpDown className="inline w-3 h-3 ml-1" />}
+                        <div className="flex items-center">Tamanho <ArrowUpDown className="w-3 h-3 ml-1" /></div>
                       </TableHead>
                       <TableHead
                         className="cursor-pointer hover:bg-muted/50 text-xs"
                         onClick={() => requestSort('qtd_deteccoes')}
                         title="Quantidade de registros/pixels de calor detectados por satélite neste foco. Valores altos indicam incêndios de maior gravidade, intensidade ou extensão."
                       >
-                        Detecções {sortConfig.key === 'qtd_deteccoes' && <ArrowUpDown className="inline w-3 h-3 ml-1" />}
+                        <div className="flex items-center">Detecções <ArrowUpDown className="w-3 h-3 ml-1" /></div>
                       </TableHead>
                       <TableHead className="cursor-pointer hover:bg-muted/50 text-xs" onClick={() => requestSort('duracao_h')}>
                         <div className="flex items-center">Duração <ArrowUpDown className="w-3 h-3 ml-1" /></div>
@@ -784,7 +784,7 @@ export default function Dashboard() {
                               <span className="whitespace-normal break-words leading-tight">{event.municipio || 'N/A'}</span>
                             </div>
                           </TableCell>
-                          <TableCell className="text-xs font-semibold">{event.tamanho_ha ? event.tamanho_ha.toLocaleString('pt-BR') : 'N/A'}</TableCell>
+                          <TableCell className="text-xs font-semibold">{event.tamanho_ha ? `${event.tamanho_ha.toLocaleString('pt-BR')} ha` : 'N/A'}</TableCell>
                           <TableCell className="text-xs text-orange-600 font-bold">{event.qtd_deteccoes || 0}</TableCell>
                           <TableCell className="text-xs">{event.duracao_h ? `${event.duracao_h} h` : 'N/A'}</TableCell>
                           <TableCell className="font-medium text-[10px] leading-tight py-2" title={event.ucText !== 'N/A' ? event.ucText : ''}>
