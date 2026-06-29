@@ -82,8 +82,8 @@ router.post('/sync', async (req, res) => {
             CQL_FILTER: `BBOX(geom,-53.25,-19.49,-45.90,-12.39) AND dt_maxima >= '${startFilter}' AND dt_minima <= '${endFilter}'`
         });
 
-        // Aumentado para 50000 para não perder eventos (antes era 300 no frontend)
-        params.set('maxFeatures', '50000');
+        // Reduzido para 1500 para evitar travamento de Memória (OOM) na VM e2-micro do Google Cloud
+        params.set('maxFeatures', '1500');
 
         console.log(`Buscando dados do CENSIPAM para ${date}...`);
         const response = await fetch(`${baseUrl}?${params.toString()}`);
