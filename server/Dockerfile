@@ -1,10 +1,34 @@
-FROM node:20-bullseye-slim
+FROM ubuntu:24.04
 
-# Instalar Chromium e dependências necessárias para o Puppeteer rodar no Linux
+# Configurar timezone e noninteractive para não travar o apt-get
+ENV DEBIAN_FRONTEND=noninteractive
+ENV TZ=America/Sao_Paulo
+
+# Instalar dependências essenciais, Node.js 20, e as dependências reais do Puppeteer (X11, GLib, etc)
 RUN apt-get update && apt-get install -y \
-    chromium \
-    fonts-ipafont-gothic fonts-wqy-zenhei fonts-thai-tlwg fonts-kacst fonts-freefont-ttf \
-    --no-install-recommends \
+    curl \
+    build-essential \
+    python3 \
+    libnss3 \
+    libatk-bridge2.0-0 \
+    libx11-xcb1 \
+    libxcomposite1 \
+    libxcursor1 \
+    libxdamage1 \
+    libxi6 \
+    libxtst6 \
+    libcups2 \
+    libxss1 \
+    libxrandr2 \
+    libasound2t64 \
+    libatk1.0-0 \
+    libgtk-3-0 \
+    libgbm-dev \
+    --no-install-recommends
+
+# Instalar Node.js
+RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
+    && apt-get install -y nodejs \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
