@@ -318,7 +318,7 @@ export default function Dashboard() {
             dt_maxima: prop.dt_maxima,
             ageHours: ageHours,
             id: prop.id_evento || Math.random(),
-            geometry: feature.geometry,
+            geometry: f.geometry,
             isGoias: uf === 'GO' || uf === 'N/A' // N/A passará pelo crivo do Turf.js a seguir
           };
         });
