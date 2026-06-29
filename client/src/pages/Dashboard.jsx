@@ -388,19 +388,20 @@ export default function Dashboard() {
             // Sem delay, API gratuita para cliente sem rate limit severo
             const res = await axios.get(`https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${ev.lat}&longitude=${ev.lng}&localityLanguage=pt`);
             
+            const baseUrl = import.meta.env.PROD ? '' : 'http://localhost:3001';
             if (res.data) {
               const city = res.data.city || res.data.locality;
               if (city) {
                 ev.municipio = city;
                 // Salva silenciosamente no banco de dados para não precisar buscar na próxima vez!
-                axios.put(`/api/focos/${ev.id}`, { municipio: city }).catch(console.error);
+                axios.put(`${baseUrl}/api/focos/${ev.id}`, { municipio: city }).catch(console.error);
               } else {
                 ev.municipio = 'Desconhecido';
-                axios.put(`/api/focos/${ev.id}`, { municipio: 'Desconhecido' }).catch(console.error);
+                axios.put(`${baseUrl}/api/focos/${ev.id}`, { municipio: 'Desconhecido' }).catch(console.error);
               }
             } else {
               ev.municipio = 'Desconhecido';
-              axios.put(`/api/focos/${ev.id}`, { municipio: 'Desconhecido' }).catch(console.error);
+              axios.put(`${baseUrl}/api/focos/${ev.id}`, { municipio: 'Desconhecido' }).catch(console.error);
             }
           } catch (e) {
             console.error("Erro na Geocodificação Reversa", e);
