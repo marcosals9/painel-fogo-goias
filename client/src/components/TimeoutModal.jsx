@@ -1,7 +1,7 @@
 import React from 'react';
-import { AlertTriangle, LogIn } from 'lucide-react';
+import { AlertTriangle, LogIn, Map } from 'lucide-react';
 
-export default function TimeoutModal({ isOpen, onClose }) {
+export default function TimeoutModal({ isOpen, onClose, onGoHome }) {
   if (!isOpen) return null;
 
   return (
@@ -17,16 +17,26 @@ export default function TimeoutModal({ isOpen, onClose }) {
           </h2>
           
           <p className="text-slate-600 dark:text-slate-400 mb-8 text-sm sm:text-base leading-relaxed">
-            Sua sessão expirou por inatividade ou devido a políticas de segurança. Para continuar, por favor, faça login novamente.
+            Sua sessão expirou por inatividade ou devido a políticas de segurança.
           </p>
           
-          <button
-            onClick={onClose}
-            className="w-full flex items-center justify-center gap-2 bg-orange-500 hover:bg-orange-600 text-white font-bold py-3 px-6 rounded-lg transition-colors focus:outline-none focus:ring-4 focus:ring-orange-500/30 shadow-md"
-          >
-            <LogIn className="w-5 h-5" />
-            Fazer Login
-          </button>
+          <div className="w-full flex flex-col gap-3">
+            <button
+              onClick={onClose}
+              className="w-full flex items-center justify-center gap-2 bg-orange-500 hover:bg-orange-600 text-white font-bold py-3 px-6 rounded-lg transition-colors focus:outline-none focus:ring-4 focus:ring-orange-500/30 shadow-md"
+            >
+              <LogIn className="w-5 h-5" />
+              Fazer Login
+            </button>
+
+            <button
+              onClick={onGoHome}
+              className="w-full flex items-center justify-center gap-2 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 font-semibold py-3 px-6 rounded-lg transition-colors focus:outline-none focus:ring-4 focus:ring-slate-500/30 border border-slate-200 dark:border-slate-700"
+            >
+              <Map className="w-5 h-5" />
+              Ver Mapa Público
+            </button>
+          </div>
         </div>
       </div>
     </div>

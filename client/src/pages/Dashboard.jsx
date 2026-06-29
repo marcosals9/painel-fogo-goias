@@ -542,10 +542,10 @@ export default function Dashboard() {
               <p className="text-sm text-muted-foreground font-medium truncate" title="Total no Estado">Focos Totais (Estado)</p>
               <div className="flex items-baseline gap-2">
                 <p className="text-3xl font-bold text-foreground">{loading ? '...' : totalStateEvents}</p>
-                <p className="text-[11px] sm:text-xs font-bold text-emerald-700">
-                  ({loading ? '...' : ucStateEvents} em UCs)
-                </p>
               </div>
+              <p className="text-[10px] sm:text-xs font-bold text-emerald-700 mt-1">
+                UCs: {loading ? '...' : ucStateEvents}
+              </p>
             </CardContent>
           </Card>
           <Card className="shadow-sm border-l-4 border-l-orange-500">
@@ -553,10 +553,10 @@ export default function Dashboard() {
               <p className="text-sm text-muted-foreground font-medium truncate" title={locationLabel}>{locationLabel}</p>
               <div className="flex items-baseline gap-2">
                 <p className="text-3xl font-bold text-foreground">{loading ? '...' : totalFocos}</p>
-                <p className="text-[11px] sm:text-xs font-bold text-emerald-700">
-                  ({loading ? '...' : ucFocos} em UCs)
-                </p>
               </div>
+              <p className="text-[10px] sm:text-xs font-bold text-emerald-700 mt-1">
+                UCs: {loading ? '...' : ucFocos}
+              </p>
             </CardContent>
           </Card>
           <Card className="shadow-sm border-l-4 border-l-red-600">
@@ -566,7 +566,7 @@ export default function Dashboard() {
                 <strong className="text-xl sm:text-2xl font-black tabular-nums">{loading ? '...' : areaTotal}</strong>
                 {!loading && <p className="text-xs text-muted-foreground font-medium">({areaTotalKm2} km²)</p>}
               </div>
-              <p className="text-[10px] sm:text-xs text-muted-foreground mt-1">
+              <p className="text-[10px] sm:text-xs font-bold text-emerald-700 mt-1">
                 UCs: {loading ? '...' : `${ucAreaTotal} ha (${ucAreaTotalKm2} km²)`}
               </p>
             </CardContent>

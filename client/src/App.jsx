@@ -30,6 +30,11 @@ function AppContent() {
     window.location.href = '/login';
   };
 
+  const goToOpenArea = () => {
+    setShowTimeoutModal(false);
+    window.location.href = '/';
+  };
+
   useAutoLogout(isLoggedIn, 30, handleSessionTimeout);
 
   useEffect(() => {
@@ -130,7 +135,7 @@ function AppContent() {
         </Routes>
       </main>
 
-      <TimeoutModal isOpen={showTimeoutModal} onClose={closeTimeoutModal} />
+      <TimeoutModal isOpen={showTimeoutModal} onClose={closeTimeoutModal} onGoHome={goToOpenArea} />
     </div>
   );
 }
