@@ -653,7 +653,7 @@ export default function Dashboard() {
                         <p className="font-bold text-base border-b pb-1 mb-1">{event.municipio}</p>
                         <p className="text-[11px] text-muted-foreground m-0 leading-tight"><span className="font-semibold">Lat:</span> {Number(event.lat).toFixed(6)}</p>
                         <p className="text-[11px] text-muted-foreground mb-1 leading-tight"><span className="font-semibold">Lon:</span> {Number(event.lng).toFixed(6)}</p>
-                        <p><span className="font-semibold">Tamanho:</span> {event.tamanho_ha ? `${event.tamanho_ha} ha` : 'N/A'}</p>
+                        <p><span className="font-semibold">Tamanho:</span> {event.tamanho_ha ? `${event.tamanho_ha.toLocaleString('pt-BR')} ha` : 'N/A'}</p>
                         <p><span className="font-semibold">Detecções:</span> {event.qtd_deteccoes}</p>
                         <p><span className="font-semibold">Duração:</span> {event.duracao_h ? `${event.duracao_h} h` : 'N/A'}</p>
                         {event.ucText && event.ucText !== 'N/A' && (
@@ -784,7 +784,7 @@ export default function Dashboard() {
                               <span className="whitespace-normal break-words leading-tight">{event.municipio || 'N/A'}</span>
                             </div>
                           </TableCell>
-                          <TableCell className="text-xs font-semibold">{event.tamanho_ha ? event.tamanho_ha : 'N/A'}</TableCell>
+                          <TableCell className="text-xs font-semibold">{event.tamanho_ha ? event.tamanho_ha.toLocaleString('pt-BR') : 'N/A'}</TableCell>
                           <TableCell className="text-xs text-orange-600 font-bold">{event.qtd_deteccoes || 0}</TableCell>
                           <TableCell className="text-xs">{event.duracao_h ? `${event.duracao_h} h` : 'N/A'}</TableCell>
                           <TableCell className="font-medium text-[10px] leading-tight py-2" title={event.ucText !== 'N/A' ? event.ucText : ''}>
@@ -798,7 +798,7 @@ export default function Dashboard() {
                                 <div className="space-y-1"><strong className="text-muted-foreground uppercase text-[10px] tracking-wider flex items-center gap-1"><MapIcon className="w-3 h-3"/> Localização</strong><p className="font-semibold text-sm">{event.municipio} - {event.uf || 'GO'}</p></div>
                                 <div className="space-y-1"><strong className="text-muted-foreground uppercase text-[10px] tracking-wider flex items-center gap-1"><LocateFixed className="w-3 h-3"/> Coordenadas</strong><p className="font-medium font-mono text-xs">{event.lat?.toFixed(5)}, {event.lng?.toFixed(5)}</p></div>
                                 <div className="space-y-1"><strong className="text-muted-foreground uppercase text-[10px] tracking-wider flex items-center gap-1"><Trees className="w-3 h-3 text-emerald-700"/> Unidade de Conservação</strong><p className={event.ucText !== 'N/A' ? 'font-bold text-emerald-700' : 'font-semibold'}>{event.ucText !== 'N/A' ? event.ucText : 'Nenhuma área protegida atingida'}</p></div>
-                                <div className="space-y-1"><strong className="text-muted-foreground uppercase text-[10px] tracking-wider flex items-center gap-1"><Flame className="w-3 h-3 text-orange-500"/> Área Estimada</strong><p className="font-semibold text-sm">{event.tamanho_ha ? `${event.tamanho_ha} hectares` : 'N/A'}</p></div>
+                                <div className="space-y-1"><strong className="text-muted-foreground uppercase text-[10px] tracking-wider flex items-center gap-1"><Flame className="w-3 h-3 text-orange-500"/> Área Estimada</strong><p className="font-semibold text-sm">{event.tamanho_ha ? `${event.tamanho_ha.toLocaleString('pt-BR')} hectares` : 'N/A'}</p></div>
                                 <div className="space-y-1"><strong className="text-muted-foreground uppercase text-[10px] tracking-wider">Qtd. Detecções (Pixels)</strong><p className="font-semibold">{event.qtd_deteccoes || 0} registros de satélite</p></div>
                                 <div className="space-y-1"><strong className="text-muted-foreground uppercase text-[10px] tracking-wider flex items-center gap-1"><Timer className="w-3 h-3"/> Duração Total</strong><p className="font-semibold">{event.duracao_h ? `${event.duracao_h} horas` : 'N/A'}</p></div>
                                 <div className="space-y-1"><strong className="text-muted-foreground uppercase text-[10px] tracking-wider">Início (Primeira Detecção)</strong><p className="font-medium text-slate-700">{event.dt_minima ? new Date(event.dt_minima).toLocaleString('pt-BR') : '—'}</p></div>
