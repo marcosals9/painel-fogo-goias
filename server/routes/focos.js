@@ -79,7 +79,8 @@ router.post('/sync', async (req, res) => {
             typeName: 'painel_do_fogo:mv_evento_filtro',
             outputFormat: 'application/json',
             // maxFeatures: 50000,
-            CQL_FILTER: `BBOX(geom,-53.25,-19.49,-45.90,-12.39) AND dt_maxima >= '${startFilter}' AND dt_minima <= '${endFilter}'`
+            CQL_FILTER: `BBOX(geom,-53.25,-19.49,-45.90,-12.39) AND dt_maxima >= '${startFilter}' AND dt_minima <= '${endFilter}'`,
+            propertyName: 'id_evento,nome_municipio,sigla_uf,dt_maxima,dt_minima,area_total_evento,qtd_deteccoes,persistencia_dias,nome_unidade_conservacao,geom'
         });
 
         // Reduzido para 1500 para evitar travamento de Memória (OOM) na VM e2-micro do Google Cloud
