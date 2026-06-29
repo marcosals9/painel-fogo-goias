@@ -318,6 +318,7 @@ export default function Dashboard() {
             dt_maxima: prop.dt_maxima,
             ageHours: ageHours,
             id: prop.id_evento || Math.random(),
+            geometry: feature.geometry,
             isGoias: uf === 'GO' || uf === 'N/A' // N/A passará pelo crivo do Turf.js a seguir
           };
         });
@@ -650,21 +651,28 @@ export default function Dashboard() {
                     }}
                   />
                 )}
-                <WMSTileLayer
-                  url="https://panorama.sipam.gov.br/geoserver/painel_do_fogo/wms"
-                  layers="painel_do_fogo:focos_ativos"
-                  format="image/png"
-                  transparent={true}
-                  zIndex={10}
-                />
-                <WMSTileLayer
-                  url="https://panorama.sipam.gov.br/geoserver/painel_do_fogo/wms"
-                  layers="painel_do_fogo:mv_frente_deteccao"
-                  format="image/png"
-                  transparent={true}
-                  opacity={0.8}
-                  cql_filter={wmsCqlFilterFrente}
-                />
+                {sortedEvents.length > 0 && (
+                  <GeoJSON
+                    key={`fire-polygons-${sortedEvents.length}-${sortedEvents[0].id}`}
+                    data={{
+                      type: "FeatureCollection",
+                      features: sortedEvents.map(ev => ({
+                        type: "Feature",
+                        geometry: ev.geometry,
+                        properties: ev
+                      })).filter(f => f.geometry)
+                    }}
+                    style={(feature) => {
+                      const color = getEventColorHex(feature.properties.ageHours);
+                      return {
+                        color: color,
+                        weight: 2,
+                        fillColor: color,
+                        fillOpacity: 0.5
+                      };
+                    }}
+                  />
+                )}
 
                 {sortedEvents.map(event => (
                   <Marker
