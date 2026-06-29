@@ -205,15 +205,15 @@ export default function DataExplorer({ isOpen, onClose, fireEvents, date }) {
           <table className="w-full border-collapse text-sm">
             <thead className="sticky top-0 bg-muted z-10 shadow-sm">
               <tr>
-                <th className={thCls} onClick={() => toggleSort('municipio')}>Município <SortIcon col="municipio"/></th>
-                <th className={thCls} onClick={() => toggleSort('uf')}>UF <SortIcon col="uf"/></th>
-                <th className={thCls + " text-center"}>Goiás?</th>
-                <th className={thCls} onClick={() => toggleSort('tamanho_ha')}>Área (ha) <SortIcon col="tamanho_ha"/></th>
-                <th className={thCls} onClick={() => toggleSort('qtd_deteccoes')}>Detecções <SortIcon col="qtd_deteccoes"/></th>
-                <th className={thCls} onClick={() => toggleSort('duracao_h')}>Duração (h) <SortIcon col="duracao_h"/></th>
-                <th className={thCls}>UC</th>
-                <th className={thCls} onClick={() => toggleSort('dt_maxima')}>Período do Evento <SortIcon col="dt_maxima"/></th>
-                <th className={thCls}>Lat / Lng</th>
+                <th className={thCls} onClick={() => toggleSort('municipio')}><div className="flex items-center gap-1 whitespace-nowrap">Município <SortIcon col="municipio"/></div></th>
+                <th className={thCls} onClick={() => toggleSort('uf')}><div className="flex items-center gap-1 whitespace-nowrap">UF <SortIcon col="uf"/></div></th>
+                <th className={thCls + " text-center"}><div className="whitespace-nowrap">Goiás?</div></th>
+                <th className={thCls} onClick={() => toggleSort('tamanho_ha')}><div className="flex items-center gap-1 whitespace-nowrap">Área (ha) <SortIcon col="tamanho_ha"/></div></th>
+                <th className={thCls} onClick={() => toggleSort('qtd_deteccoes')}><div className="flex items-center gap-1 whitespace-nowrap">Detecções <SortIcon col="qtd_deteccoes"/></div></th>
+                <th className={thCls} onClick={() => toggleSort('duracao_h')}><div className="flex items-center gap-1 whitespace-nowrap">Duração (h) <SortIcon col="duracao_h"/></div></th>
+                <th className={thCls}><div className="whitespace-nowrap">UC</div></th>
+                <th className={thCls} onClick={() => toggleSort('dt_maxima')}><div className="flex items-center gap-1 whitespace-nowrap">Período do Evento <SortIcon col="dt_maxima"/></div></th>
+                <th className={thCls}><div className="whitespace-nowrap">Lat / Lng</div></th>
               </tr>
             </thead>
             <tbody>

@@ -751,23 +751,23 @@ export default function Dashboard() {
                   <TableHeader className="bg-card sticky top-0 z-10 shadow-sm">
                     <TableRow>
                       <TableHead className="cursor-pointer hover:bg-muted text-xs" onClick={() => requestSort('municipio')}>
-                        <div className="flex items-center">Município <ArrowUpDown className="w-3 h-3 ml-1" /></div>
+                        <div className="flex items-center gap-1 whitespace-nowrap">Município <ArrowUpDown className="w-3 h-3" /></div>
                       </TableHead>
                       <TableHead className="cursor-pointer hover:bg-muted/50 text-xs" onClick={() => requestSort('tamanho_ha')}>
-                        <div className="flex items-center">Tamanho <ArrowUpDown className="w-3 h-3 ml-1" /></div>
+                        <div className="flex items-center gap-1 whitespace-nowrap">Tamanho (ha) {sortConfig.key === 'tamanho_ha' && <ArrowUpDown className="w-3 h-3" />}</div>
                       </TableHead>
                       <TableHead
                         className="cursor-pointer hover:bg-muted/50 text-xs"
                         onClick={() => requestSort('qtd_deteccoes')}
                         title="Quantidade de registros/pixels de calor detectados por satélite neste foco. Valores altos indicam incêndios de maior gravidade, intensidade ou extensão."
                       >
-                        <div className="flex items-center">Detecções <ArrowUpDown className="w-3 h-3 ml-1" /></div>
+                        <div className="flex items-center gap-1 whitespace-nowrap">Detecções {sortConfig.key === 'qtd_deteccoes' && <ArrowUpDown className="w-3 h-3" />}</div>
                       </TableHead>
                       <TableHead className="cursor-pointer hover:bg-muted/50 text-xs" onClick={() => requestSort('duracao_h')}>
-                        <div className="flex items-center">Duração <ArrowUpDown className="w-3 h-3 ml-1" /></div>
+                        <div className="flex items-center gap-1 whitespace-nowrap">Duração <ArrowUpDown className="w-3 h-3" /></div>
                       </TableHead>
                       <TableHead className="cursor-pointer hover:bg-muted text-xs" onClick={() => requestSort('uc')}>
-                        <div className="flex items-center">Unid. de Conservação <ArrowUpDown className="w-3 h-3 ml-1" /></div>
+                        <div className="flex items-center gap-1 whitespace-nowrap">Unid. de Conservação <ArrowUpDown className="w-3 h-3" /></div>
                       </TableHead>
                     </TableRow>
                   </TableHeader>
@@ -784,7 +784,7 @@ export default function Dashboard() {
                               <span className="whitespace-normal break-words leading-tight">{event.municipio || 'N/A'}</span>
                             </div>
                           </TableCell>
-                          <TableCell className="text-xs font-semibold">{event.tamanho_ha ? `${event.tamanho_ha.toLocaleString('pt-BR')} ha` : 'N/A'}</TableCell>
+                          <TableCell className="text-xs font-semibold">{event.tamanho_ha ? event.tamanho_ha.toLocaleString('pt-BR') : 'N/A'}</TableCell>
                           <TableCell className="text-xs text-orange-600 font-bold">{event.qtd_deteccoes || 0}</TableCell>
                           <TableCell className="text-xs">{event.duracao_h ? `${event.duracao_h} h` : 'N/A'}</TableCell>
                           <TableCell className="font-medium text-[10px] leading-tight py-2" title={event.ucText !== 'N/A' ? event.ucText : ''}>
