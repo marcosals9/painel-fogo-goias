@@ -20,21 +20,21 @@ export default function TimeoutModal({ isOpen, onClose, onGoHome }) {
             Sua sessão expirou por inatividade ou devido a políticas de segurança.
           </p>
           
-          <div className="w-full flex flex-col gap-3">
+          <div className="w-full flex flex-row gap-3">
             <button
-              onClick={onClose}
-              className="w-full flex items-center justify-center gap-2 bg-orange-500 hover:bg-orange-600 text-white font-bold py-3 px-6 rounded-lg transition-colors focus:outline-none focus:ring-4 focus:ring-orange-500/30 shadow-md"
+              onClick={onGoHome}
+              className="flex-1 flex items-center justify-center gap-2 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 font-medium py-2.5 px-3 text-sm rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-slate-500/30 border border-slate-200 dark:border-slate-700 shadow-sm"
             >
-              <LogIn className="w-5 h-5" />
-              Fazer Login
+              <Map className="w-4 h-4" />
+              Mapa Público
             </button>
 
             <button
-              onClick={onGoHome}
-              className="w-full flex items-center justify-center gap-2 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 font-semibold py-3 px-6 rounded-lg transition-colors focus:outline-none focus:ring-4 focus:ring-slate-500/30 border border-slate-200 dark:border-slate-700"
+              onClick={onClose}
+              className="flex-1 flex items-center justify-center gap-2 bg-orange-500 hover:bg-orange-600 text-white font-medium py-2.5 px-3 text-sm rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-orange-500/30 shadow-sm"
             >
-              <Map className="w-5 h-5" />
-              Ver Mapa Público
+              <LogIn className="w-4 h-4" />
+              Fazer Login
             </button>
           </div>
         </div>
