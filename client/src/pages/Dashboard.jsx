@@ -109,8 +109,8 @@ function MapController({ selectedEvent, sortedEvents, goiasCenter, showUCs, setS
       <Button variant="outline" size="icon" onClick={handleReset} title="Centralizar Mapa em Goiás" className="h-9 w-9 bg-background/95 backdrop-blur-sm shadow-md border-muted-foreground/20 hover:bg-accent flex items-center justify-center p-0">
         <LocateFixed className="w-4 h-4 text-foreground" />
       </Button>
-      <Button variant={showUCs ? "default" : "outline"} size="icon" onClick={() => setShowUCs(!showUCs)} title={showUCs ? "Ocultar Unidades de Conservação" : "Mostrar Unidades de Conservação"} className={`h-9 w-9 flex items-center justify-center p-0 shadow-md border ${!showUCs ? 'bg-background/95 backdrop-blur-sm border-muted-foreground/20 hover:bg-accent' : ''}`}>
-        {loadingUCs ? <Loader2 className="w-4 h-4 animate-spin text-muted-foreground" /> : <Trees className={`w-4 h-4 ${showUCs ? 'text-white' : 'text-foreground'}`} />}
+      <Button variant="outline" size="icon" onClick={() => setShowUCs(!showUCs)} title={showUCs ? "Ocultar Unidades de Conservação" : "Mostrar Unidades de Conservação"} className={`h-9 w-9 flex items-center justify-center p-0 shadow-md border ${showUCs ? 'bg-primary border-primary hover:bg-primary/90' : 'bg-background/95 backdrop-blur-sm border-muted-foreground/20 hover:bg-accent'}`}>
+        {loadingUCs ? <Loader2 className={`w-4 h-4 animate-spin ${showUCs ? 'text-white' : 'text-muted-foreground'}`} /> : <Trees className={`w-4 h-4 ${showUCs ? 'text-white' : 'text-foreground'}`} />}
       </Button>
       <div title="Dica: Segure SHIFT e arraste o mouse no mapa para dar zoom em uma área específica" className="bg-background/95 backdrop-blur-sm text-foreground border border-muted-foreground/20 rounded-md shadow-md cursor-help flex items-center justify-center h-9 w-9">
         <MousePointerSquareDashed className="w-4 h-4" />
