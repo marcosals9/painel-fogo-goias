@@ -459,7 +459,7 @@ export default function Dashboard() {
     XLSX.writeFile(wb, `focos_calor_goias_${date}.xlsx`);
   };
 
-  const wmsCqlFilter = useMemo(() => {
+  const wmsCqlFilterFrente = useMemo(() => {
     let startFilter, endFilter;
     if (timezone === 'UTC') {
       startFilter = `${date}T00:00:00Z`;
@@ -470,7 +470,7 @@ export default function Dashboard() {
       d.setUTCDate(d.getUTCDate() + 1);
       endFilter = `${d.toISOString().split('T')[0]}T02:59:59Z`;
     }
-    return `BBOX(geom,-53.25,-19.49,-45.90,-12.39) AND dt_maxima >= '${startFilter}' AND dt_minima <= '${endFilter}'`;
+    return `BBOX(geom,-53.25,-19.49,-45.90,-12.39) AND dt_deteccao >= '${startFilter}' AND dt_deteccao <= '${endFilter}'`;
   }, [date, timezone]);
 
   return (
@@ -656,7 +656,6 @@ export default function Dashboard() {
                   format="image/png"
                   transparent={true}
                   zIndex={10}
-                  cql_filter={wmsCqlFilter}
                 />
                 <WMSTileLayer
                   url="https://panorama.sipam.gov.br/geoserver/painel_do_fogo/wms"
@@ -664,7 +663,7 @@ export default function Dashboard() {
                   format="image/png"
                   transparent={true}
                   opacity={0.8}
-                  cql_filter={wmsCqlFilter}
+                  cql_filter={wmsCqlFilterFrente}
                 />
 
                 {sortedEvents.map(event => (
