@@ -257,7 +257,8 @@ export default function Dashboard() {
   const fetchFireData = async (selectedDate, tz, skipSync = false, isSilent = false) => {
     if (!isSilent) setLoading(true);
     try {
-      const baseUrl = import.meta.env.PROD ? '' : 'http://localhost:3001';
+      // VITE_API_URL deve apontar para o IP do Google Cloud (ex: http://34.120.x.x:3001)
+      const baseUrl = import.meta.env.VITE_API_URL || (import.meta.env.PROD ? '' : 'http://localhost:3001');
       
       // 1. Sincroniza com o CENSIPAM através do nosso backend (faz o POST para /api/focos/sync)
       // Pode falhar caso o censipam esteja fora, mas não vai travar a leitura do banco
@@ -401,7 +402,7 @@ export default function Dashboard() {
             // Sem delay, API gratuita para cliente sem rate limit severo
             const res = await axios.get(`https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${ev.lat}&longitude=${ev.lng}&localityLanguage=pt`);
             
-            const baseUrl = import.meta.env.PROD ? '' : 'http://localhost:3001';
+            const baseUrl = import.meta.env.VITE_API_URL || (import.meta.env.PROD ? '' : 'http://localhost:3001');
             if (res.data) {
               const city = res.data.city || res.data.locality;
               let ufCode = 'N/A';
