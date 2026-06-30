@@ -11,6 +11,7 @@ import { Input } from '@/components/ui/input';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { format, subDays, startOfDay, endOfDay } from 'date-fns';
 import { Download, Flame, Map as MapIcon, Loader2, ArrowUpDown, RefreshCw, MousePointerSquareDashed, LocateFixed, Timer, Trees, Smartphone, Database, TableProperties } from 'lucide-react';
+import { supabase } from '../lib/supabase';
 import InformativoMaker from '../components/InformativoMaker';
 import DataExplorer from '../components/DataExplorer';
 
@@ -253,17 +254,19 @@ export default function Dashboard() {
   // Coordenadas centrais de Goiás
   const goiasCenter = [-15.8270, -49.8362];
 
-  const fetchFireData = async (selectedDate, tz) => {
-    setLoading(true);
+  const fetchFireData = async (selectedDate, tz, skipSync = false, isSilent = false) => {
+    if (!isSilent) setLoading(true);
     try {
       const baseUrl = import.meta.env.PROD ? '' : 'http://localhost:3001';
       
       // 1. Sincroniza com o CENSIPAM através do nosso backend (faz o POST para /api/focos/sync)
       // Pode falhar caso o censipam esteja fora, mas não vai travar a leitura do banco
-      try {
-          await axios.post(`${baseUrl}/api/focos/sync`, { date: selectedDate, tz });
-      } catch (e) {
-          console.warn("Sincronização com CENSIPAM falhou, usando cache local:", e);
+      if (!skipSync) {
+        try {
+            await axios.post(`${baseUrl}/api/focos/sync`, { date: selectedDate, tz });
+        } catch (e) {
+            console.warn("Sincronização com CENSIPAM falhou, usando cache local:", e);
+        }
       }
 
       // 2. Lê os dados do nosso backend
@@ -319,6 +322,7 @@ export default function Dashboard() {
             ageHours: ageHours,
             id: prop.id_evento || Math.random(),
             geometry: f.geometry,
+            atualizado_em: prop.atualizado_em,
             isGoias: uf === 'GO' || uf === 'N/A' // N/A passará pelo crivo do Turf.js a seguir
           };
         });
@@ -389,10 +393,9 @@ export default function Dashboard() {
       // 3. Geocodificação Reversa Super Rápida (BigDataCloud) para Municípios N/A
       for (let i = 0; i < newEvents.length; i++) {
         const ev = newEvents[i];
-        if (ev.isGoias && (ev.municipio === 'N/A' || ev.municipio === 'Não Mapeado' || !ev.municipio)) {
+        if (ev.municipio === 'N/A' || ev.municipio === 'Não Mapeado' || !ev.municipio || ev.uf === 'N/A') {
           try {
             ev.municipio = 'Buscando...';
-            setFireEvents([...newEvents]);
             hasChanges = true;
 
             // Sem delay, API gratuita para cliente sem rate limit severo
@@ -401,10 +404,17 @@ export default function Dashboard() {
             const baseUrl = import.meta.env.PROD ? '' : 'http://localhost:3001';
             if (res.data) {
               const city = res.data.city || res.data.locality;
+              let ufCode = 'N/A';
+              if (res.data.principalSubdivisionCode) {
+                 const parts = res.data.principalSubdivisionCode.split('-');
+                 ufCode = parts[parts.length - 1]; // ex: "BR-MT" -> "MT"
+              }
+              
               if (city) {
                 ev.municipio = city;
+                ev.uf = ufCode;
                 // Salva silenciosamente no banco de dados para não precisar buscar na próxima vez!
-                axios.put(`${baseUrl}/api/focos/${ev.id}`, { municipio: city }).catch(console.error);
+                axios.put(`${baseUrl}/api/focos/${ev.id}`, { municipio: city, uf: ufCode }).catch(console.error);
               } else {
                 ev.municipio = 'Desconhecido';
                 axios.put(`${baseUrl}/api/focos/${ev.id}`, { municipio: 'Desconhecido' }).catch(console.error);
@@ -430,16 +440,38 @@ export default function Dashboard() {
   }, [fireEvents, ucGeoJSON, goiasGeoJSON]);
 
   useEffect(() => {
-    fetchFireData(date, timezone);
-  }, [date, timezone]);
-
-  useEffect(() => {
+    fetchFireData(date, timezone, true); // skipSync = true no carregamento inicial para não recriar o banco e disparar realtime
+    
+    // Auto-refresh via Polling
+    let intervalId;
     if (refreshInterval > 0) {
-      const intervalId = setInterval(() => {
+      intervalId = setInterval(() => {
         fetchFireData(date, timezone);
       }, refreshInterval * 60 * 1000);
-      return () => clearInterval(intervalId);
     }
+
+    // Auto-refresh via Supabase Realtime (WebSockets)
+    let realtimeTimeout;
+    const channel = supabase
+      .channel('focos-realtime')
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'eventos_fogo' },
+        (payload) => {
+          console.log('[Realtime] Mudança detectada, aguardando para recarregar tabela silenciosamente...', payload);
+          clearTimeout(realtimeTimeout);
+          realtimeTimeout = setTimeout(() => {
+            fetchFireData(date, timezone, true, true); // skipSync = true, isSilent = true
+          }, 1500);
+        }
+      )
+      .subscribe();
+
+    return () => {
+      if (intervalId) clearInterval(intervalId);
+      if (realtimeTimeout) clearTimeout(realtimeTimeout);
+      supabase.removeChannel(channel);
+    };
   }, [refreshInterval, date, timezone]);
 
   const exportToExcel = () => {
@@ -651,12 +683,12 @@ export default function Dashboard() {
                     }}
                   />
                 )}
-                {sortedEvents.length > 0 && (
+                {fireEvents.length > 0 && (
                   <GeoJSON
-                    key={`fire-polygons-${sortedEvents.length}-${sortedEvents[0].id}`}
+                    key={`fire-polygons-${fireEvents.length}-${fireEvents[0].id}`}
                     data={{
                       type: "FeatureCollection",
-                      features: sortedEvents.map(ev => ({
+                      features: fireEvents.map(ev => ({
                         type: "Feature",
                         geometry: ev.geometry,
                         properties: ev
@@ -674,7 +706,7 @@ export default function Dashboard() {
                   />
                 )}
 
-                {sortedEvents.map(event => (
+                {fireEvents.map(event => (
                   <Marker
                     key={event.id}
                     position={[event.lat, event.lng]}
@@ -690,6 +722,11 @@ export default function Dashboard() {
                         <p><span className="font-semibold">Duração:</span> {event.duracao_h ? `${event.duracao_h} h` : 'N/A'}</p>
                         {event.ucText && event.ucText !== 'N/A' && (
                           <p className="pt-1 mt-1 border-t border-muted/30 text-amber-600"><span className="font-bold">UC:</span> {event.ucText}</p>
+                        )}
+                        {event.atualizado_em && (
+                          <p className="pt-1 mt-1 border-t border-muted/30 text-[11px] text-muted-foreground text-right italic">
+                            Atualizado em: {format(new Date(event.atualizado_em), "dd/MM 'às' HH:mm")}
+                          </p>
                         )}
                       </div>
                     </Popup>
@@ -708,7 +745,7 @@ export default function Dashboard() {
                   />
                 )}
 
-                <MapController selectedEvent={selectedEvent} sortedEvents={sortedEvents} goiasCenter={goiasCenter} showUCs={showUCs} setShowUCs={setShowUCs} loadingUCs={loadingUCs} />
+                <MapController selectedEvent={selectedEvent} sortedEvents={fireEvents} goiasCenter={goiasCenter} showUCs={showUCs} setShowUCs={setShowUCs} loadingUCs={loadingUCs} />
 
                 {/* Legenda de Detecção de Fogo */}
                 <div className="absolute bottom-4 right-4 z-[400] flex flex-col items-end">
@@ -858,7 +895,7 @@ export default function Dashboard() {
         {/* Footer */}
         <footer className="mt-8 pt-4 pb-2 border-t border-muted-foreground/20 text-center">
           <p className="text-xs text-muted-foreground font-medium">
-            &copy; {new Date().getFullYear()} Painel Fogo Goiás. Todos os direitos reservados. | Versão 1.0.0
+            &copy; {new Date().getFullYear()} Painel Fogo Goiás. Todos os direitos reservados. | Versão 1.1.1
           </p>
         </footer>
 

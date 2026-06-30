@@ -14,24 +14,34 @@ app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ limit: '10mb', extended: true }));
 
 // Rota de Login (Área Restrita)
-app.post('/api/auth/login', (req, res) => {
+app.post('/api/auth/login', async (req, res) => {
     const { username, password } = req.body;
 
     if (!username || !password) {
         return res.status(400).json({ error: 'Usuário e senha são obrigatórios.' });
     }
 
-    db.get('SELECT * FROM users WHERE username = ? AND password = ?', [username, password], (err, user) => {
-        if (err) {
-            return res.status(500).json({ error: 'Erro no servidor' });
-        }
-        if (!user) {
-            return res.status(401).json({ error: 'Credenciais inválidas' });
+    try {
+        const { data: user, error } = await db
+            .from('users')
+            .select('*')
+            .eq('username', username)
+            .eq('password', password)
+            .single();
+
+        if (error) {
+            if (error.code === 'PGRST116') {
+                return res.status(401).json({ error: 'Credenciais inválidas' });
+            }
+            throw error;
         }
 
         const token = jwt.sign({ id: user.id, username: user.username }, JWT_SECRET, { expiresIn: '1h' });
         res.json({ token, message: 'Login realizado com sucesso' });
-    });
+    } catch (err) {
+        console.error('Erro no login:', err);
+        res.status(500).json({ error: 'Erro no servidor' });
+    }
 });
 
 // Middleware para verificar token
@@ -59,9 +69,12 @@ app.use('/api/focos', focosRoutes);
 app.get('/api/admin/dashboard', authenticateToken, (req, res) => {
     res.json({ message: 'Bem-vindo à Área Restrita do CODEC', user: req.user });
 });
+const { initCronJobs } = require('./services/cronJobs');
 
 app.listen(PORT, () => {
     console.log(`Servidor rodando na porta ${PORT}`);
     // Inicializar o cliente do WhatsApp
     whatsappClient.initializeWhatsApp();
+    // Inicializar agendador CRON
+    initCronJobs();
 });

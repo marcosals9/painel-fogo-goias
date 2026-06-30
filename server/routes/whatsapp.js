@@ -49,19 +49,22 @@ router.post('/send', async (req, res) => {
 
         const destinatariosStr = destinatarios.join(', ');
 
-        // Salvar no banco de dados (tabela informativos)
-        const query = `
-            INSERT INTO informativos (titulo, texto_boletim, imagem_base64, destinatario, status_envio)
-            VALUES (?, ?, ?, ?, ?)
-        `;
-        
-        db.run(query, [titulo || 'Boletim', texto, imagemBase64 || null, destinatariosStr, 'ENVIADO'], function(err) {
-            if (err) {
-                console.error('Erro ao salvar informativo no banco:', err);
-                return res.status(200).json({ success: true, message: 'Mensagem enviada, mas houve erro ao salvar no banco de dados.' });
-            }
-            res.json({ success: true, message: 'Mensagens enviadas e salvas com sucesso!', id: this.lastID });
-        });
+        const { data, error } = await db
+            .from('informativos')
+            .insert([{
+                titulo: titulo || 'Boletim',
+                texto_boletim: texto,
+                imagem_base64: imagemBase64 || null,
+                destinatario: destinatariosStr,
+                status_envio: 'ENVIADO'
+            }])
+            .select();
+
+        if (error) {
+            console.error('Erro ao salvar informativo no banco:', error);
+            return res.status(200).json({ success: true, message: 'Mensagem enviada, mas houve erro ao salvar no banco de dados.' });
+        }
+        res.json({ success: true, message: 'Mensagens enviadas e salvas com sucesso!', id: data[0].id });
 
     } catch (error) {
         res.status(500).json({ error: 'Erro ao enviar mensagem via WhatsApp', details: error.message });
