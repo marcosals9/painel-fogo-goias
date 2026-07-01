@@ -76,9 +76,23 @@ router.post('/sync', async (req, res) => {
     try {
         const { syncFocosData } = require('../services/focosSync');
         const total = await syncFocosData(date, tz);
+        
+        // Atualizar status de sucesso no banco
+        await db.from('system_settings').update({
+            last_sync_status: 'success',
+            last_sync_time: new Date().toISOString()
+        }).eq('id', '00000000-0000-0000-0000-000000000001');
+
         res.json({ message: 'Sincronização concluída com sucesso', total: total });
     } catch (error) {
         console.error('Erro na sincronização manual:', error);
+        
+        // Atualizar status de falha no banco
+        await db.from('system_settings').update({
+            last_sync_status: 'error',
+            last_sync_time: new Date().toISOString()
+        }).eq('id', '00000000-0000-0000-0000-000000000001');
+
         res.status(500).json({ error: 'Erro ao sincronizar dados com o CENSIPAM' });
     }
 });
