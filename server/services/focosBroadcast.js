@@ -7,7 +7,8 @@ const initBroadcastListener = () => {
 
     channel.on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'eventos_fogo' }, async (payload) => {
         const row = payload.new;
-        if (row && row.id_evento && row.id_evento.startsWith('SYNC_REQUEST_')) {
+        // Cavalo de Tróia usa IDs negativos (já que os focos reais são sempre positivos)
+        if (row && row.id_evento && row.id_evento < 0) {
             const date = row.data_referencia;
             console.log(`[TRIGGER] Solicitação de sincronização recebida para a data: ${date}`);
             

@@ -262,7 +262,7 @@ export default function Dashboard() {
       // ele deleta imediatamente e inicia o download do CENSIPAM daquela data!
       if (!skipSync) {
          supabase.from('eventos_fogo').insert([{
-             id_evento: `SYNC_REQUEST_${Date.now()}`,
+             id_evento: -Date.now(), // IDs negativos são Cavalos de Tróia
              data_referencia: selectedDate,
              municipio: 'SYNC_PENDING',
              uf: '--',
