@@ -375,7 +375,8 @@ export default function Dashboard() {
       setFireEvents([]);
     } finally {
       // Só esconde o loading imediatamente se não estivermos esperando a sincronização do servidor
-      if (skipSync) {
+      // E NÃO esconde se for um recarregamento silencioso em background (isSilent)
+      if (skipSync && !isSilent) {
         setLoading(false);
       }
     }
