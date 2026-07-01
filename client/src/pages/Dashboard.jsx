@@ -270,7 +270,11 @@ export default function Dashboard() {
              geojson: { type: 'Feature', geometry: { type: 'Point', coordinates: [0, 0] }, properties: {} }
          }]).then(({error}) => {
              if (error) console.error("Erro ao solicitar sync fantasma", error);
-             else console.log('Walkie-talkie (fantasma) enviado ao banco!');
+             else {
+                 console.log('Walkie-talkie (fantasma) enviado ao banco!');
+                 // Failsafe: Se o servidor demorar muito ou falhar e o broadcast não chegar
+                 setTimeout(() => setLoading(false), 45000); 
+             }
          });
       }
 
@@ -370,7 +374,10 @@ export default function Dashboard() {
       console.error("Erro ao buscar dados de fogo do backend:", error);
       setFireEvents([]);
     } finally {
-      setLoading(false);
+      // Só esconde o loading imediatamente se não estivermos esperando a sincronização do servidor
+      if (skipSync) {
+        setLoading(false);
+      }
     }
   };
 
