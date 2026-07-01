@@ -257,8 +257,22 @@ export default function Dashboard() {
   const fetchFireData = async (selectedDate, tz, skipSync = false, isSilent = false) => {
     if (!isSilent) setLoading(true);
     try {
-      // 1. Lemos os dados diretamente do Supabase para evitar bloqueios de proxy/Cloudflare!
-      // (O backend na máquina virtual continuará rodando o CRON de 5 em 5 minutos quietinho e atualizando o banco)
+      // 1. Walkie-Talkie: Se solicitado, manda uma mensagem via Supabase Broadcast para a máquina virtual baixar novos dados
+      if (!skipSync) {
+         const channel = supabase.channel('fogo-sync');
+         channel.subscribe((status) => {
+             if (status === 'SUBSCRIBED') {
+                 channel.send({
+                     type: 'broadcast',
+                     event: 'sync_request',
+                     payload: { date: selectedDate, tz: tz },
+                 }).then(() => supabase.removeChannel(channel));
+             }
+         });
+      }
+
+      // 2. Lemos os dados diretamente do Supabase para evitar bloqueios de proxy/Cloudflare!
+      // (A máquina virtual atualizará o banco assim que processar o Broadcast ou o CRON)
       const { data, error } = await supabase
         .from('eventos_fogo')
         .select('*')

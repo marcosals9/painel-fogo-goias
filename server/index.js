@@ -70,6 +70,7 @@ app.get('/api/admin/dashboard', authenticateToken, (req, res) => {
     res.json({ message: 'Bem-vindo à Área Restrita do CODEC', user: req.user });
 });
 const { initCronJobs } = require('./services/cronJobs');
+const { initBroadcastListener } = require('./services/focosBroadcast');
 
 app.listen(PORT, () => {
     console.log(`Servidor rodando na porta ${PORT}`);
@@ -77,4 +78,6 @@ app.listen(PORT, () => {
     whatsappClient.initializeWhatsApp();
     // Inicializar agendador CRON
     initCronJobs();
+    // Inicializar ouvinte de Broadcast do Supabase (Sincronização Manual sob demanda)
+    initBroadcastListener();
 });
