@@ -268,14 +268,14 @@ export default function Dashboard() {
       
       if (data && data.length > 0) {
         const features = data.map(row => {
-          let geojson = row.geojson;
-          if (typeof geojson === 'string') {
-              try { geojson = JSON.parse(geojson); } catch(e) {}
+          let feature = row.geojson;
+          if (typeof feature === 'string') {
+              try { feature = JSON.parse(feature); } catch(e) {}
           }
           return {
             type: "Feature",
-            geometry: geojson,
-            properties: row
+            geometry: feature.geometry,
+            properties: { ...feature.properties, ...row }
           };
         }).filter(f => f.geometry);
 
