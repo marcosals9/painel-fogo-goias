@@ -257,25 +257,20 @@ export default function Dashboard() {
   const fetchFireData = async (selectedDate, tz, skipSync = false, isSilent = false) => {
     if (!isSilent) setLoading(true);
     try {
-      // 1. Walkie-Talkie: Se solicitado, manda uma mensagem via Supabase Broadcast para a máquina virtual baixar novos dados
+      // 1. "Cavalo de Tróia": Se solicitado, insere um registro fantasma no banco
+      // O backend na máquina virtual escuta todos os INSERTs. Quando ele vir esse fantasma,
+      // ele deleta imediatamente e inicia o download do CENSIPAM daquela data!
       if (!skipSync) {
-         let channel = supabase.getChannels().find(c => c.topic === 'realtime:fogo-sync');
-         const sendSync = (ch) => {
-             ch.send({
-                 type: 'broadcast',
-                 event: 'sync_request',
-                 payload: { date: selectedDate, tz: tz },
-             }).then(() => console.log('Walkie-talkie enviado!'));
-         };
-
-         if (channel && channel.state === 'joined') {
-             sendSync(channel);
-         } else {
-             channel = supabase.channel('fogo-sync', { config: { broadcast: { ack: true } } });
-             channel.subscribe((status) => {
-                 if (status === 'SUBSCRIBED') sendSync(channel);
-             });
-         }
+         supabase.from('eventos_fogo').insert([{
+             id_evento: `SYNC_REQUEST_${Date.now()}`,
+             data_referencia: selectedDate,
+             municipio: 'SYNC_PENDING',
+             uf: '--',
+             tamanho_km2: 0
+         }]).then(({error}) => {
+             if (error) console.error("Erro ao solicitar sync fantasma", error);
+             else console.log('Walkie-talkie (fantasma) enviado ao banco!');
+         });
       }
 
       // 2. Lemos os dados diretamente do Supabase para evitar bloqueios de proxy/Cloudflare!
