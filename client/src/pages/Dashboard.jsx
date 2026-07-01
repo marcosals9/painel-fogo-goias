@@ -281,8 +281,8 @@ export default function Dashboard() {
 
         const mappedEvents = features.map(f => {
           const prop = f.properties;
-          const uf = prop.sigla_uf || 'N/A';
-          const mun = prop.nome_municipio || prop.municipio || 'N/A';
+          const uf = prop.uf || prop.sigla_uf || 'N/A';
+          const mun = prop.municipio || prop.nome_municipio || 'N/A';
           
           let lat = prop.lat;
           let lng = prop.lng;
