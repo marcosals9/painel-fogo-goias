@@ -777,11 +777,11 @@ export default function Dashboard() {
                     <Button
                       variant="secondary"
                       size="sm"
-                      className="mb-2 shadow-md bg-card/95 hover:bg-accent border-border border transition-all duration-300 gap-1.5"
+                      className="mb-2 shadow-md bg-card/95 hover:bg-accent border-border border transition-all duration-300 flex flex-row items-center justify-center gap-1.5"
                       onClick={() => setIsLegendOpen(true)}
                       title="Mostrar Legenda"
                     >
-                      <Info className="h-4 w-4" /> Legenda
+                      <Info className="h-4 w-4" /> <span>Legenda</span>
                     </Button>
                   ) : (
                     <div className="bg-card/95 backdrop-blur-sm p-3 rounded-md shadow-lg border border-border text-xs w-[240px] transition-all duration-300 animate-in slide-in-from-bottom-5 opacity-100">
