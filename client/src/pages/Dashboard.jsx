@@ -509,10 +509,20 @@ export default function Dashboard() {
       )
       .subscribe();
 
+    // Listener para o ACK do servidor (Walkie-Talkie)
+    const syncChannel = supabase.channel('fogo-sync')
+      .on('broadcast', { event: 'sync_finished' }, (payload) => {
+        console.log('[Broadcast] Sincronização finalizada pelo servidor', payload);
+        setLoading(false);
+        fetchFireData(date, timezone, true, true);
+      })
+      .subscribe();
+
     return () => {
       if (intervalId) clearInterval(intervalId);
       if (realtimeTimeout) clearTimeout(realtimeTimeout);
       supabase.removeChannel(channel);
+      supabase.removeChannel(syncChannel);
     };
   }, [refreshInterval, date, timezone]);
 

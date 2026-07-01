@@ -12,8 +12,18 @@ const initBroadcastListener = () => {
         try {
             await syncFocosData(date, tz || 'BRT');
             console.log(`[Broadcast] Sincronização concluída com sucesso para a data: ${date}`);
+            channel.send({
+                type: 'broadcast',
+                event: 'sync_finished',
+                payload: { date }
+            });
         } catch (err) {
             console.error(`[Broadcast] Erro na sincronização para a data ${date}:`, err);
+            channel.send({
+                type: 'broadcast',
+                event: 'sync_finished',
+                payload: { date, error: true }
+            });
         }
     });
 
