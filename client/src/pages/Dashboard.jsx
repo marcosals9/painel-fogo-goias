@@ -283,6 +283,20 @@ export default function Dashboard() {
           const prop = f.properties;
           const uf = prop.sigla_uf || 'N/A';
           const mun = prop.nome_municipio || prop.municipio || 'N/A';
+          
+          let lat = prop.lat;
+          let lng = prop.lng;
+          
+          if (lat === undefined || lng === undefined) {
+             if (f.geometry && f.geometry.coordinates && f.geometry.coordinates[0]) {
+                const firstCoord = f.geometry.coordinates[0][0];
+                lng = firstCoord[0];
+                lat = firstCoord[1];
+             } else {
+                lng = 0;
+                lat = 0;
+             }
+          }
 
           // Calcula a idade do evento de fogo
           let ageHours = null;
@@ -319,8 +333,8 @@ export default function Dashboard() {
             qtd_deteccoes: prop.qtd_deteccoes ? parseInt(prop.qtd_deteccoes, 10) : 0,
             uc: !!prop.nome_unidade_conservacao,
             ucText: toCapitalCase(prop.nome_unidade_conservacao || 'N/A'),
-            lat: prop.lat,
-            lng: prop.lng,
+            lat: lat,
+            lng: lng,
             dt_minima: prop.dt_minima,
             dt_maxima: prop.dt_maxima,
             ageHours: ageHours,
