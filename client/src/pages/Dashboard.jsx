@@ -259,16 +259,23 @@ export default function Dashboard() {
     try {
       // 1. Walkie-Talkie: Se solicitado, manda uma mensagem via Supabase Broadcast para a máquina virtual baixar novos dados
       if (!skipSync) {
-         const channel = supabase.channel('fogo-sync');
-         channel.subscribe((status) => {
-             if (status === 'SUBSCRIBED') {
-                 channel.send({
-                     type: 'broadcast',
-                     event: 'sync_request',
-                     payload: { date: selectedDate, tz: tz },
-                 }).then(() => supabase.removeChannel(channel));
-             }
-         });
+         let channel = supabase.getChannels().find(c => c.topic === 'realtime:fogo-sync');
+         const sendSync = (ch) => {
+             ch.send({
+                 type: 'broadcast',
+                 event: 'sync_request',
+                 payload: { date: selectedDate, tz: tz },
+             }).then(() => console.log('Walkie-talkie enviado!'));
+         };
+
+         if (channel && channel.state === 'joined') {
+             sendSync(channel);
+         } else {
+             channel = supabase.channel('fogo-sync', { config: { broadcast: { ack: true } } });
+             channel.subscribe((status) => {
+                 if (status === 'SUBSCRIBED') sendSync(channel);
+             });
+         }
       }
 
       // 2. Lemos os dados diretamente do Supabase para evitar bloqueios de proxy/Cloudflare!
