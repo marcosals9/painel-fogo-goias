@@ -10,7 +10,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { format, subDays, startOfDay, endOfDay } from 'date-fns';
-import { Download, Flame, Map as MapIcon, Loader2, ArrowUpDown, RefreshCw, MousePointerSquareDashed, LocateFixed, Timer, Trees, Smartphone, Database, TableProperties } from 'lucide-react';
+import { Download, Flame, Map as MapIcon, Loader2, ArrowUpDown, RefreshCw, MousePointerSquareDashed, LocateFixed, Timer, Trees, Smartphone, Database, TableProperties, List, X, MapPinOff, Info } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import InformativoMaker from '../components/InformativoMaker';
 import DataExplorer from '../components/DataExplorer';
@@ -87,7 +87,7 @@ let DefaultIcon = L.icon({
 });
 L.Marker.prototype.options.icon = DefaultIcon;
 
-function MapController({ selectedEvent, sortedEvents, goiasCenter, showUCs, setShowUCs, loadingUCs }) {
+function MapController({ selectedEvent, sortedEvents, goiasCenter, showUCs, setShowUCs, loadingUCs, showOnlyGoias, setShowOnlyGoias }) {
   const map = useMap();
 
   useEffect(() => {
@@ -112,6 +112,9 @@ function MapController({ selectedEvent, sortedEvents, goiasCenter, showUCs, setS
       </Button>
       <Button variant="outline" size="icon" onClick={() => setShowUCs(!showUCs)} title={showUCs ? "Ocultar Unidades de Conservação" : "Mostrar Unidades de Conservação"} className={`h-9 w-9 flex items-center justify-center p-0 shadow-md border ${showUCs ? 'bg-primary border-primary hover:bg-primary/90' : 'bg-background/95 backdrop-blur-sm border-muted-foreground/20 hover:bg-accent'}`}>
         {loadingUCs ? <Loader2 className={`w-4 h-4 animate-spin ${showUCs ? 'text-white' : 'text-muted-foreground'}`} /> : <Trees className={`w-4 h-4 ${showUCs ? 'text-white' : 'text-foreground'}`} />}
+      </Button>
+      <Button variant="outline" size="icon" onClick={() => setShowOnlyGoias(!showOnlyGoias)} title={showOnlyGoias ? "Mostrar Focos Fora de GO" : "Ocultar Focos Fora de GO"} className={`h-9 w-9 flex items-center justify-center p-0 shadow-md border ${showOnlyGoias ? 'bg-primary border-primary hover:bg-primary/90' : 'bg-background/95 backdrop-blur-sm border-muted-foreground/20 hover:bg-accent'}`}>
+        <MapPinOff className={`w-4 h-4 ${showOnlyGoias ? 'text-white' : 'text-foreground'}`} />
       </Button>
       <div title="Dica: Segure SHIFT e arraste o mouse no mapa para dar zoom em uma área específica" className="bg-background/95 backdrop-blur-sm text-foreground border border-muted-foreground/20 rounded-md shadow-md cursor-help flex items-center justify-center h-9 w-9">
         <MousePointerSquareDashed className="w-4 h-4" />
@@ -139,7 +142,12 @@ export default function Dashboard() {
   const [loadingUCs, setLoadingUCs] = useState(false);
   const [ucGeoJSON, setUcGeoJSON] = useState(null);
   const [goiasGeoJSON, setGoiasGeoJSON] = useState(null);
-  const [isLegendOpen, setIsLegendOpen] = useState(false);
+  const [isLegendOpen, setIsLegendOpen] = useState(window.innerWidth > 768);
+  const [showOnlyGoias, setShowOnlyGoias] = useState(true);
+
+  const mapEventsToRender = useMemo(() => {
+    return fireEvents.filter(ev => !showOnlyGoias || ev.isGoias);
+  }, [fireEvents, showOnlyGoias]);
 
   const [sortConfig, setSortConfig] = useState({ key: 'tamanho_ha', direction: 'desc' });
 
@@ -699,12 +707,12 @@ export default function Dashboard() {
                     }}
                   />
                 )}
-                {fireEvents.length > 0 && (
+                {mapEventsToRender.length > 0 && (
                   <GeoJSON
-                    key={`fire-polygons-${fireEvents.length}-${fireEvents[0].id}`}
+                    key={`fire-polygons-${mapEventsToRender.length}-${mapEventsToRender[0]?.id || 'empty'}`}
                     data={{
                       type: "FeatureCollection",
-                      features: fireEvents.map(ev => ({
+                      features: mapEventsToRender.map(ev => ({
                         type: "Feature",
                         geometry: ev.geometry,
                         properties: ev
@@ -722,7 +730,7 @@ export default function Dashboard() {
                   />
                 )}
 
-                {fireEvents.map(event => (
+                {mapEventsToRender.map(event => (
                   <Marker
                     key={event.id}
                     position={[event.lat, event.lng]}
@@ -761,36 +769,41 @@ export default function Dashboard() {
                   />
                 )}
 
-                <MapController selectedEvent={selectedEvent} sortedEvents={fireEvents} goiasCenter={goiasCenter} showUCs={showUCs} setShowUCs={setShowUCs} loadingUCs={loadingUCs} />
+                <MapController selectedEvent={selectedEvent} sortedEvents={fireEvents} goiasCenter={goiasCenter} showUCs={showUCs} setShowUCs={setShowUCs} loadingUCs={loadingUCs} showOnlyGoias={showOnlyGoias} setShowOnlyGoias={setShowOnlyGoias} />
 
                 {/* Legenda de Detecção de Fogo */}
                 <div className="absolute bottom-4 right-4 z-[400] flex flex-col items-end">
-                  <Button
-                    variant="secondary"
-                    size="sm"
-                    className="mb-2 shadow-md md:hidden bg-card/95 hover:bg-card border-border border"
-                    onClick={() => setIsLegendOpen(!isLegendOpen)}
-                  >
-                    ℹ️ Legenda
-                  </Button>
-
-                  <div className={`${isLegendOpen ? 'block' : 'hidden'} md:block bg-card/95 backdrop-blur-sm p-3 rounded-md shadow-md border border-border text-xs w-[240px] transition-all`}>
-                    <div className="flex justify-between items-center mb-3 border-b pb-1">
-                      <h4 className="font-bold">Frente de Fogo - 24h</h4>
-                      <button className="md:hidden text-muted-foreground" onClick={() => setIsLegendOpen(false)}>✕</button>
+                  {!isLegendOpen ? (
+                    <Button
+                      variant="secondary"
+                      size="sm"
+                      className="mb-2 shadow-md bg-card/95 hover:bg-accent border-border border transition-all duration-300 gap-1.5"
+                      onClick={() => setIsLegendOpen(true)}
+                      title="Mostrar Legenda"
+                    >
+                      <Info className="h-4 w-4" /> Legenda
+                    </Button>
+                  ) : (
+                    <div className="bg-card/95 backdrop-blur-sm p-3 rounded-md shadow-lg border border-border text-xs w-[240px] transition-all duration-300 animate-in slide-in-from-bottom-5 opacity-100">
+                      <div className="flex justify-between items-center mb-3 border-b pb-1">
+                        <h4 className="font-bold">Frente de Fogo - 24h</h4>
+                        <button className="text-muted-foreground hover:text-foreground transition-colors" onClick={() => setIsLegendOpen(false)}>
+                          <X className="h-4 w-4" />
+                        </button>
+                      </div>
+                      <div className="space-y-1.5">
+                        <div className="flex items-center gap-2"><span className="w-3 h-3 rounded bg-[#8B0000] border border-black/20 shrink-0"></span> Detecção em até 3 Horas</div>
+                        <div className="flex items-center gap-2"><span className="w-3 h-3 rounded bg-[#DC2626] border border-black/20 shrink-0"></span> Detecção entre 3 e 6 horas</div>
+                        <div className="flex items-center gap-2"><span className="w-3 h-3 rounded bg-[#F97316] border border-black/20 shrink-0"></span> Detecção entre 6 e 12 horas</div>
+                        <div className="flex items-center gap-2"><span className="w-3 h-3 rounded bg-[#F59E0B] border border-black/20 shrink-0"></span> Detecção entre 12 e 24 horas</div>
+                        <div className="flex items-center gap-2"><span className="w-3 h-3 rounded bg-[#737373] border border-black/20 shrink-0"></span> Detecção a mais de 24 horas</div>
+                      </div>
+                      <div className="mt-3 pt-2 border-t text-[10px] text-muted-foreground italic flex items-center gap-2">
+                        <div className="w-3 h-3 rounded-full border-[1.5px] border-gray-800 flex items-center justify-center shrink-0"><div className="w-1.5 h-1.5 bg-white rounded-full"></div></div>
+                        Focos em Unidade de Conservação
+                      </div>
                     </div>
-                    <div className="space-y-1.5">
-                      <div className="flex items-center gap-2"><span className="w-3 h-3 rounded bg-[#8B0000] border border-black/20 shrink-0"></span> Detecção em até 3 Horas</div>
-                      <div className="flex items-center gap-2"><span className="w-3 h-3 rounded bg-[#DC2626] border border-black/20 shrink-0"></span> Detecção entre 3 e 6 horas</div>
-                      <div className="flex items-center gap-2"><span className="w-3 h-3 rounded bg-[#F97316] border border-black/20 shrink-0"></span> Detecção entre 6 e 12 horas</div>
-                      <div className="flex items-center gap-2"><span className="w-3 h-3 rounded bg-[#F59E0B] border border-black/20 shrink-0"></span> Detecção entre 12 e 24 horas</div>
-                      <div className="flex items-center gap-2"><span className="w-3 h-3 rounded bg-[#737373] border border-black/20 shrink-0"></span> Detecção a mais de 24 horas</div>
-                    </div>
-                    <div className="mt-3 pt-2 border-t text-[10px] text-muted-foreground italic flex items-center gap-2">
-                      <div className="w-3 h-3 rounded-full border-[1.5px] border-gray-800 flex items-center justify-center shrink-0"><div className="w-1.5 h-1.5 bg-white rounded-full"></div></div>
-                      Focos em Unidade de Conservação
-                    </div>
-                  </div>
+                  )}
                 </div>
               </MapContainer>
             </CardContent>
