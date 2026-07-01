@@ -388,8 +388,11 @@ export default function Dashboard() {
       if (goiasGeoJSON && goiasGeoJSON.features) {
         for (let i = 0; i < newEvents.length; i++) {
           const ev = newEvents[i];
-          const pt = turf.point([ev.lng, ev.lat]);
+          if (!ev.lat || !ev.lng) continue;
+          
           let insideGoias = false;
+          const pt = turf.point([ev.lng, ev.lat]);
+          
           for (const feature of goiasGeoJSON.features) {
             if (feature.geometry && (feature.geometry.type === 'Polygon' || feature.geometry.type === 'MultiPolygon')) {
               if (turf.booleanPointInPolygon(pt, feature)) {
@@ -421,52 +424,6 @@ export default function Dashboard() {
                 }
               }
             }
-          }
-        }
-      }
-
-      // 3. Geocodificação Reversa Super Rápida (BigDataCloud) para Municípios N/A
-      for (let i = 0; i < newEvents.length; i++) {
-        const ev = newEvents[i];
-        if (ev.municipio === 'N/A' || ev.municipio === 'Não Mapeado' || !ev.municipio || ev.uf === 'N/A') {
-          try {
-            ev.municipio = 'Buscando...';
-            hasChanges = true;
-
-            // Sem delay, API gratuita para cliente sem rate limit severo
-            const res = await axios.get(`https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${ev.lat}&longitude=${ev.lng}&localityLanguage=pt`);
-            
-            if (res.data) {
-              const city = res.data.city || res.data.locality;
-              let ufCode = 'N/A';
-              if (res.data.principalSubdivisionCode) {
-                 const parts = res.data.principalSubdivisionCode.split('-');
-                 ufCode = parts[parts.length - 1]; // ex: "BR-MT" -> "MT"
-              }
-              
-              if (city) {
-                ev.municipio = city;
-                ev.uf = ufCode;
-                // Atualiza no banco diretamente pelo Supabase!
-                supabase.from('eventos_fogo')
-                  .update({ municipio: city, uf: ufCode })
-                  .eq('id_evento', ev.id)
-                  .then(({error}) => { if (error) console.error(error) });
-              } else {
-                ev.municipio = 'Desconhecido';
-                ev.uf = '--';
-                supabase.from('eventos_fogo').update({ municipio: 'Desconhecido', uf: '--' }).eq('id_evento', ev.id).then(({error}) => { if (error) console.error(error) });
-              }
-            } else {
-              ev.municipio = 'Desconhecido';
-              ev.uf = '--';
-              supabase.from('eventos_fogo').update({ municipio: 'Desconhecido', uf: '--' }).eq('id_evento', ev.id).then(({error}) => { if (error) console.error(error) });
-            }
-          } catch (e) {
-            console.error("Erro no reverse geocoding para foco", ev.id, e);
-            ev.municipio = 'Desconhecido';
-            ev.uf = '--';
-            supabase.from('eventos_fogo').update({ municipio: 'Desconhecido', uf: '--' }).eq('id_evento', ev.id).then(({error}) => { if (error) console.error(error) });
           }
         }
       }

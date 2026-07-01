@@ -81,7 +81,7 @@ async function syncFocosData(date, tz = 'BRT') {
         const incomingIds = new Set();
         const recordsToUpsert = [];
 
-        features.forEach(f => {
+        for (const f of features) {
             Object.keys(f.properties).forEach(key => {
                 let val = f.properties[key];
                 if (typeof val === 'string') {
@@ -126,8 +126,49 @@ async function syncFocosData(date, tz = 'BRT') {
             }
 
             if (hasChanged) {
-                const municipio = preservedCities[id_evento] || prop.nome_municipio || 'N/A';
-                const uf = preservedUFs[id_evento] || prop.sigla_uf || 'N/A';
+                let municipio = preservedCities[id_evento] || prop.nome_municipio || 'N/A';
+                let uf = preservedUFs[id_evento] || prop.sigla_uf || 'N/A';
+
+                // Realizar Geocodificação Reversa se faltar município
+                if (municipio === 'N/A' || municipio === 'Não Mapeado' || uf === 'N/A' || municipio === 'Desconhecido') {
+                    let lat, lng;
+                    if (f.geometry && f.geometry.coordinates && f.geometry.coordinates[0]) {
+                        let coords = f.geometry.coordinates;
+                        while (coords[0] && Array.isArray(coords[0]) && Array.isArray(coords[0][0])) {
+                            coords = coords[0];
+                        }
+                        if (coords[0] && coords[0].length >= 2) {
+                            lng = coords[0][0];
+                            lat = coords[0][1];
+                        }
+                    }
+
+                    if (lat !== undefined && lng !== undefined) {
+                        try {
+                            const res = await fetch(`https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lng}&localityLanguage=pt`);
+                            if (res.ok) {
+                                const gData = await res.json();
+                                municipio = gData.city || gData.locality || 'Desconhecido';
+                                if (gData.principalSubdivisionCode) {
+                                    const parts = gData.principalSubdivisionCode.split('-');
+                                    uf = parts[parts.length - 1]; // ex: "BR-MT" -> "MT"
+                                } else {
+                                    uf = '--';
+                                }
+                                console.log(`[GEOCODE] ${id_evento}: ${municipio} - ${uf}`);
+                            } else {
+                                municipio = 'Desconhecido';
+                                uf = '--';
+                            }
+                        } catch (e) {
+                            console.error(`[GEOCODE] Erro no foco ${id_evento}:`, e.message);
+                            municipio = 'Desconhecido';
+                            uf = '--';
+                        }
+                        // Delay de 200ms para evitar bloqueio da API gratuita
+                        await new Promise(r => setTimeout(r, 200));
+                    }
+                }
 
                 recordsToUpsert.push({
                     id_evento,
@@ -140,7 +181,7 @@ async function syncFocosData(date, tz = 'BRT') {
                     data_referencia: date
                 });
             }
-        });
+        }
 
         const idsToDelete = [];
         if (rows) {
