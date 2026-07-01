@@ -266,7 +266,8 @@ export default function Dashboard() {
              data_referencia: selectedDate,
              municipio: 'SYNC_PENDING',
              uf: '--',
-             tamanho_km2: 0
+             tamanho_km2: 0,
+             geojson: { type: 'Feature', geometry: { type: 'Point', coordinates: [0, 0] }, properties: {} }
          }]).then(({error}) => {
              if (error) console.error("Erro ao solicitar sync fantasma", error);
              else console.log('Walkie-talkie (fantasma) enviado ao banco!');
