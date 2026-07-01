@@ -450,17 +450,17 @@ export default function Dashboard() {
                   .eq('id_evento', ev.id)
                   .then(({error}) => { if (error) console.error(error) });
               } else {
-                setFireEvents(prev => prev.map(p => p.id === ev.id ? { ...p, municipio: 'Desconhecido' } : p));
-                supabase.from('eventos_fogo').update({ municipio: 'Desconhecido' }).eq('id_evento', ev.id).then();
+                setFireEvents(prev => prev.map(p => p.id === ev.id ? { ...p, municipio: 'Desconhecido', uf: 'Desconhecido' } : p));
+                supabase.from('eventos_fogo').update({ municipio: 'Desconhecido', uf: 'Desconhecido' }).eq('id_evento', ev.id).then();
               }
             } else {
-              setFireEvents(prev => prev.map(p => p.id === ev.id ? { ...p, municipio: 'Desconhecido' } : p));
-              supabase.from('eventos_fogo').update({ municipio: 'Desconhecido' }).eq('id_evento', ev.id).then();
+              setFireEvents(prev => prev.map(p => p.id === ev.id ? { ...p, municipio: 'Desconhecido', uf: 'Desconhecido' } : p));
+              supabase.from('eventos_fogo').update({ municipio: 'Desconhecido', uf: 'Desconhecido' }).eq('id_evento', ev.id).then();
             }
           } catch (e) {
             console.error("Erro no reverse geocoding para foco", ev.id, e);
-            setFireEvents(prev => prev.map(p => p.id === ev.id ? { ...p, municipio: 'Desconhecido' } : p));
-            supabase.from('eventos_fogo').update({ municipio: 'Desconhecido' }).eq('id_evento', ev.id).then();
+            setFireEvents(prev => prev.map(p => p.id === ev.id ? { ...p, municipio: 'Desconhecido', uf: 'Desconhecido' } : p));
+            supabase.from('eventos_fogo').update({ municipio: 'Desconhecido', uf: 'Desconhecido' }).eq('id_evento', ev.id).then();
           }
         }
       }
