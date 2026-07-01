@@ -208,7 +208,7 @@ async function syncFocosData(date, tz = 'BRT') {
         if (recordsToUpsert.length > 0) {
             const { error: insertError } = await db
                 .from('eventos_fogo')
-                .upsert(recordsToUpsert, { onConflict: 'id_evento' });
+                .upsert(recordsToUpsert, { onConflict: 'id_evento, data_referencia' });
 
             if (insertError) {
                 console.error('[SYNC] Erro ao inserir novos registros no Supabase:', insertError);
