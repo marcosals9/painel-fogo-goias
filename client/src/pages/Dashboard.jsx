@@ -257,24 +257,27 @@ export default function Dashboard() {
   const fetchFireData = async (selectedDate, tz, skipSync = false, isSilent = false) => {
     if (!isSilent) setLoading(true);
     try {
-      // VITE_API_URL deve apontar para o IP do Google Cloud (ex: http://34.120.x.x:3001)
-      const baseUrl = import.meta.env.VITE_API_URL || (import.meta.env.PROD ? '' : 'http://localhost:3001');
+      // 1. Lemos os dados diretamente do Supabase para evitar bloqueios de proxy/Cloudflare!
+      // (O backend na máquina virtual continuará rodando o CRON de 5 em 5 minutos quietinho e atualizando o banco)
+      const { data, error } = await supabase
+        .from('eventos_fogo')
+        .select('*')
+        .eq('data_referencia', selectedDate);
+        
+      if (error) throw error;
       
-      // 1. Sincroniza com o CENSIPAM através do nosso backend (faz o POST para /api/focos/sync)
-      // Pode falhar caso o censipam esteja fora, mas não vai travar a leitura do banco
-      if (!skipSync) {
-        try {
-            await axios.post(`${baseUrl}/api/focos/sync`, { date: selectedDate, tz });
-        } catch (e) {
-            console.warn("Sincronização com CENSIPAM falhou, usando cache local:", e);
-        }
-      }
-
-      // 2. Lê os dados do nosso backend
-      const response = await axios.get(`${baseUrl}/api/focos`, { params: { date: selectedDate } });
-      
-      if (response.data && response.data.features) {
-        const features = response.data.features;
+      if (data && data.length > 0) {
+        const features = data.map(row => {
+          let geojson = row.geojson;
+          if (typeof geojson === 'string') {
+              try { geojson = JSON.parse(geojson); } catch(e) {}
+          }
+          return {
+            type: "Feature",
+            geometry: geojson,
+            properties: row
+          };
+        }).filter(f => f.geometry);
 
         const mappedEvents = features.map(f => {
           const prop = f.properties;
@@ -412,21 +415,24 @@ export default function Dashboard() {
               }
               
               if (city) {
-                ev.municipio = city;
-                ev.uf = ufCode;
-                // Salva silenciosamente no banco de dados para não precisar buscar na próxima vez!
-                axios.put(`${baseUrl}/api/focos/${ev.id}`, { municipio: city, uf: ufCode }).catch(console.error);
+                setFireEvents(prev => prev.map(p => p.id === ev.id ? { ...p, municipio: city, uf: ufCode } : p));
+                // Atualiza no banco diretamente pelo Supabase!
+                supabase.from('eventos_fogo')
+                  .update({ municipio: city, sigla_uf: ufCode })
+                  .eq('id_evento', ev.id)
+                  .then(({error}) => { if (error) console.error(error) });
               } else {
-                ev.municipio = 'Desconhecido';
-                axios.put(`${baseUrl}/api/focos/${ev.id}`, { municipio: 'Desconhecido' }).catch(console.error);
+                setFireEvents(prev => prev.map(p => p.id === ev.id ? { ...p, municipio: 'Desconhecido' } : p));
+                supabase.from('eventos_fogo').update({ municipio: 'Desconhecido' }).eq('id_evento', ev.id).then();
               }
             } else {
-              ev.municipio = 'Desconhecido';
-              axios.put(`${baseUrl}/api/focos/${ev.id}`, { municipio: 'Desconhecido' }).catch(console.error);
+              setFireEvents(prev => prev.map(p => p.id === ev.id ? { ...p, municipio: 'Desconhecido' } : p));
+              supabase.from('eventos_fogo').update({ municipio: 'Desconhecido' }).eq('id_evento', ev.id).then();
             }
           } catch (e) {
-            console.error("Erro na Geocodificação Reversa", e);
-            ev.municipio = 'Desconhecido';
+            console.error("Erro no reverse geocoding para foco", ev.id, e);
+            setFireEvents(prev => prev.map(p => p.id === ev.id ? { ...p, municipio: 'Desconhecido' } : p));
+            supabase.from('eventos_fogo').update({ municipio: 'Desconhecido' }).eq('id_evento', ev.id).then();
           }
         }
       }
