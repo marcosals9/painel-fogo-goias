@@ -432,7 +432,7 @@ export default function Dashboard() {
                 setFireEvents(prev => prev.map(p => p.id === ev.id ? { ...p, municipio: city, uf: ufCode } : p));
                 // Atualiza no banco diretamente pelo Supabase!
                 supabase.from('eventos_fogo')
-                  .update({ municipio: city, sigla_uf: ufCode })
+                  .update({ municipio: city, uf: ufCode })
                   .eq('id_evento', ev.id)
                   .then(({error}) => { if (error) console.error(error) });
               } else {
