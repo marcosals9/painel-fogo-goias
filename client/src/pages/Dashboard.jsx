@@ -924,7 +924,7 @@ export default function Dashboard() {
         {/* Footer */}
         <footer className="mt-8 pt-4 pb-2 border-t border-muted-foreground/20 text-center">
           <p className="text-xs text-muted-foreground font-medium">
-            &copy; {new Date().getFullYear()} Painel Fogo Goiás. Todos os direitos reservados. | Versão 1.1.1
+            &copy; {new Date().getFullYear()} Painel Fogo Goiás. Todos os direitos reservados. | Versão 1.1.2
           </p>
         </footer>
 
