@@ -382,9 +382,9 @@ export default function Dashboard() {
     const fixData = async () => {
       isFixingRef.current = true;
       let hasChanges = false;
-      const newEvents = [...fireEvents];
+      const newEvents = fireEvents.map(e => ({ ...e }));
 
-      // 1. Filtragem Exata de Limites Estaduais (Goiás)
+      // 1. Cruzamento Espacial Goiás (Turf.js)
       if (goiasGeoJSON && goiasGeoJSON.features) {
         for (let i = 0; i < newEvents.length; i++) {
           const ev = newEvents[i];
@@ -436,7 +436,6 @@ export default function Dashboard() {
             // Sem delay, API gratuita para cliente sem rate limit severo
             const res = await axios.get(`https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${ev.lat}&longitude=${ev.lng}&localityLanguage=pt`);
             
-            const baseUrl = import.meta.env.VITE_API_URL || (import.meta.env.PROD ? '' : 'http://localhost:3001');
             if (res.data) {
               const city = res.data.city || res.data.locality;
               let ufCode = 'N/A';
@@ -446,30 +445,34 @@ export default function Dashboard() {
               }
               
               if (city) {
-                setFireEvents(prev => prev.map(p => p.id === ev.id ? { ...p, municipio: city, uf: ufCode } : p));
+                ev.municipio = city;
+                ev.uf = ufCode;
                 // Atualiza no banco diretamente pelo Supabase!
                 supabase.from('eventos_fogo')
                   .update({ municipio: city, uf: ufCode })
                   .eq('id_evento', ev.id)
                   .then(({error}) => { if (error) console.error(error) });
               } else {
-                setFireEvents(prev => prev.map(p => p.id === ev.id ? { ...p, municipio: 'Desconhecido', uf: '--' } : p));
+                ev.municipio = 'Desconhecido';
+                ev.uf = '--';
                 supabase.from('eventos_fogo').update({ municipio: 'Desconhecido', uf: '--' }).eq('id_evento', ev.id).then(({error}) => { if (error) console.error(error) });
               }
             } else {
-              setFireEvents(prev => prev.map(p => p.id === ev.id ? { ...p, municipio: 'Desconhecido', uf: '--' } : p));
+              ev.municipio = 'Desconhecido';
+              ev.uf = '--';
               supabase.from('eventos_fogo').update({ municipio: 'Desconhecido', uf: '--' }).eq('id_evento', ev.id).then(({error}) => { if (error) console.error(error) });
             }
           } catch (e) {
             console.error("Erro no reverse geocoding para foco", ev.id, e);
-            setFireEvents(prev => prev.map(p => p.id === ev.id ? { ...p, municipio: 'Desconhecido', uf: '--' } : p));
+            ev.municipio = 'Desconhecido';
+            ev.uf = '--';
             supabase.from('eventos_fogo').update({ municipio: 'Desconhecido', uf: '--' }).eq('id_evento', ev.id).then(({error}) => { if (error) console.error(error) });
           }
         }
       }
 
       if (hasChanges) {
-        setFireEvents([...newEvents]);
+        setFireEvents(newEvents);
       }
       isFixingRef.current = false;
     };
