@@ -3,7 +3,11 @@ dist
 dist-ssr
 *.local
 .env
+.env.development
+.env.production
 .DS_Store
 server/.wwebjs_auth/
 server/.wwebjs_cache/
 server/codec.db
+schema_prod.sql
+server/temp/
