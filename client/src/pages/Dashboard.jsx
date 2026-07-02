@@ -14,6 +14,7 @@ import { Download, Flame, Map as MapIcon, Loader2, ArrowUpDown, RefreshCw, Mouse
 import { supabase } from '../lib/supabase';
 import InformativoMaker from '../components/InformativoMaker';
 import DataExplorer from '../components/DataExplorer';
+import { useAuth } from '../components/AuthProvider';
 
 // Fix for Leaflet icon in React
 import L from 'leaflet';
@@ -125,6 +126,7 @@ function MapController({ selectedEvent, sortedEvents, goiasCenter, showUCs, setS
 
 export default function Dashboard() {
   const navigate = useNavigate();
+  const { session } = useAuth();
   const [isMakerOpen, setIsMakerOpen] = useState(false);
   const [isExplorerOpen, setIsExplorerOpen] = useState(false);
   const [date, setDate] = useState(() => {
@@ -551,7 +553,7 @@ export default function Dashboard() {
 
           <div className="flex flex-col items-end gap-1.5 w-full md:w-auto">
             <div className="flex items-center gap-2 flex-wrap justify-end w-full sm:w-auto">
-              {!!localStorage.getItem('codec_token') && (
+              {!!session && (
                 <Button variant="outline" size="sm" className="flex-1 sm:flex-none h-9 gap-2 flex flex-row items-center bg-orange-50 text-orange-600 border-orange-200 hover:bg-orange-100 hover:text-orange-700 shadow-sm px-2 sm:px-3" onClick={() => setIsMakerOpen(true)} title="Gerar Card Informativo WhatsApp">
                   <Smartphone className="w-4 h-4" /> <span className="hidden md:inline">Informativo WhatsApp</span><span className="md:hidden">WhatsApp</span>
                 </Button>

@@ -5,6 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Loader2, Send, QrCode, CheckCircle2, AlertTriangle, RefreshCw, LogOut } from 'lucide-react';
 import { toPng } from 'html-to-image';
+import { supabase } from '@/lib/supabase';
 
 export default function WhatsAppSender({ canvasRef, date }) {
   const [status, setStatus] = useState('DISCONNECTED');
@@ -30,7 +31,8 @@ export default function WhatsAppSender({ canvasRef, date }) {
   const fetchChats = async () => {
     setLoadingChats(true);
     try {
-      const token = localStorage.getItem('codec_token');
+      const { data: sessionData } = await supabase.auth.getSession();
+      const token = sessionData?.session?.access_token || localStorage.getItem('codec_token');
       const res = await axios.get(`${import.meta.env.PROD ? '' : 'http://localhost:3001'}/api/whatsapp/chats`, {
         headers: { Authorization: `Bearer ${token}` }
       });
@@ -46,7 +48,8 @@ export default function WhatsAppSender({ canvasRef, date }) {
 
   const fetchStatus = async () => {
     try {
-      const token = localStorage.getItem('codec_token');
+      const { data: sessionData } = await supabase.auth.getSession();
+      const token = sessionData?.session?.access_token || localStorage.getItem('codec_token');
       const res = await axios.get(`${import.meta.env.PROD ? '' : 'http://localhost:3001'}/api/whatsapp/status`, {
         headers: { Authorization: `Bearer ${token}` }
       });
@@ -90,7 +93,8 @@ export default function WhatsAppSender({ canvasRef, date }) {
         imageBase64 = await toPng(canvasRef.current, { cacheBust: true, pixelRatio: 2 });
       }
 
-      const token = localStorage.getItem('codec_token');
+      const { data: sessionData } = await supabase.auth.getSession();
+      const token = sessionData?.session?.access_token || localStorage.getItem('codec_token');
       const payload = {
         titulo: `Boletim ${date}`,
         texto,
@@ -118,7 +122,8 @@ export default function WhatsAppSender({ canvasRef, date }) {
   const handleLogoutWhatsApp = async () => {
     if (!window.confirm("Deseja realmente desconectar o robô do WhatsApp? Você precisará ler o QR Code novamente.")) return;
     try {
-      const token = localStorage.getItem('codec_token');
+      const { data: sessionData } = await supabase.auth.getSession();
+      const token = sessionData?.session?.access_token || localStorage.getItem('codec_token');
       await axios.post(`${import.meta.env.PROD ? '' : 'http://localhost:3001'}/api/whatsapp/logout`, {}, {
         headers: { Authorization: `Bearer ${token}` }
       });
