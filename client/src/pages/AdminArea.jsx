@@ -133,30 +133,30 @@ export default function AdminArea() {
   return (
     <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500 max-w-6xl mx-auto">
       {/* Header Premium */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between bg-slate-900/50 p-6 rounded-2xl border border-slate-800 backdrop-blur-md shadow-xl">
+      <div className="flex flex-col md:flex-row md:items-center justify-between bg-card p-6 rounded-2xl border border-border shadow-sm">
         <div>
-          <h2 className="text-3xl font-bold tracking-tight text-slate-100 flex items-center gap-3">
+          <h2 className="text-3xl font-bold tracking-tight text-card-foreground flex items-center gap-3">
             <ShieldAlert className="w-8 h-8 text-amber-500" />
             Centro de Comando
           </h2>
-          <p className="text-slate-400 mt-1">Gestão de acessos, automações e status do sistema CODEC.</p>
+          <p className="text-muted-foreground mt-1">Gestão de acessos, automações e status do sistema CODEC.</p>
         </div>
-        <div className="mt-4 md:mt-0 flex bg-slate-950 p-1 rounded-xl border border-slate-800">
+        <div className="mt-4 md:mt-0 flex bg-muted p-1 rounded-xl border border-border">
           <button 
             onClick={() => setActiveTab('dashboard')}
-            className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${activeTab === 'dashboard' ? 'bg-amber-500/20 text-amber-400 shadow-sm' : 'text-slate-400 hover:text-slate-200'}`}
+            className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${activeTab === 'dashboard' ? 'bg-background text-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground'}`}
           >
             <LayoutDashboard className="w-4 h-4 inline-block mr-2" /> Visão Geral
           </button>
           <button 
             onClick={() => setActiveTab('users')}
-            className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${activeTab === 'users' ? 'bg-amber-500/20 text-amber-400 shadow-sm' : 'text-slate-400 hover:text-slate-200'}`}
+            className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${activeTab === 'users' ? 'bg-background text-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground'}`}
           >
             <Users className="w-4 h-4 inline-block mr-2" /> Acessos
           </button>
           <button 
             onClick={() => setActiveTab('system')}
-            className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${activeTab === 'system' ? 'bg-amber-500/20 text-amber-400 shadow-sm' : 'text-slate-400 hover:text-slate-200'}`}
+            className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${activeTab === 'system' ? 'bg-background text-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground'}`}
           >
             <Settings className="w-4 h-4 inline-block mr-2" /> Sistema
           </button>
@@ -166,10 +166,10 @@ export default function AdminArea() {
       {/* Aba Dashboard */}
       {activeTab === 'dashboard' && (
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          <Card className="bg-slate-900/40 border-slate-800 backdrop-blur-sm hover:border-amber-500/30 transition-colors">
+          <Card className="hover:border-primary/50 transition-colors">
             <CardHeader className="pb-2">
-              <CardTitle className="text-lg font-medium text-slate-300 flex items-center gap-2">
-                <RefreshCw className="w-5 h-5 text-blue-400" />
+              <CardTitle className="text-lg font-medium flex items-center gap-2">
+                <RefreshCw className="w-5 h-5 text-blue-500" />
                 Status CENSIPAM
               </CardTitle>
             </CardHeader>
@@ -180,13 +180,13 @@ export default function AdminArea() {
                 ) : settings?.last_sync_status === 'error' ? (
                   <AlertTriangle className="w-10 h-10 text-red-500" />
                 ) : (
-                  <Clock className="w-10 h-10 text-slate-500" />
+                  <Clock className="w-10 h-10 text-muted-foreground" />
                 )}
                 <div>
-                  <p className="text-2xl font-bold text-slate-100 uppercase">
+                  <p className="text-2xl font-bold uppercase">
                     {settings?.last_sync_status || 'DESCONHECIDO'}
                   </p>
-                  <p className="text-xs text-slate-400">
+                  <p className="text-xs text-muted-foreground">
                     Última att: {settings?.last_sync_time ? new Date(settings.last_sync_time).toLocaleString() : 'N/A'}
                   </p>
                 </div>
@@ -202,21 +202,21 @@ export default function AdminArea() {
             </CardContent>
           </Card>
 
-          <Card className="bg-slate-900/40 border-slate-800 backdrop-blur-sm hover:border-amber-500/30 transition-colors">
+          <Card className="hover:border-primary/50 transition-colors">
             <CardHeader className="pb-2">
-              <CardTitle className="text-lg font-medium text-slate-300 flex items-center gap-2">
+              <CardTitle className="text-lg font-medium flex items-center gap-2">
                 <ShieldAlert className="w-5 h-5 text-amber-500" />
                 Modo Manutenção
               </CardTitle>
             </CardHeader>
             <CardContent>
               <div className="flex flex-col gap-4">
-                <p className="text-sm text-slate-400">
+                <p className="text-sm text-muted-foreground">
                   Bloqueia o acesso público ao mapa. Apenas administradores poderão visualizar o sistema.
                 </p>
-                <div className="flex items-center justify-between bg-slate-950 p-3 rounded-lg border border-slate-800">
-                  <span className="font-medium text-slate-300">Status Atual:</span>
-                  <span className={`px-3 py-1 rounded-full text-xs font-bold ${settings?.maintenance_mode ? 'bg-red-500/20 text-red-400' : 'bg-emerald-500/20 text-emerald-400'}`}>
+                <div className="flex items-center justify-between bg-muted p-3 rounded-lg border border-border">
+                  <span className="font-medium text-foreground">Status Atual:</span>
+                  <span className={`px-3 py-1 rounded-full text-xs font-bold ${settings?.maintenance_mode ? 'bg-red-500/20 text-red-600 dark:text-red-400' : 'bg-emerald-500/20 text-emerald-600 dark:text-emerald-400'}`}>
                     {settings?.maintenance_mode ? 'ATIVADO' : 'DESATIVADO'}
                   </span>
                 </div>
@@ -231,21 +231,21 @@ export default function AdminArea() {
             </CardContent>
           </Card>
 
-          <Card className="bg-slate-900/40 border-slate-800 backdrop-blur-sm hover:border-amber-500/30 transition-colors lg:col-span-1 md:col-span-2">
+          <Card className="hover:border-primary/50 transition-colors lg:col-span-1 md:col-span-2">
             <CardHeader className="pb-2">
-              <CardTitle className="text-lg font-medium text-slate-300 flex items-center gap-2">
-                <Users className="w-5 h-5 text-purple-400" />
+              <CardTitle className="text-lg font-medium flex items-center gap-2">
+                <Users className="w-5 h-5 text-purple-500" />
                 Resumo de Acessos
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="flex items-center justify-between p-4 bg-slate-950 rounded-xl border border-slate-800 mb-2">
-                <span className="text-slate-400">Total de Usuários</span>
-                <span className="text-2xl font-bold text-slate-100">{profiles.length}</span>
+              <div className="flex items-center justify-between p-4 bg-muted rounded-xl border border-border mb-2">
+                <span className="text-muted-foreground">Total de Usuários</span>
+                <span className="text-2xl font-bold text-foreground">{profiles.length}</span>
               </div>
-              <div className="flex items-center justify-between p-4 bg-slate-950 rounded-xl border border-slate-800">
-                <span className="text-slate-400">Administradores</span>
-                <span className="text-2xl font-bold text-amber-400">
+              <div className="flex items-center justify-between p-4 bg-muted rounded-xl border border-border">
+                <span className="text-muted-foreground">Administradores</span>
+                <span className="text-2xl font-bold text-amber-500">
                   {profiles.filter(p => p.role === 'admin').length}
                 </span>
               </div>
@@ -258,29 +258,29 @@ export default function AdminArea() {
       {activeTab === 'users' && (
         <div className="grid gap-6 lg:grid-cols-3">
           <div className="lg:col-span-2">
-            <Card className="bg-slate-900/40 border-slate-800 backdrop-blur-sm">
+            <Card>
               <CardHeader>
-                <CardTitle className="text-slate-100">Usuários Registrados</CardTitle>
-                <CardDescription className="text-slate-400">Gerencie os níveis de acesso da equipe.</CardDescription>
+                <CardTitle>Usuários Registrados</CardTitle>
+                <CardDescription>Gerencie os níveis de acesso da equipe.</CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="overflow-x-auto">
-                  <table className="w-full text-sm text-left text-slate-300">
-                    <thead className="text-xs text-slate-400 uppercase bg-slate-950/50 border-b border-slate-800">
+                  <table className="w-full text-sm text-left text-muted-foreground">
+                    <thead className="text-xs uppercase bg-muted/50 border-b border-border">
                       <tr>
-                        <th className="px-4 py-3">E-mail</th>
-                        <th className="px-4 py-3">Data de Criação</th>
-                        <th className="px-4 py-3 text-right">Nível de Acesso</th>
+                        <th className="px-4 py-3 text-foreground">E-mail</th>
+                        <th className="px-4 py-3 text-foreground">Data de Criação</th>
+                        <th className="px-4 py-3 text-right text-foreground">Nível de Acesso</th>
                       </tr>
                     </thead>
                     <tbody>
                       {profiles.map(profile => (
-                        <tr key={profile.id} className="border-b border-slate-800/50 hover:bg-slate-800/30 transition-colors">
-                          <td className="px-4 py-4 font-medium text-slate-200">{profile.email}</td>
+                        <tr key={profile.id} className="border-b border-border/50 hover:bg-muted/30 transition-colors">
+                          <td className="px-4 py-4 font-medium text-foreground">{profile.email}</td>
                           <td className="px-4 py-4">{new Date(profile.created_at).toLocaleDateString()}</td>
                           <td className="px-4 py-4 text-right">
                             <select 
-                              className="bg-slate-950 border border-slate-700 text-slate-200 text-sm rounded-lg focus:ring-amber-500 focus:border-amber-500 p-2 outline-none"
+                              className="bg-background border border-input text-foreground text-sm rounded-lg focus:ring-primary focus:border-primary p-2 outline-none"
                               value={profile.role}
                               onChange={(e) => handleUpdateUserRole(profile.id, e.target.value)}
                             >
@@ -299,35 +299,35 @@ export default function AdminArea() {
           </div>
           
           <div>
-            <Card className="bg-slate-900/40 border-slate-800 backdrop-blur-sm sticky top-24">
+            <Card className="sticky top-24">
               <CardHeader>
-                <CardTitle className="text-slate-100 flex items-center gap-2">
+                <CardTitle className="flex items-center gap-2">
                   <Send className="w-5 h-5 text-amber-500" />
                   Convidar Equipe
                 </CardTitle>
-                <CardDescription className="text-slate-400">
+                <CardDescription>
                   Envie um Magic Link por e-mail para um novo membro.
                 </CardDescription>
               </CardHeader>
               <CardContent>
                 <form onSubmit={handleInviteUser} className="space-y-4">
                   <div className="space-y-2">
-                    <Label htmlFor="inviteEmail" className="text-slate-300">E-mail Institucional</Label>
+                    <Label htmlFor="inviteEmail">E-mail Institucional</Label>
                     <Input 
                       id="inviteEmail" 
                       type="email" 
                       placeholder="exemplo@goias.gov.br" 
-                      className="bg-slate-950 border-slate-700 text-slate-100 focus-visible:ring-amber-500"
+                      className="bg-background"
                       value={inviteEmail}
                       onChange={(e) => setInviteEmail(e.target.value)}
                       required
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="inviteRole" className="text-slate-300">Nível de Acesso Inicial</Label>
+                    <Label htmlFor="inviteRole">Nível de Acesso Inicial</Label>
                     <select 
                       id="inviteRole"
-                      className="w-full bg-slate-950 border border-slate-700 text-slate-200 text-sm rounded-lg focus:ring-amber-500 focus:border-amber-500 p-2.5 outline-none"
+                      className="w-full bg-background border border-input text-foreground text-sm rounded-lg focus:ring-primary focus:border-primary p-2.5 outline-none"
                       value={inviteRole}
                       onChange={(e) => setInviteRole(e.target.value)}
                     >
@@ -353,21 +353,21 @@ export default function AdminArea() {
       {/* Aba Sistema */}
       {activeTab === 'system' && (
         <div className="max-w-2xl">
-          <Card className="bg-slate-900/40 border-slate-800 backdrop-blur-sm">
+          <Card>
             <CardHeader>
-              <CardTitle className="text-slate-100 flex items-center gap-2">
-                <Clock className="w-5 h-5 text-indigo-400" />
+              <CardTitle className="flex items-center gap-2">
+                <Clock className="w-5 h-5 text-indigo-500" />
                 Agendador CENSIPAM (CRON)
               </CardTitle>
-              <CardDescription className="text-slate-400">
+              <CardDescription>
                 Configure a automação de busca de dados do satélite. As alterações aqui refletem instantaneamente no servidor via Supabase Realtime.
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
-              <div className="flex items-center justify-between bg-slate-950 p-4 rounded-xl border border-slate-800">
+              <div className="flex items-center justify-between bg-muted p-4 rounded-xl border border-border">
                 <div>
-                  <h4 className="text-sm font-medium text-slate-200">Status do Agendador Automático</h4>
-                  <p className="text-xs text-slate-500">Se desativado, os dados só atualizarão manualmente.</p>
+                  <h4 className="text-sm font-medium text-foreground">Status do Agendador Automático</h4>
+                  <p className="text-xs text-muted-foreground">Se desativado, os dados só atualizarão manualmente.</p>
                 </div>
                 <Button 
                   onClick={() => handleUpdateSetting('cron_enabled', !settings?.cron_enabled)}
@@ -379,14 +379,14 @@ export default function AdminArea() {
                 </Button>
               </div>
 
-              <div className="space-y-3 p-4 bg-slate-950 rounded-xl border border-slate-800">
-                <Label htmlFor="cronExpression" className="text-slate-300">Expressão CRON Atual</Label>
+              <div className="space-y-3 p-4 bg-muted rounded-xl border border-border">
+                <Label htmlFor="cronExpression">Expressão CRON Atual</Label>
                 <div className="flex gap-2">
                   <Input 
                     id="cronExpression" 
                     value={settings?.cron_expression || ''} 
                     onChange={(e) => setSettings(prev => ({...prev, cron_expression: e.target.value}))}
-                    className="bg-slate-900 font-mono text-sm border-slate-700 text-amber-400 focus-visible:ring-amber-500"
+                    className="bg-background font-mono text-sm border-input text-foreground focus-visible:ring-primary"
                   />
                   <Button 
                     onClick={() => handleUpdateSetting('cron_expression', settings.cron_expression)}
@@ -396,8 +396,8 @@ export default function AdminArea() {
                     Salvar Novo Padrão
                   </Button>
                 </div>
-                <p className="text-xs text-slate-500 mt-2">
-                  Exemplo atual: <code className="bg-slate-800 px-1 rounded text-slate-300">30 4,10,13,16,19,22 * * *</code> (Aos 30 minutos das horas especificadas)
+                <p className="text-xs text-muted-foreground mt-2">
+                  Exemplo atual: <code className="bg-background border border-border px-1.5 py-0.5 rounded text-foreground">30 4,10,13,16,19,22 * * *</code> (Aos 30 minutos das horas especificadas)
                 </p>
               </div>
             </CardContent>
